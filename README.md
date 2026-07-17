@@ -1,161 +1,258 @@
-# FLUIDEKA ACADEMY - Premium EdTech Website
+# SmartChatix - Plataforma EdTech Completa
 
-Una plataforma web premium diseñada para **FLUIDEKA ACADEMY**, la academia online líder en Latinoamérica especializada en ingeniería, CFD y simulación industrial.
+Plataforma web completa de academia online con **aula virtual integrada**, **sistema de pagos** y **gestión de cursos** para SmartChatix (Fluideka Academy).
 
 ## 🚀 Características Principales
 
-### ✨ Diseño y UX Premium
-- **Diseño responsivo** optimizado para todos los dispositivos
-- **Interfaz moderna** con glassmorphism y gradientes
-- **Animaciones fluidas** con Framer Motion
-- **Navegación intuitiva** con menús dropdowns inteligentes
-- **Hero section** impactante con call-to-actions optimizados
+### 🛒 Sistema de Comercio Electrónico
+- **Carrito de compras** integrado con Culqi
+- **Pasarela de pagos** con tarjetas de crédito/débito (Visa, Mastercard, Amex, Diners)
+- **Checkout optimizado** en un solo paso
+- **Confirmación automática** de pagos
+- **Métodos de pago múltiples**: Tarjeta, PayPal, Yape
 
-### 📚 Gestión de Contenido Educativo
-- **Catálogo de 15 cursos** especializados en ingeniería
-- **4 rutas de aprendizaje** estructuradas por nivel
-- **Programa destacado** FLUIDEKA PUMP ENGINEER PROGRAM
-- **Sistema de filtros** por categoría, nivel y búsqueda
-- **Información detallada** de cada curso con curriculum
+### 🎓 Aula Virtual Completa
+- **Dashboard de estudiante** con progreso de cursos
+- **Reproductor de video** integrado
+- **Sistema de módulos y lecciones** con tracking de progreso
+- **Quizzes interactivos** con calificación automática
+- **Entrega de tareas** con sistema de archivos
+- **Certificados digitales** generados automáticamente al completar cursos
+- **Verificación de certificados** con código único
 
-### 🎯 Optimización de Conversión (CRO)
-- **Lead magnet**: Guía gratuita "10 Errores Comunes al Seleccionar una Bomba Centrífuga"
-- **Masterclass gratuita** con registro optimizado
-- **Múltiples CTAs** estratégicamente ubicados
-- **Formularios de captura** con validación avanzada
-- **Prueba social** con testimonios y estadísticas
+### 👨‍🏫 Panel de Instructor
+- **Gestión de cursos** (crear, editar, eliminar)
+- **Subida de contenido multimedia** (videos, documentos, imágenes)
+- **Editor de lecciones** con Markdown y TipTap
+- **Creación de quizzes** con múltiples tipos de preguntas
+- **Calificaciones** de tareas y quizzes
+- **Asistente IA** para estructurar cursos automáticamente
+- **Reordenamiento drag-and-drop** de módulos y lecciones
+- **Configuración de pesos** para evaluaciones
 
-### 🏢 Servicios Empresariales
-- **Capacitación empresarial** para equipos técnicos
-- **Mentorías personalizadas** con expertos de la industria
-- **Formularios especializados** para consultas corporativas
-- **Casos de éxito** de empresas como Antamina, Bechtel, Repsol
+### 🔐 Sistema de Autenticación
+- **Registro de usuarios** con activación por email
+- **Login/Logout** con JWT
+- **Roles**: Admin, Instructor, Estudiante
+- **Protección de rutas** según rol
+- **Recuperación de contraseña**
 
-### 🔧 Stack Tecnológico
-- **Next.js 16** con App Router
+### 💳 Integración de Pagos - Culqi
+- **Tokenización segura** de tarjetas
+- **Culqi.js v4** para formularios custom
+- **Endpoint de cargo** en backend
+- **Matrícula automática** después del pago exitoso
+- **Entorno de pruebas** configurado
+
+### 📊 Panel de Administrador
+- **Dashboard con estadísticas** de cursos y usuarios
+- **Gestión de usuarios** (crear, editar, eliminar)
+- **Gestión de cursos** global
+- **Vista de matrículas** por curso
+- **Reportes y analíticas**
+
+## 🔧 Stack Tecnológico
+
+### Frontend
+- **Next.js 15** con App Router
 - **React 19** con TypeScript
-- **Tailwind CSS 4** para estilos
+- **Tailwind CSS** para estilos
 - **Framer Motion** para animaciones
-- **React Hook Form** + Zod para formularios
-- **Lucide React** para iconografía
+- **TipTap** editor WYSIWYG
+- **React Hook Form** + Zod para validación
+
+### Backend
+- **Next.js API Routes**
+- **MySQL** base de datos relacional
+- **JWT** para autenticación
+- **bcrypt** para encriptación de contraseñas
+- **Nodemailer** para emails
+
+### Pagos
+- **Culqi.js v4** SDK oficial
+- **culqi-node** SDK para backend
+- Tarjetas de prueba disponibles
+
+### Deployment
+- **EasyPanel** (hosting)
+- **GitHub** (repositorio)
+- **Nixpacks** (build)
 
 ## 📁 Estructura del Proyecto
 
 ```
 src/
-├── app/                    # App Router de Next.js
-│   ├── globals.css         # Estilos globales
-│   ├── layout.tsx          # Layout principal con SEO
-│   └── page.tsx           # Homepage principal
+├── app/
+│   ├── api/                      # API Routes
+│   │   ├── auth/                 # Autenticación
+│   │   ├── payment/              # Pagos con Culqi
+│   │   ├── instructor/           # Endpoints de instructor
+│   │   ├── student/              # Endpoints de estudiante
+│   │   └── admin/                # Endpoints de admin
+│   ├── aula-virtual/            # Aula virtual del estudiante
+│   ├── instructor/              # Panel del instructor
+│   ├── admin/                   # Panel de administración
+│   ├── comprar-grabado/         # Checkout de curso grabado
+│   ├── inscripcion-vivo/        # Checkout de curso en vivo
+│   ├── login/                   # Página de login
+│   └── register/                # Página de registro
 ├── components/
-│   ├── ui/                # Componentes base reutilizables
-│   │   └── Button.tsx     # Botón con variantes
-│   ├── layout/            # Componentes de layout
-│   │   ├── Header.tsx     # Navegación principal
-│   │   └── Footer.tsx     # Footer con enlaces y social
-│   ├── forms/             # Formularios especializados
-│   │   └── LeadCaptureForm.tsx
-│   └── sections/          # Secciones de la homepage
-│       ├── Hero.tsx
-│       ├── FeaturedProgram.tsx
-│       ├── LearningPaths.tsx
-│       ├── CourseCatalog.tsx
-│       ├── LeadMagnetSection.tsx
-│       ├── MasterclassSection.tsx
-│       ├── SocialProof.tsx
-│       ├── CorporateTraining.tsx
-│       └── MentoringSection.tsx
+│   ├── CulqiPaymentForm.tsx     # Formulario de pago con Culqi
+│   ├── StudentSidebar.tsx       # Sidebar del aula virtual
+│   ├── CourseInstructorHeader.tsx
+│   ├── MarkdownEditor.tsx       # Editor de lecciones
+│   └── ...
 ├── lib/
-│   ├── data.ts           # Base de datos de cursos y programas
-│   └── utils.ts          # Utilidades y helpers
-└── types/
-    └── index.ts          # Definiciones de TypeScript
+│   ├── db.ts                    # Conexión a MySQL
+│   ├── auth.ts                  # Helpers de autenticación
+│   ├── culqi.ts                 # Cliente de Culqi
+│   └── utils.ts
+└── data/
+    └── courses.ts               # Catálogo de cursos
 ```
 
 ## 🚀 Getting Started
 
 ### Prerrequisitos
 - Node.js 20+
-- npm o yarn
+- MySQL 8+
+- Cuenta de Culqi (para pagos)
+
+### Variables de Entorno
+
+Crea un archivo `.env.local`:
+
+```bash
+# Base de datos
+DATABASE_URL="mysql://usuario:password@host:3306/base_datos"
+
+# Autenticación
+JWT_SECRET="tu_secret_key_aqui"
+NEXTAUTH_URL="http://localhost:3000"
+NEXTAUTH_SECRET="tu_nextauth_secret"
+
+# Email (opcional)
+EMAIL_USER="tu_email@gmail.com"
+EMAIL_PASS="tu_password"
+
+# OpenAI (opcional - para asistente IA)
+OPENAI_API_KEY="sk-proj-..."
+
+# Culqi
+NEXT_PUBLIC_CULQI_PUBLIC_KEY="pk_test_..."
+CULQI_SECRET_KEY="sk_test_..."
+```
 
 ### Instalación
+
 ```bash
-# Clonar el repositorio
-git clone [url-del-repo]
-cd web_fluideka_reloaded
+# Clonar repositorio
+git clone https://github.com/elisa-rivadeneira/smartchatix-reloaded.git
+cd smartchatix-reloaded
 
 # Instalar dependencias
-npm install --legacy-peer-deps
+npm install
+
+# Crear base de datos
+mysql -u root -p < db/schema.sql
 
 # Ejecutar en desarrollo
 npm run dev
-
-# Construir para producción
-npm run build
-npm start
 ```
 
 ### Scripts Disponibles
+
 ```bash
-npm run dev          # Servidor de desarrollo
+npm run dev          # Servidor de desarrollo en puerto 3000
 npm run build        # Build de producción
 npm run start        # Servidor de producción
-npm run lint         # Linting con ESLint
-npm run type-check   # Verificación de tipos
+npm run lint         # Linting
 ```
 
-## 📊 Embudo de Conversión
+## 💳 Testing de Pagos (Culqi)
 
-### 1. **Atracción** (Tráfico)
-- **Hero section** con propuesta de valor clara
-- **SEO optimizado** para keywords de ingeniería
-- **Social media** integrado (LinkedIn, YouTube, Instagram)
+### Tarjetas de Prueba
 
-### 2. **Interés** (Lead Magnet)
-- **Guía gratuita** de 25 páginas
-- **Masterclass** con casos reales
-- **Contenido educativo** de alta calidad
+**Visa exitosa:**
+- Número: `4111 1111 1111 1111`
+- CVV: `123`
+- Fecha: `12/25`
 
-### 3. **Consideración** (Nurturing)
-- **Email sequences** automáticos
-- **Retargeting** con pixel de Facebook/Google
-- **Testimonios** y prueba social
+**Mastercard exitosa:**
+- Número: `5111 1111 1111 1118`
+- CVV: `123`
+- Fecha: `12/25`
 
-### 4. **Decisión** (Conversión)
-- **Ofertas limitadas** con urgencia
-- **Garantías** y policies claras
-- **Múltiples métodos** de pago
+Ver más en `CULQI_TESTING.md`
 
-### 5. **Retención** (Loyalty)
-- **Comunidad privada** de estudiantes
-- **Contenido exclusivo** continuo
-- **Programa de referidos**
+## 📝 Flujo de Usuario
 
-## 🎯 Estrategia de Marketing
+### Estudiante
+1. Navega catálogo de cursos
+2. Selecciona curso (grabado o en vivo)
+3. Completa checkout con datos personales
+4. Paga con tarjeta vía Culqi
+5. Recibe acceso automático al aula virtual
+6. Estudia módulos y lecciones
+7. Completa quizzes y tareas
+8. Obtiene certificado digital
 
-### Canales de Adquisición
-1. **Content Marketing**: Blog con SEO técnico
-2. **Social Media**: LinkedIn (B2B), YouTube (educativo)
-3. **Paid Advertising**: Google Ads, LinkedIn Ads
-4. **Email Marketing**: Secuencias automatizadas
-5. **Partnerships**: Universidades, asociaciones
+### Instructor
+1. Accede al panel de instructor
+2. Crea nuevo curso
+3. Estructura módulos y lecciones
+4. Sube contenido multimedia
+5. Crea quizzes y tareas
+6. Califica entregas de estudiantes
+7. Monitorea progreso
 
-### Segmentación de Audiencia
-- **Estudiantes**: Universitarios de ingeniería
-- **Profesionales**: Ingenieros junior/senior
-- **Corporativo**: Gerentes de RRHH, jefes técnicos
-- **Freelancers**: Consultores independientes
+### Administrador
+1. Dashboard con métricas
+2. Gestiona usuarios y roles
+3. Revisa matrículas
+4. Analiza reportes
 
-## 📈 Métricas de Conversión
+## 🔒 Seguridad
 
-### KPIs Principales
-- **Conversion Rate**: Lead Magnet (objetivo: 15-25%)
-- **Email Open Rate**: Secuencias (objetivo: 25-35%)
-- **Course Enrollment**: Cursos pagos (objetivo: 3-8%)
-- **Corporate Inquiries**: Empresas (objetivo: 5-10/mes)
+- Variables de entorno protegidas (`.env*` en `.gitignore`)
+- JWT con expiración configurada
+- Contraseñas hasheadas con bcrypt
+- Validación de inputs con Zod
+- Protección CSRF en formularios
+- Headers de seguridad configurados
+
+## 📚 Documentación Adicional
+
+- `CLAUDE.md` - Guía para desarrollo con Claude Code
+- `CULQI_TESTING.md` - Testing de integración de Culqi
+- `AULAVIRTUAL.md` - Documentación del aula virtual
+- `DESARROLLO.md` - Guía de desarrollo
+
+## 🚀 Deployment
+
+### EasyPanel
+1. Conectar repositorio de GitHub
+2. Configurar variables de entorno
+3. Nixpacks detecta automáticamente Next.js
+4. Deploy automático en cada push
+
+### Variables de Entorno en Producción
+Configurar todas las variables listadas arriba en el panel de EasyPanel.
+
+## 📊 Roadmap
+
+- [x] Sistema de autenticación
+- [x] Aula virtual completa
+- [x] Panel de instructor
+- [x] Integración de pagos con Culqi
+- [x] Generación de certificados
+- [ ] Notificaciones por email
+- [ ] Chat en vivo
+- [ ] App móvil con React Native
+- [ ] Integración con Zoom para clases en vivo
 
 ---
 
-**Desarrollado con ❤️ para impulsar la educación en ingeniería en Latinoamérica**
+**Desarrollado con ❤️ para transformar la educación online**
 
-© 2025 FLUIDEKA ACADEMY. Todos los derechos reservados.
+© 2025 SmartChatix. Todos los derechos reservados.
