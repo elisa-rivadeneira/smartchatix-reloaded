@@ -29,6 +29,10 @@ interface StudentStats {
   total_lessons: number;
   max_possible_points: number;
   average_percentage: number;
+  quiz_max_points: number;
+  assignment_max_points: number;
+  quiz_score: number;
+  assignment_score: number;
 }
 
 interface AssignmentSubmission {
