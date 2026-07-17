@@ -786,7 +786,7 @@ export default function CalificacionesPage() {
                 <tbody>
                   {data.assignmentSubmissions && data.assignmentSubmissions.map(assignment => {
                     const isGraded = assignment.grade !== null;
-                    const gradeColor = isGraded
+                    const gradeColor = isGraded && assignment.grade !== null
                       ? ((assignment.grade / assignment.total_points) * 100 >= 70 ? '#10b981' : ((assignment.grade / assignment.total_points) * 100 >= 50 ? '#f59e0b' : '#ef4444'))
                       : '#6b7280';
 
