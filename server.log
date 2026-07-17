@@ -1,0 +1,109 @@
+
+> fluideka-academy@1.0.0 dev
+> TURBOPACK=0 next dev
+
+⚠ Port 3000 is in use by an unknown process, using available port 3001 instead.
+▲ Next.js 16.2.9 (Turbopack)
+- Local:         http://localhost:3001
+- Network:       http://192.168.18.49:3001
+- Environments: .env.local
+✓ Ready in 644ms
+
+⚠ Found a change in next.config.js. Restarting the server to apply the changes...
+▲ Next.js 16.2.9 (Turbopack)
+- Local:         http://localhost:3001
+- Network:       http://192.168.18.49:3001
+- Environments: .env.local
+✓ Ready in 652ms
+- Experiments (use with caution):
+  · cpus: 1
+
+Killed
+Persisting failed: Unable to open static sorted file referenced from 00000024.meta
+
+Caused by:
+    0: Unable to open static sorted file 00000023.sst
+    1: Failed to open SST file /home/oem/Projects/web_smartchatix/.next/dev/cache/turbopack/f37fad94/00000023.sst
+    2: No such file or directory (os error 2)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Persisting failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+
+thread 'tokio-runtime-worker' (60749) panicked at turbopack/crates/turbo-persistence/src/static_sorted_file.rs:600:24:
+range start index 13866873 out of range for slice of length 13866205
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+thread 'tokio-runtime-worker' (60749) panicked at turbopack/crates/turbo-persistence/src/static_sorted_file.rs:600:24:
+range start index 13866873 out of range for slice of length 13866205
+Persisting failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Persisting failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Persisting failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Persisting failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+
+thread 'tokio-runtime-worker' (60748) panicked at turbopack/crates/turbo-tasks-backend/src/backend/operation/mod.rs:197:17:
+Failed to restore task data (corrupted database or bug): Data for TaskId 133)
+
+Caused by:
+    0: Looking up task storage for TaskId 133 from database failed
+    1: Unable to open static sorted file referenced from 00000007.meta
+    2: Unable to open static sorted file 00000002.sst
+    3: Failed to open SST file /home/oem/Projects/web_smartchatix/.next/dev/cache/turbopack/f37fad94/00000002.sst
+    4: No such file or directory (os error 2)
+
+thread 'tokio-runtime-worker' (60748) panicked at turbopack/crates/turbo-tasks-backend/src/backend/operation/mod.rs:197:17:
+Failed to restore task data (corrupted database or bug): Data for TaskId 133)
+
+Caused by:
+    0: Looking up task storage for TaskId 133 from database failed
+    1: Unable to open static sorted file referenced from 00000007.meta
+    2: Unable to open static sorted file 00000002.sst
+    3: Failed to open SST file /home/oem/Projects/web_smartchatix/.next/dev/cache/turbopack/f37fad94/00000002.sst
+    4: No such file or directory (os error 2)
+Persisting failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Persisting failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+
+thread 'tokio-runtime-worker' (60751) panicked at turbopack/crates/turbo-tasks-backend/src/backend/operation/mod.rs:197:17:
+Failed to restore task data (corrupted database or bug): Data for TaskId 154)
+
+Caused by:
+    0: Looking up task storage for TaskId 154 from database failed
+    1: Unable to open static sorted file referenced from 00000007.meta
+    2: Unable to open static sorted file 00000002.sst
+    3: Failed to open SST file /home/oem/Projects/web_smartchatix/.next/dev/cache/turbopack/f37fad94/00000002.sst
+    4: No such file or directory (os error 2)
+
+thread 'tokio-runtime-worker' (60751) panicked at turbopack/crates/turbo-tasks-backend/src/backend/operation/mod.rs:197:17:
+Failed to restore task data (corrupted database or bug): Data for TaskId 154)
+
+Caused by:
+    0: Looking up task storage for TaskId 154 from database failed
+    1: Unable to open static sorted file referenced from 00000007.meta
+    2: Unable to open static sorted file 00000002.sst
+    3: Failed to open SST file /home/oem/Projects/web_smartchatix/.next/dev/cache/turbopack/f37fad94/00000002.sst
+    4: No such file or directory (os error 2)
+Persisting failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Persisting failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Persisting failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Persisting failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Persisting failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Persisting failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Compaction failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
