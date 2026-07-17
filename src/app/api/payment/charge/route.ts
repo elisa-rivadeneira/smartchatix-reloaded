@@ -81,12 +81,12 @@ export async function POST(request: NextRequest) {
           if (userResult && userResult.length > 0) {
             userId = userResult[0].id;
           } else {
-            const insertResult = await query(
+            const insertResult: any = await query(
               `INSERT INTO users (name, email, password, role, created_at)
                VALUES (?, ?, '', 'student', NOW())`,
               [metadata.student_name || 'Estudiante', metadata.student_email]
             );
-            userId = insertResult.insertId;
+            userId = (insertResult as any).insertId;
           }
 
           const existingEnrollment = await query(
