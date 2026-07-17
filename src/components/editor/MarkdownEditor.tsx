@@ -60,7 +60,7 @@ const ResizableImage = Image.extend({
     };
   },
 
-  renderMarkdown(state: any, node: any) {
+  renderMarkdown(state: any, node: any): string {
     const { src, alt, width, height } = node.attrs;
 
     if (width || height) {
@@ -71,6 +71,7 @@ const ResizableImage = Image.extend({
     } else {
       state.write(`![${alt || ''}](${src})\n\n`);
     }
+    return '';
   },
 
   parseMarkdown() {

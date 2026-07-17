@@ -100,6 +100,8 @@ interface Course {
   price_vivo: number;
   price_grabado: number;
   is_active: boolean;
+  is_certification_enabled?: boolean;
+  passing_score?: number;
   modules: Module[];
 }
 
@@ -144,7 +146,7 @@ function QuizManagementModal({ lesson, onClose }: { lesson: Lesson; onClose: () 
       setQuizData(data.questions);
     } catch (error: any) {
       console.error('Error completo:', error);
-      showModal('error', error.message || 'Error al generar preguntas');
+      alert(error.message || 'Error al generar preguntas');
     } finally {
       setGeneratingQuiz(false);
     }
@@ -691,7 +693,7 @@ function QuizManagementModal({ lesson, onClose }: { lesson: Lesson; onClose: () 
                     setRegenerateModal(null);
                     setRegenerateObservations('');
                   } catch (error) {
-                    showModal('error', 'Error al regenerar pregunta');
+                    alert('Error al regenerar pregunta');
                   } finally {
                     setGeneratingQuiz(false);
                   }
@@ -3328,7 +3330,7 @@ function LessonModal({ lesson, course, moduleId, onClose, onSave, onDelete, savi
     if (!file) return;
 
     if (!file.name.endsWith('.pdf')) {
-      showModal('warning', 'Solo se permiten archivos PDF');
+      alert('Solo se permiten archivos PDF');
       return;
     }
 
@@ -3348,7 +3350,7 @@ function LessonModal({ lesson, course, moduleId, onClose, onSave, onDelete, savi
       setDocumentUrl(data.url);
     } catch (error) {
       console.error('Error uploading file:', error);
-      showModal('error', 'Error al subir el archivo');
+      alert('Error al subir el archivo');
     } finally {
       setUploading(false);
     }
@@ -3359,7 +3361,7 @@ function LessonModal({ lesson, course, moduleId, onClose, onSave, onDelete, savi
     if (!file) return;
 
     if (!file.type.startsWith('image/')) {
-      showModal('warning', 'Solo se permiten archivos de imagen');
+      alert('Solo se permiten archivos de imagen');
       return;
     }
 
@@ -3382,7 +3384,7 @@ function LessonModal({ lesson, course, moduleId, onClose, onSave, onDelete, savi
       setMarkdownImage(data.url);
     } catch (error) {
       console.error('Error uploading image:', error);
-      showModal('error', `Error al subir la imagen: ${error instanceof Error ? error.message : 'Error desconocido'}`);
+      alert(`Error al subir la imagen: ${error instanceof Error ? error.message : 'Error desconocido'}`);
     } finally {
       setUploadingImage(false);
     }
@@ -3393,7 +3395,7 @@ function LessonModal({ lesson, course, moduleId, onClose, onSave, onDelete, savi
     if (!file) return;
 
     if (!file.type.startsWith('video/')) {
-      showModal('warning', 'Solo se permiten archivos de video');
+      alert('Solo se permiten archivos de video');
       return;
     }
 
@@ -3417,7 +3419,7 @@ function LessonModal({ lesson, course, moduleId, onClose, onSave, onDelete, savi
       setVideoUrl('');
     } catch (error) {
       console.error('Error uploading video:', error);
-      showModal('error', `Error al subir el video: ${error instanceof Error ? error.message : 'Error desconocido'}`);
+      alert(`Error al subir el video: ${error instanceof Error ? error.message : 'Error desconocido'}`);
     } finally {
       setUploadingVideo(false);
     }
@@ -3660,7 +3662,7 @@ Genera el contenido completo.`;
 
                       if (navigator.clipboard && navigator.clipboard.writeText) {
                         navigator.clipboard.writeText(prompt).then(() => {
-                          showModal('success', '✓ Prompt copiado. Pégalo en ChatGPT y copia el resultado aquí.');
+                          alert('✓ Prompt copiado. Pégalo en ChatGPT y copia el resultado aquí.');
                         }).catch(() => {
                           const textarea = document.createElement('textarea');
                           textarea.value = prompt;
@@ -3670,7 +3672,7 @@ Genera el contenido completo.`;
                           textarea.select();
                           document.execCommand('copy');
                           document.body.removeChild(textarea);
-                          showModal('success', '✓ Prompt copiado. Pégalo en ChatGPT y copia el resultado aquí.');
+                          alert('✓ Prompt copiado. Pégalo en ChatGPT y copia el resultado aquí.');
                         });
                       } else {
                         const textarea = document.createElement('textarea');
@@ -3681,7 +3683,7 @@ Genera el contenido completo.`;
                         textarea.select();
                         document.execCommand('copy');
                         document.body.removeChild(textarea);
-                        showModal('success', '✓ Prompt copiado. Pégalo en ChatGPT y copia el resultado aquí.');
+                        alert('✓ Prompt copiado. Pégalo en ChatGPT y copia el resultado aquí.');
                       }
                     }}
                     style={{

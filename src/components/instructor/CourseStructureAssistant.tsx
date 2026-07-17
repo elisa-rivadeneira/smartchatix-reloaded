@@ -8,6 +8,8 @@ interface Message {
 }
 
 interface ParsedStructure {
+  title?: string;
+  description?: string;
   course_description?: string;
   modules: Array<{
     title: string;

@@ -975,7 +975,7 @@ export default function CalificacionesPage() {
                 textAlign: 'center'
               }}>
                 <div style={{ fontSize: '2rem', fontWeight: '700', color: '#667eea' }}>
-                  {(selectedStudent.average_percentage || 0).toFixed(1)}%
+                  {((selectedStudent.average_percentage as number) || 0).toFixed(1)}%
                 </div>
                 <div style={{ fontSize: '0.875rem', color: '#6b7280' }}>Promedio</div>
               </div>
