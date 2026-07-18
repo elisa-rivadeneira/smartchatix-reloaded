@@ -78,7 +78,7 @@ interface Lesson {
   content_type: 'video' | 'document' | 'quiz' | 'assignment' | 'markdown';
   video_url: string;
   video_file: string;
-  video_markdown: string;
+  main_content: string;
   document_url: string;
   markdown_content: string;
   markdown_image: string;
@@ -120,7 +120,7 @@ function QuizManagementModal({ lesson, onClose }: { lesson: Lesson; onClose: () 
   const [errorModal, setErrorModal] = useState<string>('');
 
   const handleGenerateQuiz = async () => {
-    const content = lesson.video_markdown || lesson.markdown_content;
+    const content = lesson.main_content || lesson.markdown_content;
     if (!content) {
       setErrorModal('Esta lección no tiene contenido Markdown para generar preguntas');
       return;
@@ -669,7 +669,7 @@ function QuizManagementModal({ lesson, onClose }: { lesson: Lesson; onClose: () 
                   setGeneratingQuiz(true);
                   try {
                     const existingQuestions = quizData.filter((_: any, i: number) => i !== regenerateModal.questionIndex);
-                    const content = lesson.video_markdown || lesson.markdown_content;
+                    const content = lesson.main_content || lesson.markdown_content;
 
                     const response = await fetch('/api/instructor/generate-quiz', {
                       method: 'POST',
@@ -918,7 +918,7 @@ function SortableLesson({ lesson, lessonIdx, onQuiz, onPreview, onEdit }: any) {
     isDragging,
   } = useSortable({ id: `lesson-${lesson.id}` });
 
-  const hasContent = lesson.video_url || lesson.video_file || lesson.document_url || lesson.markdown_content || lesson.video_markdown;
+  const hasContent = lesson.video_url || lesson.video_file || lesson.document_url || lesson.markdown_content || lesson.main_content;
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -1405,6 +1405,55 @@ function CourseConfigForm({ course, onUpdate }: { course: Course | null; onUpdat
       >
         {saving ? 'Guardando...' : 'Guardar cambios'}
       </button>
+
+      {/* Modal de mensajes */}
+      {modal.show && (
+        <div
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: 'rgba(0, 0, 0, 0.5)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 10000
+          }}
+          onClick={closeModal}
+        >
+          <div
+            style={{
+              background: 'white',
+              padding: '24px',
+              borderRadius: '12px',
+              maxWidth: '400px',
+              boxShadow: '0 20px 60px rgba(0,0,0,0.3)'
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <p style={{ fontSize: '16px', color: '#1a202c', marginBottom: '16px' }}>
+              {modal.message}
+            </p>
+            <button
+              onClick={closeModal}
+              style={{
+                padding: '8px 16px',
+                background: '#667eea',
+                color: 'white',
+                border: 'none',
+                borderRadius: '6px',
+                cursor: 'pointer',
+                fontSize: '14px',
+                fontWeight: '600'
+              }}
+            >
+              Cerrar
+            </button>
+          </div>
+        </div>
+      )}
     </form>
   );
 }
@@ -2665,7 +2714,7 @@ export default function InstructorCourseEditPage() {
               )}
 
               {/* Video Markdown */}
-              {previewModal.lesson.video_markdown && (
+              {previewModal.lesson.main_content && (
                 <div style={{
                   marginBottom: '24px',
                   padding: '20px',
@@ -2719,7 +2768,7 @@ export default function InstructorCourseEditPage() {
                   `}} />
                   <div
                     className="preview-html-content"
-                    dangerouslySetInnerHTML={{ __html: previewModal.lesson.video_markdown }}
+                    dangerouslySetInnerHTML={{ __html: previewModal.lesson.main_content }}
                     style={{
                       fontSize: '15px',
                       lineHeight: '1.7',
@@ -3307,7 +3356,7 @@ function LessonModal({ lesson, course, moduleId, onClose, onSave, onDelete, savi
   const [contentType, setContentType] = useState(lesson?.content_type || 'video');
   const [videoUrl, setVideoUrl] = useState(lesson?.video_url || '');
   const [videoFile, setVideoFile] = useState(lesson?.video_file || '');
-  const [videoMarkdown, setVideoMarkdown] = useState(lesson?.video_markdown || '');
+  const [mainContent, setMainContent] = useState(lesson?.main_content || '');
   const [documentUrl, setDocumentUrl] = useState(lesson?.document_url || '');
   const [markdownContent, setMarkdownContent] = useState(lesson?.markdown_content || '');
   const [markdownImage, setMarkdownImage] = useState(lesson?.markdown_image || '');
@@ -3324,6 +3373,77 @@ function LessonModal({ lesson, course, moduleId, onClose, onSave, onDelete, savi
   const [regenerateModal, setRegenerateModal] = useState<{ open: boolean; questionIndex: number; currentQuestion: any } | null>(null);
   const [regenerateObservations, setRegenerateObservations] = useState('');
   const [aiHelpModal, setAiHelpModal] = useState(false);
+  const [generatingContent, setGeneratingContent] = useState(false);
+  const [confirmReplaceModal, setConfirmReplaceModal] = useState(false);
+  const [modal, setModal] = useState<{
+    show: boolean;
+    type: 'success' | 'error' | 'warning' | 'info';
+    message: string;
+  }>({ show: false, type: 'info', message: '' });
+
+  const showModal = (type: 'success' | 'error' | 'warning' | 'info', message: string) => {
+    setModal({ show: true, type, message });
+  };
+
+  const closeModal = () => {
+    setModal({ show: false, type: 'info', message: '' });
+  };
+
+  const handleGenerateContent = async () => {
+    let moduleName = 'Módulo';
+    let previousLessons: string[] = [];
+
+    if (course && course.modules && moduleId) {
+      const foundModule = course.modules.find((m: any) => m.id === moduleId);
+      if (foundModule) {
+        moduleName = foundModule.title;
+
+        if (foundModule.lessons && Array.isArray(foundModule.lessons)) {
+          const currentLessonIndex = lesson
+            ? foundModule.lessons.findIndex((l: any) => l.id === lesson.id)
+            : foundModule.lessons.length;
+
+          if (currentLessonIndex > 0) {
+            previousLessons = foundModule.lessons
+              .slice(0, currentLessonIndex)
+              .map((l: any) => l.title);
+          }
+        }
+      }
+    }
+
+    const courseTitle = course?.title || 'Curso';
+
+    setGeneratingContent(true);
+    setConfirmReplaceModal(false);
+
+    try {
+      const response = await fetch('/api/instructor/generate-lesson-content', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          courseTitle,
+          moduleName,
+          lessonTitle: title,
+          lessonDescription: description,
+          previousLessons
+        })
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Error al generar contenido');
+      }
+
+      setMainContent(data.content);
+      showModal('success', `✅ Contenido generado exitosamente (${data.tokensUsed} tokens)`);
+    } catch (error: any) {
+      showModal('error', `❌ Error: ${error.message}`);
+    } finally {
+      setGeneratingContent(false);
+    }
+  };
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -3623,12 +3743,13 @@ function LessonModal({ lesson, course, moduleId, onClose, onSave, onDelete, savi
             <div style={{ marginBottom: '12px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
                 <label style={{ fontSize: '13px', fontWeight: '600', color: '#374151' }}>
-                  Contenido adicional (Markdown)
+                  Contenido Principal (HTML)
                 </label>
                 {title && (
-                  <button
-                    type="button"
-                    onClick={() => {
+                  <div style={{ display: 'flex', gap: '8px' }}>
+                    <button
+                      type="button"
+                      onClick={() => {
                       let moduleName = 'Módulo';
                       if (course && course.modules && moduleId) {
                         const foundModule = course.modules.find((m: any) => m.id === moduleId);
@@ -3698,14 +3819,42 @@ Genera el contenido completo.`;
                       whiteSpace: 'nowrap'
                     }}
                   >
-                    📋 Generar con ChatGPT
-                  </button>
+                      📋 Copiar prompt
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (mainContent && mainContent.trim().length > 0) {
+                          setConfirmReplaceModal(true);
+                        } else {
+                          handleGenerateContent();
+                        }
+                      }}
+                      disabled={generatingContent}
+                      style={{
+                        padding: '6px 12px',
+                        background: generatingContent ? '#9ca3af' : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '6px',
+                        fontSize: '12px',
+                        fontWeight: '600',
+                        cursor: generatingContent ? 'not-allowed' : 'pointer',
+                        whiteSpace: 'nowrap',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '6px'
+                      }}
+                    >
+                      {generatingContent ? '⏳ Generando...' : '🤖 Generar con IA'}
+                    </button>
+                  </div>
                 )}
               </div>
               <MarkdownEditor
-                value={videoMarkdown}
-                onChange={setVideoMarkdown}
-                placeholder="Agrega notas, recursos o información adicional en Markdown..."
+                value={mainContent}
+                onChange={setMainContent}
+                placeholder="Agrega el contenido principal de la lección (HTML)..."
               />
             </div>
           </>
@@ -3995,7 +4144,7 @@ Genera el contenido completo.`;
           </label>
         </div>
 
-        {(contentType === 'video' || contentType === 'markdown' || contentType === 'assignment') && (videoMarkdown || markdownContent) && (
+        {(contentType === 'video' || contentType === 'markdown' || contentType === 'assignment') && (mainContent || markdownContent) && (
           <>
             <div style={{
               marginBottom: '12px',
@@ -4085,7 +4234,7 @@ Genera el contenido completo.`;
                 content_type: contentType,
                 video_url: videoUrl,
                 video_file: videoFile,
-                video_markdown: videoMarkdown,
+                main_content: mainContent,
                 document_url: documentUrl,
                 markdown_content: markdownContent,
                 markdown_image: markdownImage,
@@ -4340,6 +4489,134 @@ Genera el contenido completo.`;
           </div>
         </div>
       )}
+
+    {/* Modal de confirmación para reemplazar contenido */}
+    {confirmReplaceModal && (
+      <div
+        style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'rgba(0, 0, 0, 0.5)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 10001
+        }}
+        onClick={() => setConfirmReplaceModal(false)}
+      >
+        <div
+          style={{
+            background: 'white',
+            padding: '32px',
+            borderRadius: '12px',
+            maxWidth: '500px',
+            boxShadow: '0 20px 60px rgba(0,0,0,0.3)'
+          }}
+          onClick={(e) => e.stopPropagation()}
+        >
+          <div style={{ marginBottom: '24px', textAlign: 'center' }}>
+            <div style={{ fontSize: '48px', marginBottom: '16px' }}>⚠️</div>
+            <h3 style={{ fontSize: '20px', fontWeight: '700', color: '#1a202c', marginBottom: '12px' }}>
+              ¿Reemplazar contenido existente?
+            </h3>
+            <p style={{ fontSize: '14px', color: '#6b7280', lineHeight: '1.6' }}>
+              Ya existe contenido en este campo. Si continúas, el contenido actual será <strong>reemplazado</strong> por el nuevo contenido generado por IA.
+            </p>
+            <p style={{ fontSize: '13px', color: '#ef4444', marginTop: '12px', fontWeight: '500' }}>
+              Esta acción no se puede deshacer.
+            </p>
+          </div>
+          <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
+            <button
+              onClick={() => setConfirmReplaceModal(false)}
+              style={{
+                padding: '10px 20px',
+                background: '#f3f4f6',
+                color: '#374151',
+                border: 'none',
+                borderRadius: '8px',
+                cursor: 'pointer',
+                fontSize: '14px',
+                fontWeight: '600'
+              }}
+            >
+              Cancelar
+            </button>
+            <button
+              onClick={handleGenerateContent}
+              style={{
+                padding: '10px 20px',
+                background: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)',
+                color: 'white',
+                border: 'none',
+                borderRadius: '8px',
+                cursor: 'pointer',
+                fontSize: '14px',
+                fontWeight: '600'
+              }}
+            >
+              Sí, reemplazar contenido
+            </button>
+          </div>
+        </div>
+      </div>
+    )}
+
+    {/* Overlay de carga mientras se genera contenido */}
+    {generatingContent && (
+      <div
+        style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'rgba(0, 0, 0, 0.75)',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 10002
+        }}
+      >
+        <div
+          style={{
+            width: '60px',
+            height: '60px',
+            border: '4px solid rgba(255, 255, 255, 0.3)',
+            borderTop: '4px solid #667eea',
+            borderRadius: '50%',
+            animation: 'spin 1s linear infinite'
+          }}
+        />
+        <p style={{
+          color: 'white',
+          fontSize: '18px',
+          fontWeight: '600',
+          marginTop: '24px',
+          textAlign: 'center'
+        }}>
+          🤖 Generando contenido con IA...
+        </p>
+        <p style={{
+          color: 'rgba(255, 255, 255, 0.7)',
+          fontSize: '14px',
+          marginTop: '8px',
+          textAlign: 'center'
+        }}>
+          Esto puede tomar hasta 30 segundos
+        </p>
+        <style>{`
+          @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+          }
+        `}</style>
+      </div>
+    )}
     </>
   );
 }

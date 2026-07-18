@@ -19,7 +19,7 @@ export async function PATCH(
 
     const { id: lessonId } = await params;
     const body = await request.json();
-    const { title, description, content_type, video_url, video_file, video_markdown, document_url, markdown_content, markdown_image, markdown_video, duration, is_free, has_quiz, quiz_questions_count, quiz_data, module_id } = body;
+    const { title, description, content_type, video_url, video_file, main_content, document_url, markdown_content, markdown_image, markdown_video, duration, is_free, has_quiz, quiz_questions_count, quiz_data, module_id } = body;
 
     const lessonCheck = await query(`
       SELECT l.id FROM lessons l
@@ -55,9 +55,9 @@ export async function PATCH(
       updateFields.push('video_file = ?');
       updateValues.push(video_file || '');
     }
-    if (video_markdown !== undefined) {
-      updateFields.push('video_markdown = ?');
-      updateValues.push(video_markdown || '');
+    if (main_content !== undefined) {
+      updateFields.push('main_content = ?');
+      updateValues.push(main_content || '');
     }
     if (document_url !== undefined) {
       updateFields.push('document_url = ?');

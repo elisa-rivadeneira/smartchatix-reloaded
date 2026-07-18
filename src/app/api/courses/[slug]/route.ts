@@ -17,7 +17,7 @@ interface Lesson {
   content_type: 'video' | 'document' | 'quiz' | 'assignment' | 'markdown' | 'tarea';
   video_url: string | null;
   video_file: string | null;
-  video_markdown: string | null;
+  main_content: string | null;
   document_url: string | null;
   markdown_content: string | null;
   markdown_image: string | null;
@@ -105,7 +105,7 @@ export async function GET(
         const lessons = await query<Lesson>(`
           SELECT
             l.id, l.module_id, l.title, l.description, l.content_type,
-            l.video_url, l.video_file, l.video_markdown, l.document_url,
+            l.video_url, l.video_file, l.main_content, l.document_url,
             l.markdown_content, l.markdown_image, l.markdown_video,
             l.duration, l.order_index, l.is_free, l.has_quiz,
             l.quiz_questions_count, l.quiz_data,

@@ -52,7 +52,7 @@ interface Lesson {
   content_type: 'video' | 'document' | 'quiz' | 'assignment' | 'markdown';
   video_url: string | null;
   video_file: string | null;
-  video_markdown: string | null;
+  main_content: string | null;
   document_url: string | null;
   markdown_content: string | null;
   markdown_image: string | null;
@@ -1106,7 +1106,7 @@ export default function CoursePage({ params }: { params: Promise<{ slug: string 
                       )}
                     </>
                   )}
-                  {selectedLesson.video_markdown && (
+                  {selectedLesson.main_content && (
                     <div style={{
                       background: 'white',
                       borderRadius: '12px',
@@ -1223,7 +1223,7 @@ export default function CoursePage({ params }: { params: Promise<{ slug: string 
                       `}} />
                       <div
                         className="html-content"
-                        dangerouslySetInnerHTML={{ __html: selectedLesson.video_markdown }}
+                        dangerouslySetInnerHTML={{ __html: selectedLesson.main_content }}
                         style={{
                           fontSize: '15px',
                           lineHeight: '1.7',
