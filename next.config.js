@@ -26,6 +26,10 @@ const nextConfig = {
         protocol: 'https',
         hostname: 'via.placeholder.com',
       },
+      {
+        protocol: 'https',
+        hostname: 'pub-39582e519f204b8799b03d63e07c0b67.r2.dev',
+      },
     ],
     formats: ['image/webp', 'image/avif'],
   },
