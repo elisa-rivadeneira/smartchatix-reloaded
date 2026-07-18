@@ -719,7 +719,7 @@ export default function SmartChatixPrincipalPage() {
                 transition: 'opacity 0.8s ease-in-out'
               }}
             >
-              <source src="https://res.cloudinary.com/b0yzpair/video/upload/v1784331909/people_animated_h2ofy0.mp4" type="video/mp4" />
+              <source src="https://pub-39582e519f204b8799b03d63e07c0b67.r2.dev/videos/people_animated.mp4" type="video/mp4" />
             </video>
             <video
               ref={video2Ref}
@@ -739,7 +739,7 @@ export default function SmartChatixPrincipalPage() {
                 transition: 'opacity 0.8s ease-in-out'
               }}
             >
-              <source src="https://res.cloudinary.com/b0yzpair/video/upload/v1784331909/people_animated_h2ofy0.mp4" type="video/mp4" />
+              <source src="https://pub-39582e519f204b8799b03d63e07c0b67.r2.dev/videos/people_animated.mp4" type="video/mp4" />
             </video>
             <div style={{
               position: 'absolute',
