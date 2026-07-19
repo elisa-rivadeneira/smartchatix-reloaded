@@ -141,3 +141,25 @@ Debe retornar: `HTTP/1.1 200 OK`
 - Build: `npm run build`
 - Typecheck: Verificar en package.json si existe
 
+## ⚠️ CRÍTICO: Antes de hacer Git Push
+
+**SIEMPRE ejecutar ANTES de commit:**
+
+```bash
+npm run build
+```
+
+Este comando:
+- Compila TypeScript con validación completa (strict mode)
+- Detecta errores que development mode ignora
+- Valida que el código funcione en producción
+- Previene errores en el deploy
+
+**Si el build falla:**
+1. Leer el error de TypeScript
+2. Corregir el código
+3. Volver a ejecutar `npm run build`
+4. Solo cuando pase exitosamente ✓, hacer commit y push
+
+**NUNCA hacer push sin verificar el build de producción.**
+
