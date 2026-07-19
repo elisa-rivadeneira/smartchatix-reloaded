@@ -109,8 +109,51 @@ export default function CulqiPaymentForm({
     return () => clearInterval(checkCulqi);
   }, [amount, courseSlug, courseTitle, modality, email, fullName, phone, onSuccess, onError]);
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     console.log('Form submitted, payment starting...');
+
+    const isDemoMode = process.env.NEXT_PUBLIC_PAYMENT_DEMO_MODE === 'true';
+
+    if (isDemoMode) {
+      console.log('🎭 DEMO MODE: Simulating payment...');
+      setProcessing(true);
+
+      try {
+        const demoResponse = await fetch('/api/payment/charge', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            token: 'demo_token_' + Date.now(),
+            amount: amount,
+            email: email,
+            description: `${courseTitle} - ${modality}`,
+            metadata: {
+              course_slug: courseSlug,
+              course_title: courseTitle,
+              modality: modality,
+              student_name: fullName,
+              student_email: email,
+              student_phone: phone,
+              demo_mode: true
+            }
+          })
+        });
+
+        const demoData = await demoResponse.json();
+
+        if (!demoResponse.ok) {
+          throw new Error(demoData.error || 'Error en pago demo');
+        }
+
+        setProcessing(false);
+        onSuccess();
+        return true;
+      } catch (error: any) {
+        setProcessing(false);
+        onError(error.message || 'Error en pago demo');
+        return false;
+      }
+    }
 
     if (!culqiLoaded || !window.Culqi) {
       console.error('Culqi not loaded');

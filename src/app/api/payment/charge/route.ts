@@ -20,45 +20,66 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const chargeData = {
-      amount: Math.round(amount * 100),
-      currency_code: 'PEN',
-      email,
-      source_id: token,
-      description: description || 'Compra de curso',
-      metadata: metadata || {}
-    };
+    const isDemoMode = metadata?.demo_mode === true;
+    let charge: any;
 
-    const culqiResponse = await fetch('https://api.culqi.com/v2/charges', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${process.env.CULQI_SECRET_KEY}`
-      },
-      body: JSON.stringify(chargeData)
-    });
+    if (isDemoMode) {
+      console.log('🎭 DEMO MODE: Simulating successful payment');
 
-    const charge = await culqiResponse.json();
+      await new Promise(resolve => setTimeout(resolve, 1500));
 
-    if (!culqiResponse.ok) {
-      console.error('Culqi charge error:', charge);
-      return NextResponse.json(
-        {
-          error: 'Error al procesar el pago',
-          details: charge.user_message || charge.merchant_message || 'Error desconocido'
+      charge = {
+        id: 'demo_charge_' + Date.now(),
+        amount: Math.round(amount * 100),
+        currency_code: 'PEN',
+        email: email,
+        outcome: {
+          type: 'venta_exitosa',
+          user_message: 'Pago simulado exitosamente (MODO DEMO)'
         },
-        { status: 400 }
-      );
-    }
+        metadata: metadata
+      };
+    } else {
+      const chargeData = {
+        amount: Math.round(amount * 100),
+        currency_code: 'PEN',
+        email,
+        source_id: token,
+        description: description || 'Compra de curso',
+        metadata: metadata || {}
+      };
 
-    if (charge.outcome.type !== 'venta_exitosa') {
-      return NextResponse.json(
-        {
-          error: 'El pago no fue exitoso',
-          details: charge.outcome.user_message
+      const culqiResponse = await fetch('https://api.culqi.com/v2/charges', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${process.env.CULQI_SECRET_KEY}`
         },
-        { status: 400 }
-      );
+        body: JSON.stringify(chargeData)
+      });
+
+      charge = await culqiResponse.json();
+
+      if (!culqiResponse.ok) {
+        console.error('Culqi charge error:', charge);
+        return NextResponse.json(
+          {
+            error: 'Error al procesar el pago',
+            details: charge.user_message || charge.merchant_message || 'Error desconocido'
+          },
+          { status: 400 }
+        );
+      }
+
+      if (charge.outcome.type !== 'venta_exitosa') {
+        return NextResponse.json(
+          {
+            error: 'El pago no fue exitoso',
+            details: charge.outcome.user_message
+          },
+          { status: 400 }
+        );
+      }
     }
 
     if (metadata?.course_slug && metadata?.student_email) {
