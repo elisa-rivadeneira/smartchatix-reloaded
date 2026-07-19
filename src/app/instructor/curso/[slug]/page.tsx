@@ -1137,6 +1137,7 @@ function CourseConfigForm({ course, onUpdate }: { course: Course | null; onUpdat
     live_start_date: (course as any)?.live_start_date || '',
     live_schedule: (course as any)?.live_schedule || '',
     recorded_features: (course as any)?.recorded_features || {
+      duration_hours: 0,
       duration: '',
       modules: '',
       recordings: 'Acceso a grabaciones',
@@ -1160,6 +1161,7 @@ function CourseConfigForm({ course, onUpdate }: { course: Course | null; onUpdat
         live_start_date: (course as any).live_start_date || '',
         live_schedule: (course as any).live_schedule || '',
         recorded_features: (course as any).recorded_features || {
+          duration_hours: 0,
           duration: '',
           modules: '',
           recordings: 'Acceso a grabaciones',
@@ -1200,12 +1202,21 @@ function CourseConfigForm({ course, onUpdate }: { course: Course | null; onUpdat
     e.preventDefault();
     if (!course) return;
 
+    const modulesCount = course?.modules?.length || 0;
+    const dataToSend = {
+      ...formData,
+      recorded_features: {
+        ...formData.recorded_features,
+        modules: `${modulesCount} módulos especializados`
+      }
+    };
+
     setSaving(true);
     try {
       const response = await fetch(`/api/instructor/course/${course.slug}/config`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData)
+        body: JSON.stringify(dataToSend)
       });
 
       if (response.ok) {
@@ -1522,25 +1533,39 @@ function CourseConfigForm({ course, onUpdate }: { course: Course | null; onUpdat
           color: '#374151',
           marginBottom: '8px'
         }}>
-          ✓ Duración del contenido (ej: "4h de contenido")
+          ✓ Horas de contenido
         </label>
-        <input
-          type="text"
-          value={formData.recorded_features.duration}
-          onChange={(e) => setFormData(prev => ({
-            ...prev,
-            recorded_features: { ...prev.recorded_features, duration: e.target.value }
-          }))}
-          placeholder="4h de contenido"
-          style={{
-            width: '100%',
-            padding: '10px 12px',
-            border: '1px solid #d1d5db',
-            borderRadius: '6px',
-            fontSize: '14px',
-            boxSizing: 'border-box'
-          }}
-        />
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <input
+            type="number"
+            min="0"
+            step="0.5"
+            value={formData.recorded_features.duration_hours || ''}
+            onChange={(e) => {
+              const hours = parseFloat(e.target.value) || 0;
+              setFormData(prev => ({
+                ...prev,
+                recorded_features: {
+                  ...prev.recorded_features,
+                  duration_hours: hours,
+                  duration: hours > 0 ? `${hours}h de contenido` : ''
+                }
+              }));
+            }}
+            placeholder="4"
+            style={{
+              width: '100px',
+              padding: '10px 12px',
+              border: '1px solid #d1d5db',
+              borderRadius: '6px',
+              fontSize: '14px',
+              boxSizing: 'border-box'
+            }}
+          />
+          <span style={{ fontSize: '14px', color: '#6b7280' }}>
+            horas → {formData.recorded_features.duration || 'Ejemplo: "4h de contenido"'}
+          </span>
+        </div>
       </div>
 
       <div style={{ marginBottom: '16px' }}>
@@ -1551,25 +1576,21 @@ function CourseConfigForm({ course, onUpdate }: { course: Course | null; onUpdat
           color: '#374151',
           marginBottom: '8px'
         }}>
-          ✓ Módulos (ej: "5 módulos especializados")
+          ✓ Módulos
         </label>
-        <input
-          type="text"
-          value={formData.recorded_features.modules}
-          onChange={(e) => setFormData(prev => ({
-            ...prev,
-            recorded_features: { ...prev.recorded_features, modules: e.target.value }
-          }))}
-          placeholder="5 módulos especializados"
-          style={{
-            width: '100%',
-            padding: '10px 12px',
-            border: '1px solid #d1d5db',
-            borderRadius: '6px',
-            fontSize: '14px',
-            boxSizing: 'border-box'
-          }}
-        />
+        <div style={{
+          padding: '10px 12px',
+          background: '#f3f4f6',
+          border: '1px solid #d1d5db',
+          borderRadius: '6px',
+          fontSize: '14px',
+          color: '#374151'
+        }}>
+          {course?.modules?.length || 0} módulos especializados
+          <span style={{ fontSize: '12px', color: '#6b7280', marginLeft: '8px' }}>
+            (calculado automáticamente)
+          </span>
+        </div>
       </div>
 
       <div style={{ marginBottom: '16px' }}>
