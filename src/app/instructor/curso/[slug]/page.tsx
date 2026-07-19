@@ -1405,55 +1405,6 @@ function CourseConfigForm({ course, onUpdate }: { course: Course | null; onUpdat
       >
         {saving ? 'Guardando...' : 'Guardar cambios'}
       </button>
-
-      {/* Modal de mensajes */}
-      {modal.show && (
-        <div
-          style={{
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            background: 'rgba(0, 0, 0, 0.5)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            zIndex: 10000
-          }}
-          onClick={closeModal}
-        >
-          <div
-            style={{
-              background: 'white',
-              padding: '24px',
-              borderRadius: '12px',
-              maxWidth: '400px',
-              boxShadow: '0 20px 60px rgba(0,0,0,0.3)'
-            }}
-            onClick={(e) => e.stopPropagation()}
-          >
-            <p style={{ fontSize: '16px', color: '#1a202c', marginBottom: '16px' }}>
-              {modal.message}
-            </p>
-            <button
-              onClick={closeModal}
-              style={{
-                padding: '8px 16px',
-                background: '#667eea',
-                color: 'white',
-                border: 'none',
-                borderRadius: '6px',
-                cursor: 'pointer',
-                fontSize: '14px',
-                fontWeight: '600'
-              }}
-            >
-              Cerrar
-            </button>
-          </div>
-        </div>
-      )}
     </form>
   );
 }
