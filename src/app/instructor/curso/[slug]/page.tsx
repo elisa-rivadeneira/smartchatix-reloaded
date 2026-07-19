@@ -1132,7 +1132,17 @@ function CourseConfigForm({ course, onUpdate }: { course: Course | null; onUpdat
     thumbnail: course?.thumbnail || '',
     price_vivo: course?.price_vivo || 0,
     price_grabado: course?.price_grabado || 0,
-    is_active: course?.is_active || false
+    is_active: course?.is_active || false,
+    has_live_mode: (course as any)?.has_live_mode || false,
+    live_start_date: (course as any)?.live_start_date || '',
+    live_schedule: (course as any)?.live_schedule || '',
+    recorded_features: (course as any)?.recorded_features || {
+      duration: '',
+      modules: '',
+      recordings: 'Acceso a grabaciones',
+      certificate: 'Certificado digital',
+      support: 'Soporte del instructor'
+    }
   });
   const [saving, setSaving] = useState(false);
   const [uploadingImage, setUploadingImage] = useState(false);
@@ -1145,7 +1155,17 @@ function CourseConfigForm({ course, onUpdate }: { course: Course | null; onUpdat
         thumbnail: course.thumbnail || '',
         price_vivo: course.price_vivo,
         price_grabado: course.price_grabado,
-        is_active: course.is_active
+        is_active: course.is_active,
+        has_live_mode: (course as any).has_live_mode || false,
+        live_start_date: (course as any).live_start_date || '',
+        live_schedule: (course as any).live_schedule || '',
+        recorded_features: (course as any).recorded_features || {
+          duration: '',
+          modules: '',
+          recordings: 'Acceso a grabaciones',
+          certificate: 'Certificado digital',
+          support: 'Soporte del instructor'
+        }
       });
     }
   }, [course]);
@@ -1387,6 +1407,256 @@ function CourseConfigForm({ course, onUpdate }: { course: Course | null; onUpdat
           />
           Curso activo (visible para estudiantes)
         </label>
+      </div>
+
+      <hr style={{ margin: '32px 0', border: 'none', borderTop: '1px solid #e5e7eb' }} />
+
+      <h3 style={{
+        fontSize: '16px',
+        fontWeight: '600',
+        color: '#374151',
+        marginBottom: '24px'
+      }}>
+        📅 Modalidad En Vivo
+      </h3>
+
+      <div style={{ marginBottom: '20px' }}>
+        <label style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '8px',
+          fontSize: '14px',
+          fontWeight: '500',
+          color: '#374151',
+          cursor: 'pointer'
+        }}>
+          <input
+            type="checkbox"
+            checked={formData.has_live_mode}
+            onChange={(e) => setFormData(prev => ({ ...prev, has_live_mode: e.target.checked }))}
+            style={{ width: '16px', height: '16px' }}
+          />
+          Habilitar modalidad en vivo
+        </label>
+        <p style={{ fontSize: '12px', color: '#6b7280', marginTop: '4px', marginLeft: '24px' }}>
+          Si activas esto, el curso aparecerá en la página de "Inscripción en Vivo"
+        </p>
+      </div>
+
+      {formData.has_live_mode && (
+        <>
+          <div style={{ marginBottom: '20px' }}>
+            <label style={{
+              display: 'block',
+              fontSize: '14px',
+              fontWeight: '500',
+              color: '#374151',
+              marginBottom: '8px'
+            }}>
+              Fecha de inicio *
+            </label>
+            <input
+              type="date"
+              value={formData.live_start_date}
+              onChange={(e) => setFormData(prev => ({ ...prev, live_start_date: e.target.value }))}
+              required={formData.has_live_mode}
+              style={{
+                width: '100%',
+                padding: '10px 12px',
+                border: '1px solid #d1d5db',
+                borderRadius: '6px',
+                fontSize: '14px',
+                boxSizing: 'border-box'
+              }}
+            />
+          </div>
+
+          <div style={{ marginBottom: '20px' }}>
+            <label style={{
+              display: 'block',
+              fontSize: '14px',
+              fontWeight: '500',
+              color: '#374151',
+              marginBottom: '8px'
+            }}>
+              Horario (ej: Lunes y Miércoles 7pm - 9pm)
+            </label>
+            <input
+              type="text"
+              value={formData.live_schedule}
+              onChange={(e) => setFormData(prev => ({ ...prev, live_schedule: e.target.value }))}
+              placeholder="Lunes y Miércoles 7pm - 9pm"
+              style={{
+                width: '100%',
+                padding: '10px 12px',
+                border: '1px solid #d1d5db',
+                borderRadius: '6px',
+                fontSize: '14px',
+                boxSizing: 'border-box'
+              }}
+            />
+          </div>
+        </>
+      )}
+
+      <hr style={{ margin: '32px 0', border: 'none', borderTop: '1px solid #e5e7eb' }} />
+
+      <h3 style={{
+        fontSize: '16px',
+        fontWeight: '600',
+        color: '#374151',
+        marginBottom: '24px'
+      }}>
+        🎥 Características del Curso Grabado
+      </h3>
+
+      <p style={{ fontSize: '13px', color: '#6b7280', marginBottom: '16px' }}>
+        Estos bullets aparecerán en la página de venta del curso grabado
+      </p>
+
+      <div style={{ marginBottom: '16px' }}>
+        <label style={{
+          display: 'block',
+          fontSize: '14px',
+          fontWeight: '500',
+          color: '#374151',
+          marginBottom: '8px'
+        }}>
+          ✓ Duración del contenido (ej: "4h de contenido")
+        </label>
+        <input
+          type="text"
+          value={formData.recorded_features.duration}
+          onChange={(e) => setFormData(prev => ({
+            ...prev,
+            recorded_features: { ...prev.recorded_features, duration: e.target.value }
+          }))}
+          placeholder="4h de contenido"
+          style={{
+            width: '100%',
+            padding: '10px 12px',
+            border: '1px solid #d1d5db',
+            borderRadius: '6px',
+            fontSize: '14px',
+            boxSizing: 'border-box'
+          }}
+        />
+      </div>
+
+      <div style={{ marginBottom: '16px' }}>
+        <label style={{
+          display: 'block',
+          fontSize: '14px',
+          fontWeight: '500',
+          color: '#374151',
+          marginBottom: '8px'
+        }}>
+          ✓ Módulos (ej: "5 módulos especializados")
+        </label>
+        <input
+          type="text"
+          value={formData.recorded_features.modules}
+          onChange={(e) => setFormData(prev => ({
+            ...prev,
+            recorded_features: { ...prev.recorded_features, modules: e.target.value }
+          }))}
+          placeholder="5 módulos especializados"
+          style={{
+            width: '100%',
+            padding: '10px 12px',
+            border: '1px solid #d1d5db',
+            borderRadius: '6px',
+            fontSize: '14px',
+            boxSizing: 'border-box'
+          }}
+        />
+      </div>
+
+      <div style={{ marginBottom: '16px' }}>
+        <label style={{
+          display: 'block',
+          fontSize: '14px',
+          fontWeight: '500',
+          color: '#374151',
+          marginBottom: '8px'
+        }}>
+          ✓ Grabaciones
+        </label>
+        <input
+          type="text"
+          value={formData.recorded_features.recordings}
+          onChange={(e) => setFormData(prev => ({
+            ...prev,
+            recorded_features: { ...prev.recorded_features, recordings: e.target.value }
+          }))}
+          placeholder="Acceso a grabaciones"
+          style={{
+            width: '100%',
+            padding: '10px 12px',
+            border: '1px solid #d1d5db',
+            borderRadius: '6px',
+            fontSize: '14px',
+            boxSizing: 'border-box'
+          }}
+        />
+      </div>
+
+      <div style={{ marginBottom: '16px' }}>
+        <label style={{
+          display: 'block',
+          fontSize: '14px',
+          fontWeight: '500',
+          color: '#374151',
+          marginBottom: '8px'
+        }}>
+          ✓ Certificado
+        </label>
+        <input
+          type="text"
+          value={formData.recorded_features.certificate}
+          onChange={(e) => setFormData(prev => ({
+            ...prev,
+            recorded_features: { ...prev.recorded_features, certificate: e.target.value }
+          }))}
+          placeholder="Certificado digital"
+          style={{
+            width: '100%',
+            padding: '10px 12px',
+            border: '1px solid #d1d5db',
+            borderRadius: '6px',
+            fontSize: '14px',
+            boxSizing: 'border-box'
+          }}
+        />
+      </div>
+
+      <div style={{ marginBottom: '24px' }}>
+        <label style={{
+          display: 'block',
+          fontSize: '14px',
+          fontWeight: '500',
+          color: '#374151',
+          marginBottom: '8px'
+        }}>
+          ✓ Soporte
+        </label>
+        <input
+          type="text"
+          value={formData.recorded_features.support}
+          onChange={(e) => setFormData(prev => ({
+            ...prev,
+            recorded_features: { ...prev.recorded_features, support: e.target.value }
+          }))}
+          placeholder="Soporte del instructor"
+          style={{
+            width: '100%',
+            padding: '10px 12px',
+            border: '1px solid #d1d5db',
+            borderRadius: '6px',
+            fontSize: '14px',
+            boxSizing: 'border-box'
+          }}
+        />
       </div>
 
       <button

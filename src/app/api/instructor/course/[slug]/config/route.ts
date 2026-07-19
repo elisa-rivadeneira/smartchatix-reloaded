@@ -66,6 +66,26 @@ export async function PUT(
       values.push(body.is_active);
     }
 
+    if (typeof body.has_live_mode === 'boolean') {
+      updates.push('has_live_mode = ?');
+      values.push(body.has_live_mode);
+    }
+
+    if (body.live_start_date !== undefined) {
+      updates.push('live_start_date = ?');
+      values.push(body.live_start_date || null);
+    }
+
+    if (body.live_schedule !== undefined) {
+      updates.push('live_schedule = ?');
+      values.push(body.live_schedule || null);
+    }
+
+    if (body.recorded_features) {
+      updates.push('recorded_features = ?');
+      values.push(JSON.stringify(body.recorded_features));
+    }
+
     if (updates.length === 0) {
       return NextResponse.json({ error: 'No hay cambios para actualizar' }, { status: 400 });
     }

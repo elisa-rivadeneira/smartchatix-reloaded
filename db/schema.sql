@@ -26,12 +26,18 @@ CREATE TABLE IF NOT EXISTS courses (
   price_vivo DECIMAL(10, 2),
   price_grabado DECIMAL(10, 2),
   duration VARCHAR(50),
+  has_live_mode BOOLEAN DEFAULT FALSE COMMENT 'Si el curso está disponible en modalidad en vivo',
+  live_start_date DATE NULL COMMENT 'Fecha de inicio del curso en vivo',
+  live_schedule VARCHAR(500) NULL COMMENT 'Horario del curso en vivo',
+  recorded_features JSON NULL COMMENT 'Características del curso grabado',
   instructor_id INT,
   is_active BOOLEAN DEFAULT TRUE,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   INDEX idx_slug (slug),
   INDEX idx_instructor (instructor_id),
+  INDEX idx_has_live_mode (has_live_mode),
+  INDEX idx_live_start_date (live_start_date),
   FOREIGN KEY (instructor_id) REFERENCES users(id) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
