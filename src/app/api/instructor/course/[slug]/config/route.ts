@@ -91,6 +91,11 @@ export async function PUT(
       values.push(JSON.stringify(body.learning_outcomes));
     }
 
+    if (body.module_titles) {
+      updates.push('module_titles = ?');
+      values.push(JSON.stringify(body.module_titles));
+    }
+
     if (updates.length === 0) {
       return NextResponse.json({ error: 'No hay cambios para actualizar' }, { status: 400 });
     }

@@ -1144,7 +1144,8 @@ function CourseConfigForm({ course, onUpdate }: { course: Course | null; onUpdat
       certificate: 'Certificado digital',
       support: 'Soporte del instructor'
     },
-    learning_outcomes: (course as any)?.learning_outcomes || ['', '', '', '', '']
+    learning_outcomes: (course as any)?.learning_outcomes || ['', '', '', '', ''],
+    module_titles: (course as any)?.module_titles || (course?.modules?.map((m: any) => m.title) || [])
   });
   const [saving, setSaving] = useState(false);
   const [uploadingImage, setUploadingImage] = useState(false);
@@ -1169,7 +1170,8 @@ function CourseConfigForm({ course, onUpdate }: { course: Course | null; onUpdat
           certificate: 'Certificado digital',
           support: 'Soporte del instructor'
         },
-        learning_outcomes: (course as any).learning_outcomes || ['', '', '', '', '']
+        learning_outcomes: (course as any).learning_outcomes || ['', '', '', '', ''],
+        module_titles: (course as any).module_titles || (course.modules?.map((m: any) => m.title) || [])
       });
     }
   }, [course]);
@@ -1578,21 +1580,38 @@ function CourseConfigForm({ course, onUpdate }: { course: Course | null; onUpdat
           color: '#374151',
           marginBottom: '8px'
         }}>
-          ✓ Módulos
+          ✓ Módulos especializados
         </label>
-        <div style={{
-          padding: '10px 12px',
-          background: '#f3f4f6',
-          border: '1px solid #d1d5db',
-          borderRadius: '6px',
-          fontSize: '14px',
-          color: '#374151'
-        }}>
-          {course?.modules?.length || 0} módulos especializados
-          <span style={{ fontSize: '12px', color: '#6b7280', marginLeft: '8px' }}>
-            (calculado automáticamente)
-          </span>
-        </div>
+        <p style={{ fontSize: '12px', color: '#6b7280', marginBottom: '12px' }}>
+          Títulos cargados automáticamente del aula virtual (editables)
+        </p>
+        {(formData.module_titles || []).map((moduleTitle: string, index: number) => (
+          <div key={index} style={{ marginBottom: '8px' }}>
+            <input
+              type="text"
+              value={moduleTitle}
+              onChange={(e) => {
+                const newTitles = [...(formData.module_titles || [])];
+                newTitles[index] = e.target.value;
+                setFormData(prev => ({ ...prev, module_titles: newTitles }));
+              }}
+              placeholder={`Módulo ${index + 1}`}
+              style={{
+                width: '100%',
+                padding: '8px 12px',
+                border: '1px solid #d1d5db',
+                borderRadius: '6px',
+                fontSize: '13px',
+                boxSizing: 'border-box'
+              }}
+            />
+          </div>
+        ))}
+        {(!formData.module_titles || formData.module_titles.length === 0) && (
+          <p style={{ fontSize: '13px', color: '#9ca3af', fontStyle: 'italic' }}>
+            No hay módulos creados aún. Crea módulos en la pestaña "Contenido".
+          </p>
+        )}
       </div>
 
       <div style={{ marginBottom: '16px' }}>
