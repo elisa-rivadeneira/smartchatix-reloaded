@@ -86,6 +86,11 @@ export async function PUT(
       values.push(JSON.stringify(body.recorded_features));
     }
 
+    if (body.learning_outcomes) {
+      updates.push('learning_outcomes = ?');
+      values.push(JSON.stringify(body.learning_outcomes));
+    }
+
     if (updates.length === 0) {
       return NextResponse.json({ error: 'No hay cambios para actualizar' }, { status: 400 });
     }

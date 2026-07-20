@@ -30,6 +30,7 @@ CREATE TABLE IF NOT EXISTS courses (
   live_start_date DATE NULL COMMENT 'Fecha de inicio del curso en vivo',
   live_schedule VARCHAR(500) NULL COMMENT 'Horario del curso en vivo',
   recorded_features JSON NULL COMMENT 'Características del curso grabado',
+  learning_outcomes JSON NULL COMMENT 'Lo que dominarás (bullets de aprendizaje)',
   instructor_id INT,
   is_active BOOLEAN DEFAULT TRUE,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

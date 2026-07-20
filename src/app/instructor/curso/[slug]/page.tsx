@@ -1143,7 +1143,8 @@ function CourseConfigForm({ course, onUpdate }: { course: Course | null; onUpdat
       recordings: 'Acceso a grabaciones',
       certificate: 'Certificado digital',
       support: 'Soporte del instructor'
-    }
+    },
+    learning_outcomes: (course as any)?.learning_outcomes || ['', '', '', '', '']
   });
   const [saving, setSaving] = useState(false);
   const [uploadingImage, setUploadingImage] = useState(false);
@@ -1167,7 +1168,8 @@ function CourseConfigForm({ course, onUpdate }: { course: Course | null; onUpdat
           recordings: 'Acceso a grabaciones',
           certificate: 'Certificado digital',
           support: 'Soporte del instructor'
-        }
+        },
+        learning_outcomes: (course as any).learning_outcomes || ['', '', '', '', '']
       });
     }
   }, [course]);
@@ -1679,6 +1681,53 @@ function CourseConfigForm({ course, onUpdate }: { course: Course | null; onUpdat
           }}
         />
       </div>
+
+      <hr style={{ margin: '32px 0', border: 'none', borderTop: '1px solid #e5e7eb' }} />
+
+      <h3 style={{
+        fontSize: '16px',
+        fontWeight: '600',
+        color: '#374151',
+        marginBottom: '24px'
+      }}>
+        ⚡ LO QUE DOMINARÁS
+      </h3>
+
+      <p style={{ fontSize: '13px', color: '#6b7280', marginBottom: '16px' }}>
+        Estos bullets aparecerán en la página del curso (/cursos/[slug])
+      </p>
+
+      {[0, 1, 2, 3, 4].map((index) => (
+        <div key={index} style={{ marginBottom: '12px' }}>
+          <label style={{
+            display: 'block',
+            fontSize: '14px',
+            fontWeight: '500',
+            color: '#374151',
+            marginBottom: '6px'
+          }}>
+            ✓ Logro {index + 1}
+          </label>
+          <input
+            type="text"
+            value={formData.learning_outcomes[index] || ''}
+            onChange={(e) => {
+              const newOutcomes = [...formData.learning_outcomes];
+              newOutcomes[index] = e.target.value;
+              setFormData(prev => ({ ...prev, learning_outcomes: newOutcomes }));
+            }}
+            placeholder={index === 0 ? "Ej: Metodología SmartPrompt Framework" : `Logro de aprendizaje ${index + 1}`}
+            style={{
+              width: '100%',
+              padding: '10px 12px',
+              border: '1px solid #d1d5db',
+              borderRadius: '6px',
+              fontSize: '14px',
+              boxSizing: 'border-box'
+            }}
+          />
+        </div>
+      ))}
 
       <button
         type="submit"
