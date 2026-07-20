@@ -1710,9 +1710,9 @@ function CourseConfigForm({ course, onUpdate }: { course: Course | null; onUpdat
           </label>
           <input
             type="text"
-            value={formData.learning_outcomes[index] || ''}
+            value={(formData.learning_outcomes && formData.learning_outcomes[index]) || ''}
             onChange={(e) => {
-              const newOutcomes = [...formData.learning_outcomes];
+              const newOutcomes = formData.learning_outcomes ? [...formData.learning_outcomes] : ['', '', '', '', ''];
               newOutcomes[index] = e.target.value;
               setFormData(prev => ({ ...prev, learning_outcomes: newOutcomes }));
             }}
