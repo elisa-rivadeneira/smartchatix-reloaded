@@ -1152,6 +1152,10 @@ function CourseConfigForm({ course, onUpdate }: { course: Course | null; onUpdat
 
   useEffect(() => {
     if (course) {
+      const moduleTitles = (course as any).module_titles || (course.modules?.map((m: any) => m.title) || []);
+      console.log('📚 Course modules:', course.modules);
+      console.log('📋 Module titles:', moduleTitles);
+
       setFormData({
         title: course.title,
         description: course.description,
@@ -1171,7 +1175,7 @@ function CourseConfigForm({ course, onUpdate }: { course: Course | null; onUpdat
           support: 'Soporte del instructor'
         },
         learning_outcomes: (course as any).learning_outcomes || ['', '', '', '', ''],
-        module_titles: (course as any).module_titles || (course.modules?.map((m: any) => m.title) || [])
+        module_titles: moduleTitles
       });
     }
   }, [course]);
@@ -1520,12 +1524,12 @@ function CourseConfigForm({ course, onUpdate }: { course: Course | null; onUpdat
         fontSize: '16px',
         fontWeight: '600',
         color: '#374151',
-        marginBottom: '24px'
+        marginBottom: '8px'
       }}>
-        🎥 Características del Curso Grabado
+        🎥 Este curso incluye:
       </h3>
 
-      <p style={{ fontSize: '13px', color: '#6b7280', marginBottom: '16px' }}>
+      <p style={{ fontSize: '13px', color: '#6b7280', marginBottom: '20px' }}>
         Estos bullets aparecerán en la página de venta del curso grabado
       </p>
 
