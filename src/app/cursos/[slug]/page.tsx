@@ -15,6 +15,7 @@ export default function CursoPage({ params }: { params: Promise<{ slug: string }
   const [scrollPosition, setScrollPosition] = React.useState(0);
   const [allCourses, setAllCourses] = React.useState<any[]>([]);
   const [loading, setLoading] = React.useState(true);
+  const [sidebarVisible, setSidebarVisible] = React.useState(false);
 
   React.useEffect(() => {
     params.then(async ({ slug }) => {
@@ -48,31 +49,48 @@ export default function CursoPage({ params }: { params: Promise<{ slug: string }
   }, []);
 
   React.useEffect(() => {
+    if (!curso) return;
+
+    setSidebarVisible(false);
+
     const handleScroll = () => {
       const carrusel = document.querySelector('.related-courses-carousel');
       const sticky = document.querySelector('.sticky-sidebar') as HTMLElement;
 
       if (!carrusel || !sticky) return;
 
-      const carruselTop = carrusel.getBoundingClientRect().top;
+      const scrollY = window.scrollY || window.pageYOffset;
+      const carruselOffsetTop = (carrusel as HTMLElement).offsetTop;
       const stickyHeight = sticky.offsetHeight;
       const windowHeight = window.innerHeight;
       const stickyTopOffset = 80;
 
-      if (carruselTop <= windowHeight) {
-        const maxTop = (carrusel as HTMLElement).offsetTop - stickyHeight - 20;
-        setStickyTop(maxTop);
+      // Calcular en qué punto el sticky debería detenerse (antes del carrusel)
+      const stopPoint = carruselOffsetTop - stickyHeight - 20;
+
+      // Si el scroll ha llegado al punto donde debe detenerse
+      if (scrollY + stickyTopOffset >= stopPoint) {
+        setStickyTop(stopPoint);
         setStickyPosition('absolute');
       } else {
+        // Mientras tanto, mantener fixed
         setStickyPosition('fixed');
         setStickyTop(stickyTopOffset);
       }
     };
 
-    window.addEventListener('scroll', handleScroll);
-    handleScroll();
+    // Esperar a que el DOM esté completamente renderizado
+    const timer = setTimeout(() => {
+      handleScroll();
+      setSidebarVisible(true);
+    }, 100);
 
-    return () => window.removeEventListener('scroll', handleScroll);
+    window.addEventListener('scroll', handleScroll);
+
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener('scroll', handleScroll);
+    };
   }, [curso]);
 
   if (loading || curso === undefined) {
@@ -325,6 +343,7 @@ export default function CursoPage({ params }: { params: Promise<{ slug: string }
       )}
 
       {/* Módulo flotante sticky - Fixed position */}
+      {sidebarVisible && (
       <aside className="sticky-sidebar" style={{
         position: stickyPosition,
         top: `${stickyTop}px`
@@ -444,6 +463,7 @@ export default function CursoPage({ params }: { params: Promise<{ slug: string }
           </div>
         </div>
       </aside>
+      )}
 
       {/* Hero Section del Curso - Full Width Background */}
       <section className="hero-section" style={{
