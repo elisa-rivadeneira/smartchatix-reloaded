@@ -35,8 +35,15 @@ export async function GET() {
           ORDER BY order_index ASC
         `, [course.id]);
 
-        const recordedFeatures = course.recorded_features || {};
-        const moduleTitles = course.module_titles || modules.map((m: any) => m.title);
+        const recordedFeatures = typeof course.recorded_features === 'string'
+          ? JSON.parse(course.recorded_features)
+          : (course.recorded_features || {});
+        const moduleTitles = typeof course.module_titles === 'string'
+          ? JSON.parse(course.module_titles)
+          : (course.module_titles || modules.map((m: any) => m.title));
+        const learningOutcomes = typeof course.learning_outcomes === 'string'
+          ? JSON.parse(course.learning_outcomes)
+          : (course.learning_outcomes || []);
 
         return {
           slug: course.slug,
@@ -54,9 +61,9 @@ export async function GET() {
           hasLiveMode: Boolean(course.has_live_mode),
           live_start_date: course.live_start_date,
           live_schedule: course.live_schedule,
-          keyTopics: course.learning_outcomes || [],
+          keyTopics: learningOutcomes,
           recorded_features: recordedFeatures,
-          learning_outcomes: course.learning_outcomes,
+          learning_outcomes: learningOutcomes,
           module_titles: moduleTitles,
           modules: moduleTitles.map((title: string, idx: number) => ({
             num: idx + 1,
