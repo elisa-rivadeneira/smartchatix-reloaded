@@ -145,6 +145,31 @@ export default function StudentSidebar({ user, isOpen, onClose }: StudentSidebar
           )}
 
           <Link
+            href="/perfil"
+            onClick={onClose}
+            style={{
+              width: '100%',
+              padding: '12px 20px',
+              background: 'transparent',
+              border: 'none',
+              borderLeft: '4px solid transparent',
+              color: '#a0aec0',
+              fontSize: '15px',
+              fontWeight: '400',
+              cursor: 'pointer',
+              textAlign: 'left',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '12px',
+              textDecoration: 'none',
+              transition: 'all 0.2s'
+            }}
+          >
+            <span style={{ fontSize: '20px' }}>👤</span>
+            <span>Mi Perfil</span>
+          </Link>
+
+          <Link
             href="/aula-virtual"
             onClick={onClose}
             style={{

@@ -56,6 +56,11 @@ export default function AdminPanel() {
   const [enrolledStudents, setEnrolledStudents] = useState<number[]>([]);
   const [loadingEnrollments, setLoadingEnrollments] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const [editingUser, setEditingUser] = useState<User | null>(null);
+  const [userCourses, setUserCourses] = useState<number[]>([]);
+  const [loadingUserCourses, setLoadingUserCourses] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   useEffect(() => {
     checkAuth();
@@ -226,6 +231,101 @@ export default function AdminPanel() {
     }
   };
 
+  const handleEditUser = async (user: User) => {
+    setEditingUser(user);
+    setLoadingUserCourses(true);
+    try {
+      const response = await fetch(`/api/admin/users/${user.id}/enrollments`);
+      if (response.ok) {
+        const data = await response.json();
+        setUserCourses(data.enrollments?.map((e: any) => e.course_id) || []);
+      }
+    } catch (error) {
+      console.error('Error loading user enrollments:', error);
+    } finally {
+      setLoadingUserCourses(false);
+    }
+  };
+
+  const handleSaveUser = async () => {
+    if (!editingUser) return;
+
+    setSaving(true);
+    try {
+      const updateResponse = await fetch(`/api/admin/users/${editingUser.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: editingUser.name,
+          email: editingUser.email
+        })
+      });
+
+      if (!updateResponse.ok) {
+        alert('Error al actualizar el usuario');
+        setSaving(false);
+        return;
+      }
+
+      const enrollResponse = await fetch(`/api/admin/users/${editingUser.id}/enrollments`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          course_ids: userCourses
+        })
+      });
+
+      if (enrollResponse.ok) {
+        await loadData();
+        setEditingUser(null);
+        setUserCourses([]);
+      } else {
+        alert('Error al actualizar cursos');
+      }
+    } catch (error) {
+      console.error('Error updating user:', error);
+      alert('Error al actualizar el usuario');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const toggleUserCourse = (courseId: number) => {
+    setUserCourses(prev => {
+      if (prev.includes(courseId)) {
+        return prev.filter(id => id !== courseId);
+      } else {
+        return [...prev, courseId];
+      }
+    });
+  };
+
+  const handleDeleteUser = async () => {
+    if (!editingUser) return;
+
+    setDeleting(true);
+    try {
+      const response = await fetch(`/api/admin/users/${editingUser.id}`, {
+        method: 'DELETE'
+      });
+
+      if (response.ok) {
+        await loadData();
+        setEditingUser(null);
+        setUserCourses([]);
+        setShowDeleteConfirm(false);
+      } else {
+        const data = await response.json();
+        alert(data.message || 'Error al eliminar el usuario');
+      }
+    } catch (error) {
+      console.error('Error deleting user:', error);
+      alert('Error al eliminar el usuario');
+    } finally {
+      setDeleting(false);
+    }
+  };
+
   if (loading) {
     return (
       <div style={{
@@ -334,6 +434,27 @@ export default function AdminPanel() {
                   {currentUser?.email}
                 </div>
               </div>
+              <Link
+                href="/perfil"
+                onClick={() => setUserMenuOpen(false)}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '12px',
+                  padding: '12px 16px',
+                  textDecoration: 'none',
+                  color: '#374151',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  transition: 'background 0.2s',
+                  borderBottom: '1px solid #f3f4f6'
+                }}
+                onMouseEnter={(e) => e.currentTarget.style.background = '#f9fafb'}
+                onMouseLeave={(e) => e.currentTarget.style.background = 'white'}
+              >
+                <span style={{ fontSize: '16px' }}>👤</span>
+                Mi Perfil
+              </Link>
               <Link
                 href="/aula-virtual"
                 onClick={() => setUserMenuOpen(false)}
@@ -615,15 +736,18 @@ export default function AdminPanel() {
                         {new Date(user.created_at).toLocaleDateString('es-ES')}
                       </td>
                       <td style={{ padding: '16px 24px' }}>
-                        <button style={{
-                          padding: '6px 12px',
-                          background: '#f3f4f6',
-                          border: '1px solid #e5e7eb',
-                          borderRadius: '6px',
-                          fontSize: '13px',
-                          cursor: 'pointer',
-                          marginRight: '8px'
-                        }}>
+                        <button
+                          onClick={() => handleEditUser(user)}
+                          style={{
+                            padding: '6px 12px',
+                            background: '#f3f4f6',
+                            border: '1px solid #e5e7eb',
+                            borderRadius: '6px',
+                            fontSize: '13px',
+                            cursor: 'pointer',
+                            marginRight: '8px'
+                          }}
+                        >
                           Editar
                         </button>
                       </td>
@@ -1195,6 +1319,310 @@ export default function AdminPanel() {
                 }}
               >
                 {saving ? 'Creando...' : 'Crear Curso'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {editingUser && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'rgba(0,0,0,0.5)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 1000
+        }}>
+          <div style={{
+            background: 'white',
+            borderRadius: '12px',
+            padding: '32px',
+            maxWidth: '600px',
+            width: '90%',
+            maxHeight: '90vh',
+            overflowY: 'auto'
+          }}>
+            <h3 style={{
+              fontSize: '20px',
+              fontWeight: '600',
+              color: '#1a202c',
+              marginBottom: '24px'
+            }}>
+              Editar Usuario
+            </h3>
+
+            <div style={{ marginBottom: '16px' }}>
+              <label style={{
+                display: 'block',
+                fontSize: '14px',
+                fontWeight: '600',
+                color: '#374151',
+                marginBottom: '8px'
+              }}>
+                Nombre
+              </label>
+              <input
+                type="text"
+                value={editingUser.name || ''}
+                onChange={(e) => setEditingUser({ ...editingUser, name: e.target.value })}
+                style={{
+                  width: '100%',
+                  padding: '12px',
+                  border: '1px solid #e5e7eb',
+                  borderRadius: '8px',
+                  fontSize: '14px',
+                  boxSizing: 'border-box'
+                }}
+                placeholder="Nombre del usuario"
+              />
+            </div>
+
+            <div style={{ marginBottom: '24px' }}>
+              <label style={{
+                display: 'block',
+                fontSize: '14px',
+                fontWeight: '600',
+                color: '#374151',
+                marginBottom: '8px'
+              }}>
+                Email
+              </label>
+              <input
+                type="email"
+                value={editingUser.email}
+                onChange={(e) => setEditingUser({ ...editingUser, email: e.target.value })}
+                style={{
+                  width: '100%',
+                  padding: '12px',
+                  border: '1px solid #e5e7eb',
+                  borderRadius: '8px',
+                  fontSize: '14px',
+                  boxSizing: 'border-box'
+                }}
+                placeholder="email@ejemplo.com"
+              />
+            </div>
+
+            <div style={{ marginBottom: '24px' }}>
+              <label style={{
+                display: 'block',
+                fontSize: '14px',
+                fontWeight: '600',
+                color: '#374151',
+                marginBottom: '8px'
+              }}>
+                Cursos Asignados
+              </label>
+              {loadingUserCourses ? (
+                <p style={{ fontSize: '14px', color: '#6b7280' }}>Cargando...</p>
+              ) : (
+                <div style={{
+                  maxHeight: '200px',
+                  overflowY: 'auto',
+                  border: '1px solid #e5e7eb',
+                  borderRadius: '8px',
+                  padding: '8px'
+                }}>
+                  {courses.length === 0 ? (
+                    <p style={{ fontSize: '14px', color: '#6b7280', margin: '8px' }}>
+                      No hay cursos disponibles
+                    </p>
+                  ) : (
+                    courses.map(course => (
+                      <label
+                        key={course.id}
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          padding: '8px',
+                          cursor: 'pointer',
+                          borderRadius: '6px',
+                          marginBottom: '4px',
+                          background: userCourses.includes(course.id) ? '#f0f9ff' : 'transparent'
+                        }}
+                      >
+                        <input
+                          type="checkbox"
+                          checked={userCourses.includes(course.id)}
+                          onChange={() => toggleUserCourse(course.id)}
+                          style={{
+                            marginRight: '8px',
+                            width: '16px',
+                            height: '16px',
+                            cursor: 'pointer'
+                          }}
+                        />
+                        <span style={{ fontSize: '14px', color: '#1a202c' }}>
+                          {course.title}
+                        </span>
+                      </label>
+                    ))
+                  )}
+                </div>
+              )}
+            </div>
+
+            <div style={{
+              display: 'flex',
+              gap: '12px',
+              justifyContent: 'space-between'
+            }}>
+              <button
+                onClick={() => setShowDeleteConfirm(true)}
+                disabled={saving || deleting}
+                style={{
+                  padding: '10px 20px',
+                  background: '#ef4444',
+                  border: 'none',
+                  borderRadius: '8px',
+                  fontSize: '14px',
+                  fontWeight: '600',
+                  cursor: (saving || deleting) ? 'not-allowed' : 'pointer',
+                  color: 'white',
+                  opacity: (saving || deleting) ? 0.7 : 1
+                }}
+              >
+                🗑️ Eliminar
+              </button>
+              <div style={{ display: 'flex', gap: '12px' }}>
+                <button
+                  onClick={() => setEditingUser(null)}
+                  disabled={saving || deleting}
+                  style={{
+                    padding: '10px 20px',
+                    background: '#f3f4f6',
+                    border: '1px solid #e5e7eb',
+                    borderRadius: '8px',
+                    fontSize: '14px',
+                    fontWeight: '600',
+                    cursor: (saving || deleting) ? 'not-allowed' : 'pointer',
+                    color: '#374151',
+                    opacity: (saving || deleting) ? 0.5 : 1
+                  }}
+                >
+                  Cancelar
+                </button>
+                <button
+                  onClick={handleSaveUser}
+                  disabled={saving || deleting}
+                  style={{
+                    padding: '10px 20px',
+                    background: (saving || deleting) ? '#9ca3af' : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                    border: 'none',
+                    borderRadius: '8px',
+                    fontSize: '14px',
+                    fontWeight: '600',
+                    cursor: (saving || deleting) ? 'not-allowed' : 'pointer',
+                    color: 'white'
+                  }}
+                >
+                  {saving ? 'Guardando...' : 'Guardar Cambios'}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showDeleteConfirm && editingUser && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'rgba(0,0,0,0.6)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 1100
+        }}>
+          <div style={{
+            background: 'white',
+            borderRadius: '12px',
+            padding: '32px',
+            maxWidth: '480px',
+            width: '90%',
+            boxShadow: '0 20px 60px rgba(0,0,0,0.3)'
+          }}>
+            <div style={{
+              width: '56px',
+              height: '56px',
+              background: '#fee2e2',
+              borderRadius: '50%',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              margin: '0 auto 20px',
+              fontSize: '28px'
+            }}>
+              ⚠️
+            </div>
+
+            <h3 style={{
+              fontSize: '20px',
+              fontWeight: '600',
+              color: '#1a202c',
+              marginBottom: '12px',
+              textAlign: 'center'
+            }}>
+              ¿Eliminar usuario?
+            </h3>
+
+            <p style={{
+              fontSize: '14px',
+              color: '#6b7280',
+              textAlign: 'center',
+              marginBottom: '24px',
+              lineHeight: '1.6'
+            }}>
+              Estás a punto de eliminar al usuario <strong>{editingUser.name || editingUser.email}</strong>.
+              <br />
+              Esta acción no se puede deshacer.
+            </p>
+
+            <div style={{
+              display: 'flex',
+              gap: '12px',
+              justifyContent: 'center'
+            }}>
+              <button
+                onClick={() => setShowDeleteConfirm(false)}
+                disabled={deleting}
+                style={{
+                  padding: '10px 24px',
+                  background: '#f3f4f6',
+                  border: '1px solid #e5e7eb',
+                  borderRadius: '8px',
+                  fontSize: '14px',
+                  fontWeight: '600',
+                  cursor: deleting ? 'not-allowed' : 'pointer',
+                  color: '#374151',
+                  opacity: deleting ? 0.5 : 1
+                }}
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={handleDeleteUser}
+                disabled={deleting}
+                style={{
+                  padding: '10px 24px',
+                  background: deleting ? '#fca5a5' : '#ef4444',
+                  border: 'none',
+                  borderRadius: '8px',
+                  fontSize: '14px',
+                  fontWeight: '600',
+                  cursor: deleting ? 'not-allowed' : 'pointer',
+                  color: 'white'
+                }}
+              >
+                {deleting ? 'Eliminando...' : 'Sí, eliminar'}
               </button>
             </div>
           </div>

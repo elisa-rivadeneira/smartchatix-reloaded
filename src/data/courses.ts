@@ -14,6 +14,7 @@ export interface Course {
   oldPriceVivo: number;
   priceGrabado: number;
   oldPriceGrabado: number;
+  hasLiveMode?: boolean;
 
   modules: {
     num: number;

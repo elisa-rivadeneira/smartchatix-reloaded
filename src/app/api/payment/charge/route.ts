@@ -1,5 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { query } from '@/lib/db';
+import bcrypt from 'bcrypt';
+import crypto from 'crypto';
+
+function generateTemporaryPassword(): string {
+  return crypto.randomBytes(8).toString('hex').slice(0, 12);
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -98,14 +104,20 @@ export async function POST(request: NextRequest) {
           );
 
           let userId;
+          let isNewUser = false;
+          let temporaryPassword = '';
 
           if (userResult && userResult.length > 0) {
             userId = userResult[0].id;
           } else {
+            isNewUser = true;
+            temporaryPassword = generateTemporaryPassword();
+            const hashedPassword = await bcrypt.hash(temporaryPassword, 10);
+
             const insertResult: any = await query(
-              `INSERT INTO users (name, email, password, role, created_at)
-               VALUES (?, ?, '', 'student', NOW())`,
-              [metadata.student_name || 'Estudiante', metadata.student_email]
+              `INSERT INTO users (name, email, password_hash, role, is_active, created_at)
+               VALUES (?, ?, ?, 'student', TRUE, NOW())`,
+              [metadata.student_name || 'Estudiante', metadata.student_email, hashedPassword]
             );
             userId = (insertResult as any).insertId;
           }
@@ -117,11 +129,41 @@ export async function POST(request: NextRequest) {
 
           if (!existingEnrollment || existingEnrollment.length === 0) {
             await query(
-              `INSERT INTO enrollments (user_id, course_id, enrolled_at, payment_status, payment_id)
-               VALUES (?, ?, NOW(), 'completed', ?)`,
-              [userId, course.id, charge.id]
+              `INSERT INTO enrollments (user_id, course_id, modality, payment_amount, payment_status, enrolled_at)
+               VALUES (?, ?, ?, ?, 'completed', NOW())`,
+              [userId, course.id, metadata.modality || 'grabado', amount]
             );
           }
+
+          if (isNewUser && temporaryPassword) {
+            try {
+              await fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/email/send-credentials`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  email: metadata.student_email,
+                  name: metadata.student_name || 'Estudiante',
+                  password: temporaryPassword,
+                  courseTitle: course.title
+                })
+              });
+            } catch (emailError) {
+              console.error('Error enviando correo:', emailError);
+            }
+          }
+
+          return NextResponse.json({
+            success: true,
+            charge_id: charge.id,
+            amount: charge.amount / 100,
+            currency: charge.currency_code,
+            outcome: charge.outcome,
+            enrollment: {
+              isNewUser,
+              courseTitle: course.title,
+              email: metadata.student_email
+            }
+          });
         }
       } catch (dbError) {
         console.error('Error registrando matrícula:', dbError);

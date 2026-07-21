@@ -1150,12 +1150,32 @@ function CourseConfigForm({ course, onUpdate }: { course: Course | null; onUpdat
   });
   const [saving, setSaving] = useState(false);
   const [uploadingImage, setUploadingImage] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [showErrorModal, setShowErrorModal] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
+  const [dateDisplay, setDateDisplay] = useState('');
 
   useEffect(() => {
     if (course) {
       const moduleTitles = (course as any).module_titles || (course.modules?.map((m: any) => m.title) || []);
       console.log('📚 Course modules:', course.modules);
       console.log('📋 Module titles:', moduleTitles);
+
+      const liveStartDate = (course as any).live_start_date;
+      const formattedDate = liveStartDate
+        ? (liveStartDate instanceof Date
+            ? liveStartDate.toISOString().split('T')[0]
+            : typeof liveStartDate === 'string'
+              ? liveStartDate.split('T')[0]
+              : '')
+        : '';
+
+      if (formattedDate) {
+        const [year, month, day] = formattedDate.split('-');
+        setDateDisplay(`${day}/${month}/${year}`);
+      } else {
+        setDateDisplay('');
+      }
 
       setFormData({
         title: course.title,
@@ -1165,7 +1185,7 @@ function CourseConfigForm({ course, onUpdate }: { course: Course | null; onUpdat
         price_grabado: course.price_grabado,
         is_active: course.is_active,
         has_live_mode: (course as any).has_live_mode || false,
-        live_start_date: (course as any).live_start_date || '',
+        live_start_date: formattedDate,
         live_schedule: (course as any).live_schedule || '',
         recorded_features: (course as any).recorded_features || {
           duration_hours: 0,
@@ -1229,14 +1249,16 @@ function CourseConfigForm({ course, onUpdate }: { course: Course | null; onUpdat
       });
 
       if (response.ok) {
-        alert('Curso actualizado correctamente');
+        setShowSuccessModal(true);
         onUpdate();
       } else {
-        alert('Error al actualizar el curso');
+        setErrorMessage('Error al actualizar el curso');
+        setShowErrorModal(true);
       }
     } catch (error) {
       console.error('Error updating course:', error);
-      alert('Error al actualizar el curso');
+      setErrorMessage('Error al actualizar el curso');
+      setShowErrorModal(true);
     } finally {
       setSaving(false);
     }
@@ -1475,20 +1497,81 @@ function CourseConfigForm({ course, onUpdate }: { course: Course | null; onUpdat
             }}>
               Fecha de inicio *
             </label>
-            <input
-              type="date"
-              value={formData.live_start_date}
-              onChange={(e) => setFormData(prev => ({ ...prev, live_start_date: e.target.value }))}
-              required={formData.has_live_mode}
-              style={{
-                width: '100%',
-                padding: '10px 12px',
-                border: '1px solid #d1d5db',
-                borderRadius: '6px',
-                fontSize: '14px',
-                boxSizing: 'border-box'
-              }}
-            />
+            <div style={{ position: 'relative', width: 'fit-content' }}>
+              <input
+                type="text"
+                value={dateDisplay}
+                onChange={(e) => {
+                  let value = e.target.value.replace(/[^\d]/g, '');
+                  if (value.length >= 2) {
+                    value = value.slice(0, 2) + '/' + value.slice(2);
+                  }
+                  if (value.length >= 5) {
+                    value = value.slice(0, 5) + '/' + value.slice(5);
+                  }
+                  if (value.length > 10) {
+                    value = value.slice(0, 10);
+                  }
+                  setDateDisplay(value);
+
+                  const parts = value.split('/');
+                  if (parts.length === 3 && parts[0].length === 2 && parts[1].length === 2 && parts[2].length === 4) {
+                    const [day, month, year] = parts;
+                    const dayNum = parseInt(day);
+                    const monthNum = parseInt(month);
+                    if (dayNum >= 1 && dayNum <= 31 && monthNum >= 1 && monthNum <= 12) {
+                      setFormData(prev => ({ ...prev, live_start_date: `${year}-${month}-${day}` }));
+                    }
+                  }
+                }}
+                onClick={() => {
+                  const dateInput = document.getElementById('hidden-date-input') as HTMLInputElement;
+                  dateInput?.showPicker?.();
+                }}
+                placeholder="DD/MM/YYYY"
+                required={formData.has_live_mode}
+                readOnly={false}
+                style={{
+                  width: '140px',
+                  padding: '10px 36px 10px 12px',
+                  border: '1px solid #d1d5db',
+                  borderRadius: '6px',
+                  fontSize: '14px',
+                  boxSizing: 'border-box',
+                  cursor: 'pointer'
+                }}
+              />
+              <span style={{
+                position: 'absolute',
+                right: '12px',
+                top: '50%',
+                transform: 'translateY(-50%)',
+                pointerEvents: 'none',
+                fontSize: '16px',
+                color: '#6b7280'
+              }}>
+                📅
+              </span>
+              <input
+                id="hidden-date-input"
+                type="date"
+                value={formData.live_start_date}
+                onChange={(e) => {
+                  setFormData(prev => ({ ...prev, live_start_date: e.target.value }));
+                  if (e.target.value) {
+                    const [year, month, day] = e.target.value.split('-');
+                    setDateDisplay(`${day}/${month}/${year}`);
+                  }
+                }}
+                style={{
+                  position: 'absolute',
+                  opacity: 0,
+                  width: 0,
+                  height: 0,
+                  pointerEvents: 'none'
+                }}
+              />
+            </div>
           </div>
 
           <div style={{ marginBottom: '20px' }}>
@@ -1499,13 +1582,14 @@ function CourseConfigForm({ course, onUpdate }: { course: Course | null; onUpdat
               color: '#374151',
               marginBottom: '8px'
             }}>
-              Horario (ej: Lunes y Miércoles 7pm - 9pm)
+              Horario (ej: Lunes y Miércoles 7pm - 9pm) *
             </label>
             <input
               type="text"
               value={formData.live_schedule}
               onChange={(e) => setFormData(prev => ({ ...prev, live_schedule: e.target.value }))}
               placeholder="Lunes y Miércoles 7pm - 9pm"
+              required={formData.has_live_mode}
               style={{
                 width: '100%',
                 padding: '10px 12px',
@@ -1803,6 +1887,100 @@ function CourseConfigForm({ course, onUpdate }: { course: Course | null; onUpdat
       >
         {saving ? 'Guardando...' : 'Guardar cambios'}
       </button>
+
+      {showSuccessModal && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'rgba(0, 0, 0, 0.5)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 10000
+        }}>
+          <div style={{
+            background: 'white',
+            padding: '32px',
+            borderRadius: '12px',
+            maxWidth: '400px',
+            textAlign: 'center',
+            boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)'
+          }}>
+            <div style={{ fontSize: '48px', marginBottom: '16px' }}>✓</div>
+            <h3 style={{ fontSize: '20px', fontWeight: '600', marginBottom: '8px', color: '#111827' }}>
+              Curso actualizado correctamente
+            </h3>
+            <p style={{ fontSize: '14px', color: '#6b7280', marginBottom: '24px' }}>
+              Los cambios se han guardado exitosamente
+            </p>
+            <button
+              onClick={() => setShowSuccessModal(false)}
+              style={{
+                background: '#10b981',
+                color: 'white',
+                padding: '10px 24px',
+                borderRadius: '8px',
+                border: 'none',
+                fontSize: '14px',
+                fontWeight: '600',
+                cursor: 'pointer'
+              }}
+            >
+              Entendido
+            </button>
+          </div>
+        </div>
+      )}
+
+      {showErrorModal && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'rgba(0, 0, 0, 0.5)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 10000
+        }}>
+          <div style={{
+            background: 'white',
+            padding: '32px',
+            borderRadius: '12px',
+            maxWidth: '400px',
+            textAlign: 'center',
+            boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)'
+          }}>
+            <div style={{ fontSize: '48px', marginBottom: '16px' }}>✕</div>
+            <h3 style={{ fontSize: '20px', fontWeight: '600', marginBottom: '8px', color: '#111827' }}>
+              Error al actualizar
+            </h3>
+            <p style={{ fontSize: '14px', color: '#6b7280', marginBottom: '24px' }}>
+              {errorMessage}
+            </p>
+            <button
+              onClick={() => setShowErrorModal(false)}
+              style={{
+                background: '#ef4444',
+                color: 'white',
+                padding: '10px 24px',
+                borderRadius: '8px',
+                border: 'none',
+                fontSize: '14px',
+                fontWeight: '600',
+                cursor: 'pointer'
+              }}
+            >
+              Cerrar
+            </button>
+          </div>
+        </div>
+      )}
     </form>
   );
 }

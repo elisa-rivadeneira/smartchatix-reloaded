@@ -20,6 +20,7 @@ function ComprarGrabadoContent() {
   const [phone, setPhone] = React.useState('');
   const [paymentSuccess, setPaymentSuccess] = React.useState(false);
   const [paymentError, setPaymentError] = React.useState('');
+  const [enrollment, setEnrollment] = React.useState<any>(null);
 
   const colors = {
     primary: '#003366',
@@ -602,9 +603,9 @@ function ComprarGrabadoContent() {
                           email={email}
                           fullName={fullName}
                           phone={phone}
-                          onSuccess={() => {
+                          onSuccess={(data) => {
                             setPaymentSuccess(true);
-                            setStep(3);
+                            setEnrollment(data.enrollment);
                           }}
                           onError={(error) => {
                             setPaymentError(error);
@@ -613,33 +614,117 @@ function ComprarGrabadoContent() {
                         />
                       ) : (
                         <div style={{
-                          padding: '2rem',
-                          background: '#E8F5E9',
-                          borderRadius: '12px',
-                          textAlign: 'center'
+                          padding: '3rem 2rem',
+                          background: 'linear-gradient(135deg, #E8F5E9 0%, #C8E6C9 100%)',
+                          borderRadius: '16px',
+                          textAlign: 'center',
+                          boxShadow: '0 8px 24px rgba(46, 125, 50, 0.15)'
                         }}>
-                          <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>✅</div>
-                          <h3 style={{ color: '#2E7D32', marginBottom: '0.5rem' }}>
-                            ¡Pago exitoso!
+                          <div style={{ fontSize: '4rem', marginBottom: '1rem', animation: 'bounce 1s ease' }}>🎉</div>
+                          <h2 style={{
+                            color: '#1B5E20',
+                            marginBottom: '0.5rem',
+                            fontSize: '2rem',
+                            fontWeight: '700'
+                          }}>
+                            ¡Felicitaciones!
+                          </h2>
+                          <h3 style={{ color: '#2E7D32', marginBottom: '1.5rem', fontSize: '1.3rem' }}>
+                            Te has inscrito exitosamente al curso
                           </h3>
-                          <p style={{ color: '#558B2F', marginBottom: '1.5rem' }}>
-                            Tu compra ha sido confirmada. Ya puedes acceder al curso.
-                          </p>
-                          <button
-                            onClick={() => router.push('/aula-virtual')}
-                            style={{
-                              padding: '0.75rem 1.5rem',
-                              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                              color: 'white',
-                              border: 'none',
-                              borderRadius: '8px',
-                              fontSize: '1rem',
-                              fontWeight: '600',
-                              cursor: 'pointer'
-                            }}
-                          >
-                            Ir a mis cursos
-                          </button>
+
+                          <div style={{
+                            background: 'white',
+                            padding: '1.5rem',
+                            borderRadius: '12px',
+                            marginBottom: '2rem',
+                            border: '2px solid #4CAF50',
+                            textAlign: 'left'
+                          }}>
+                            <div style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '12px',
+                              marginBottom: '1rem',
+                              paddingBottom: '1rem',
+                              borderBottom: '1px solid #E0E0E0'
+                            }}>
+                              <div style={{ fontSize: '2rem' }}>📧</div>
+                              <div>
+                                <h4 style={{ margin: 0, color: '#1B5E20', fontSize: '1.1rem' }}>
+                                  Credenciales enviadas
+                                </h4>
+                                <p style={{ margin: '4px 0 0 0', color: '#558B2F', fontSize: '0.9rem' }}>
+                                  {enrollment?.email || email}
+                                </p>
+                              </div>
+                            </div>
+
+                            <p style={{
+                              color: '#424242',
+                              fontSize: '0.95rem',
+                              lineHeight: '1.6',
+                              margin: 0
+                            }}>
+                              {enrollment?.isNewUser ? (
+                                <>
+                                  📨 Hemos enviado tus <strong>credenciales de acceso</strong> al correo electrónico:
+                                  <br/>
+                                  <strong style={{ color: '#2E7D32' }}>{enrollment?.email || email}</strong>
+                                  <br/><br/>
+                                  ✅ Revisa tu bandeja de entrada (y carpeta de spam) para acceder al aula virtual.
+                                </>
+                              ) : (
+                                <>
+                                  ✅ Ya tenías una cuenta con nosotros. Puedes acceder al curso con tus credenciales habituales.
+                                </>
+                              )}
+                            </p>
+                          </div>
+
+                          <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap' }}>
+                            <button
+                              onClick={() => router.push('/login')}
+                              style={{
+                                padding: '1rem 2rem',
+                                background: 'linear-gradient(135deg, #2E7D32 0%, #388E3C 100%)',
+                                color: 'white',
+                                border: 'none',
+                                borderRadius: '8px',
+                                fontSize: '1rem',
+                                fontWeight: '600',
+                                cursor: 'pointer',
+                                boxShadow: '0 4px 12px rgba(46, 125, 50, 0.3)',
+                                transition: 'transform 0.2s'
+                              }}
+                              onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-2px)'}
+                              onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
+                            >
+                              🎓 Ir al Aula Virtual
+                            </button>
+                            <button
+                              onClick={() => router.push('/')}
+                              style={{
+                                padding: '1rem 2rem',
+                                background: 'white',
+                                color: '#2E7D32',
+                                border: '2px solid #4CAF50',
+                                borderRadius: '8px',
+                                fontSize: '1rem',
+                                fontWeight: '600',
+                                cursor: 'pointer',
+                                transition: 'all 0.2s'
+                              }}
+                              onMouseEnter={(e) => {
+                                e.currentTarget.style.background = '#F1F8E9';
+                              }}
+                              onMouseLeave={(e) => {
+                                e.currentTarget.style.background = 'white';
+                              }}
+                            >
+                              🏠 Volver al Inicio
+                            </button>
+                          </div>
                         </div>
                       )}
                 </div>

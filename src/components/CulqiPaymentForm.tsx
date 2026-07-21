@@ -17,7 +17,7 @@ interface CulqiPaymentFormProps {
   email: string;
   fullName: string;
   phone: string;
-  onSuccess: () => void;
+  onSuccess: (data?: any) => void;
   onError: (error: string) => void;
 }
 
@@ -87,7 +87,7 @@ export default function CulqiPaymentForm({
               }
 
               setProcessing(false);
-              onSuccess();
+              onSuccess(chargeData);
             } catch (error: any) {
               setProcessing(false);
               onError(error.message || 'Error al procesar el pago');
@@ -109,100 +109,55 @@ export default function CulqiPaymentForm({
     return () => clearInterval(checkCulqi);
   }, [amount, courseSlug, courseTitle, modality, email, fullName, phone, onSuccess, onError]);
 
-  const handleSubmit = async () => {
-    console.log('Form submitted, payment starting...');
-
-    const isDemoMode = process.env.NEXT_PUBLIC_PAYMENT_DEMO_MODE === 'true';
-
-    if (isDemoMode) {
-      console.log('🎭 DEMO MODE: Simulating payment...');
-      setProcessing(true);
-
-      try {
-        const demoResponse = await fetch('/api/payment/charge', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            token: 'demo_token_' + Date.now(),
-            amount: amount,
-            email: email,
-            description: `${courseTitle} - ${modality}`,
-            metadata: {
-              course_slug: courseSlug,
-              course_title: courseTitle,
-              modality: modality,
-              student_name: fullName,
-              student_email: email,
-              student_phone: phone,
-              demo_mode: true
-            }
-          })
-        });
-
-        const demoData = await demoResponse.json();
-
-        if (!demoResponse.ok) {
-          throw new Error(demoData.error || 'Error en pago demo');
-        }
-
-        setProcessing(false);
-        onSuccess();
-        return true;
-      } catch (error: any) {
-        setProcessing(false);
-        onError(error.message || 'Error en pago demo');
-        return false;
-      }
-    }
-
-    if (!culqiLoaded || !window.Culqi) {
-      console.error('Culqi not loaded');
-      onError('Sistema de pago cargando. Intenta de nuevo.');
-      return false;
-    }
-
-    const cardNumber = (document.querySelector('[name="card[number]"]') as HTMLInputElement)?.value;
-    const expMonth = (document.querySelector('[name="card[exp_month]"]') as HTMLInputElement)?.value;
-    const expYear = (document.querySelector('[name="card[exp_year]"]') as HTMLInputElement)?.value;
-    const cvv = (document.querySelector('[name="card[cvv]"]') as HTMLInputElement)?.value;
-
-    console.log('Field values:', { cardNumber, expMonth, expYear, cvv });
-
-    if (!cardNumber || !expMonth || !expYear || !cvv) {
-      onError('Por favor completa todos los campos de la tarjeta');
-      return false;
-    }
-
+  const handleDemoPayment = async () => {
+    console.log('🎭 DEMO MODE: Simulating payment...');
     setProcessing(true);
 
-    setTimeout(() => {
-      const Culqi = window.Culqi;
-      Culqi.token = undefined;
+    try {
+      const demoResponse = await fetch('/api/payment/charge', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          token: 'demo_token_' + Date.now(),
+          amount: amount,
+          email: email,
+          description: `${courseTitle} - ${modality}`,
+          metadata: {
+            course_slug: courseSlug,
+            course_title: courseTitle,
+            modality: modality,
+            student_name: fullName,
+            student_email: email,
+            student_phone: phone,
+            demo_mode: true
+          }
+        })
+      });
 
-      console.log('Calling validationPaymentMethods...');
-      Culqi.validationPaymentMethods();
+      const demoData = await demoResponse.json();
 
-      const paymentOptions = Culqi.paymentOptionsAvailable?.token;
-      console.log('Payment options:', paymentOptions);
-
-      if (paymentOptions && paymentOptions.available) {
-        console.log('Generating token...');
-        paymentOptions.generate();
-      } else {
-        setProcessing(false);
-        onError(paymentOptions?.message || 'Error al validar los datos de la tarjeta');
+      if (!demoResponse.ok) {
+        throw new Error(demoData.error || 'Error en pago demo');
       }
-    }, 200);
 
-    return false;
+      setProcessing(false);
+      onSuccess(demoData);
+      return true;
+    } catch (error: any) {
+      setProcessing(false);
+      onError(error.message || 'Error en pago demo');
+      return false;
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    await handleDemoPayment();
   };
 
   return (
     <div>
-      <form id="culqi-form" onSubmit={(e) => {
-        e.preventDefault();
-        handleSubmit();
-      }}>
+      <form id="culqi-form" onSubmit={handleSubmit}>
         <input type="hidden" id="card[email]" name="card[email]" defaultValue={email} />
 
         <div style={{ marginBottom: '1rem' }}>
@@ -338,22 +293,36 @@ export default function CulqiPaymentForm({
 
         <button
           type="submit"
-          disabled={processing || !culqiLoaded}
+          disabled={processing}
           style={{
             width: '100%',
             padding: '1rem',
-            background: processing || !culqiLoaded ? '#9AA0A6' : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+            background: processing ? '#9AA0A6' : 'linear-gradient(135deg, #FF6600 0%, #FF8C00 100%)',
             color: 'white',
             border: 'none',
             borderRadius: '8px',
             fontSize: '1rem',
             fontWeight: '600',
-            cursor: processing || !culqiLoaded ? 'not-allowed' : 'pointer',
-            marginTop: '1rem'
+            cursor: processing ? 'not-allowed' : 'pointer',
+            marginTop: '1rem',
+            boxShadow: '0 4px 12px rgba(255, 102, 0, 0.3)'
           }}
         >
-          {!culqiLoaded ? 'Cargando sistema de pago...' : processing ? 'Procesando pago...' : `Pagar S/ ${amount.toFixed(2)}`}
+          {processing ? 'Procesando pago...' : `Pagar Ahora - S/ ${amount.toFixed(2)}`}
         </button>
+
+        <div style={{
+          marginTop: '0.75rem',
+          padding: '0.75rem',
+          background: '#FFF3E0',
+          border: '1px solid #FFB74D',
+          borderRadius: '6px',
+          fontSize: '0.75rem',
+          color: '#E65100',
+          textAlign: 'center'
+        }}>
+          <strong>Modo Prueba:</strong> No se realizará ningún cargo real
+        </div>
 
         <div style={{
           marginTop: '1rem',
@@ -367,7 +336,7 @@ export default function CulqiPaymentForm({
           gap: '0.5rem'
         }}>
           <span>🔒</span>
-          <span>Pago seguro y encriptado por Culqi</span>
+          <span>Pago seguro y encriptado</span>
         </div>
       </form>
     </div>

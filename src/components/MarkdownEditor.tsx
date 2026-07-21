@@ -6,6 +6,13 @@ import StarterKit from '@tiptap/starter-kit';
 import Image from '@tiptap/extension-image';
 import Link from '@tiptap/extension-link';
 import Placeholder from '@tiptap/extension-placeholder';
+import { Table } from '@tiptap/extension-table';
+import { TableRow } from '@tiptap/extension-table-row';
+import { TableHeader } from '@tiptap/extension-table-header';
+import { TableCell } from '@tiptap/extension-table-cell';
+import TextAlign from '@tiptap/extension-text-align';
+import { TextStyle } from '@tiptap/extension-text-style';
+import { Color } from '@tiptap/extension-color';
 import {
   Bold,
   Italic,
@@ -19,7 +26,13 @@ import {
   Image as ImageIcon,
   Link as LinkIcon,
   Undo,
-  Redo
+  Redo,
+  Table as TableIcon,
+  AlignLeft,
+  AlignCenter,
+  AlignRight,
+  Palette,
+  Pipette
 } from 'lucide-react';
 
 const ResizableImage = Image.extend({
@@ -167,7 +180,6 @@ const ResizableImage = Image.extend({
             const pos = getPos();
             if (typeof pos === 'number') {
               const { tr } = editor.state;
-              const resolvedPos = tr.doc.resolve(pos);
 
               editor.view.dispatch(
                 tr.setNodeMarkup(pos, null, {
@@ -226,11 +238,26 @@ const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
   placeholder = 'Escribe el contenido de la lección aquí...'
 }) => {
   const fileInputRef = React.useRef<HTMLInputElement>(null);
+  const textColorInputRef = React.useRef<HTMLInputElement>(null);
+  const cellColorInputRef = React.useRef<HTMLInputElement>(null);
+  const [showTableMenu, setShowTableMenu] = React.useState(false);
+  const [showTextColorPicker, setShowTextColorPicker] = React.useState(false);
+  const [showCellColorPicker, setShowCellColorPicker] = React.useState(false);
+  const [recentTextColors, setRecentTextColors] = React.useState<string[]>([]);
+  const [recentCellColors, setRecentCellColors] = React.useState<string[]>([]);
+  const [tempTextColor, setTempTextColor] = React.useState('#000000');
+  const [tempCellColor, setTempCellColor] = React.useState('#ffffff');
   const [modal, setModal] = React.useState<{
     show: boolean;
     type: 'success' | 'error' | 'warning' | 'info';
     message: string;
   }>({ show: false, type: 'info', message: '' });
+
+  const themeColors = [
+    '#000000', '#374151', '#6b7280', '#9ca3af', '#d1d5db', '#f3f4f6',
+    '#ef4444', '#f59e0b', '#eab308', '#22c55e', '#06b6d4', '#3b82f6',
+    '#8b5cf6', '#ec4899', '#f43f5e', '#10b981', '#14b8a6', '#6366f1'
+  ];
 
   const showModal = (type: 'success' | 'error' | 'warning' | 'info', message: string) => {
     setModal({ show: true, type, message });
@@ -249,6 +276,78 @@ const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
         HTMLAttributes: {
           style: 'color: #2563eb; text-decoration: underline;'
         }
+      }),
+      TextStyle,
+      Color,
+      TextAlign.configure({
+        types: ['heading', 'paragraph', 'tableCell', 'tableHeader'],
+        alignments: ['left', 'center', 'right'],
+      }),
+      Table.configure({
+        resizable: true,
+        allowTableNodeSelection: true,
+        HTMLAttributes: {
+          style: 'border-collapse: collapse; width: 100%; margin: 1rem 0;'
+        }
+      }),
+      TableRow,
+      TableHeader.extend({
+        addAttributes() {
+          return {
+            ...this.parent?.(),
+            backgroundColor: {
+              default: null,
+              parseHTML: element => element.style.backgroundColor || null,
+              renderHTML: attributes => {
+                if (!attributes.backgroundColor) return {};
+                return { style: `background-color: ${attributes.backgroundColor}` };
+              },
+            },
+            colwidth: {
+              default: null,
+              parseHTML: element => {
+                const width = element.getAttribute('data-colwidth');
+                return width ? [parseInt(width, 10)] : null;
+              },
+              renderHTML: attributes => {
+                if (!attributes.colwidth) return {};
+                return {
+                  'data-colwidth': attributes.colwidth,
+                  style: `width: ${attributes.colwidth}px`,
+                };
+              },
+            },
+          };
+        },
+      }),
+      TableCell.extend({
+        addAttributes() {
+          return {
+            ...this.parent?.(),
+            backgroundColor: {
+              default: null,
+              parseHTML: element => element.style.backgroundColor || null,
+              renderHTML: attributes => {
+                if (!attributes.backgroundColor) return {};
+                return { style: `background-color: ${attributes.backgroundColor}` };
+              },
+            },
+            colwidth: {
+              default: null,
+              parseHTML: element => {
+                const width = element.getAttribute('data-colwidth');
+                return width ? [parseInt(width, 10)] : null;
+              },
+              renderHTML: attributes => {
+                if (!attributes.colwidth) return {};
+                return {
+                  'data-colwidth': attributes.colwidth,
+                  style: `width: ${attributes.colwidth}px`,
+                };
+              },
+            },
+          };
+        },
       }),
       Placeholder.configure({
         placeholder
@@ -271,6 +370,24 @@ const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
       editor.commands.setContent(value || '');
     }
   }, [value, editor]);
+
+  useEffect(() => {
+    const savedTextColors = localStorage.getItem('tiptap-recent-text-colors');
+    const savedCellColors = localStorage.getItem('tiptap-recent-cell-colors');
+    if (savedTextColors) setRecentTextColors(JSON.parse(savedTextColors));
+    if (savedCellColors) setRecentCellColors(JSON.parse(savedCellColors));
+  }, []);
+
+  useEffect(() => {
+    const handleClickOutside = () => {
+      if (showTableMenu) setShowTableMenu(false);
+      if (showTextColorPicker) setShowTextColorPicker(false);
+      if (showCellColorPicker) setShowCellColorPicker(false);
+    };
+
+    document.addEventListener('click', handleClickOutside);
+    return () => document.removeEventListener('click', handleClickOutside);
+  }, [showTableMenu, showTextColorPicker, showCellColorPicker]);
 
   if (!editor) {
     return null;
@@ -321,8 +438,39 @@ const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
     }
   };
 
+  const addToRecentColors = (color: string, type: 'text' | 'cell') => {
+    const setColors = type === 'text' ? setRecentTextColors : setRecentCellColors;
+    const storageKey = type === 'text' ? 'tiptap-recent-text-colors' : 'tiptap-recent-cell-colors';
+
+    setColors(prev => {
+      const filtered = prev.filter(c => c !== color);
+      const newColors = [color, ...filtered].slice(0, 6);
+      localStorage.setItem(storageKey, JSON.stringify(newColors));
+      return newColors;
+    });
+  };
+
+  const applyTextColor = (color: string) => {
+    editor.chain().focus().setColor(color).run();
+    addToRecentColors(color, 'text');
+  };
+
+  const applyCellColor = (color: string) => {
+    console.log('🎨 Applying cell color:', color);
+    console.log('📊 Is in table cell?', editor.isActive('tableCell'));
+    console.log('📊 Is in table header?', editor.isActive('tableHeader'));
+    console.log('📊 Editor state:', editor.state.selection);
+
+    const result = editor.chain().setCellAttribute('backgroundColor', color).run();
+    console.log('✅ Command result:', result);
+
+    addToRecentColors(color, 'cell');
+    setTempCellColor(color);
+  };
+
+
   const MenuButton: React.FC<{
-    onClick: () => void;
+    onClick: (e?: React.MouseEvent) => void;
     isActive?: boolean;
     children: React.ReactNode;
     title: string;
@@ -397,6 +545,54 @@ const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
           overflow-y: auto;
           border-radius: 0 0 6px 6px;
         }
+        .prose-editor-content table {
+          border-collapse: collapse;
+          table-layout: fixed;
+          width: 100%;
+          margin: 1rem 0;
+          overflow: visible;
+        }
+        .prose-editor-content table td,
+        .prose-editor-content table th {
+          border: 2px solid #e5e7eb;
+          padding: 8px 12px;
+          position: relative;
+          min-width: 100px;
+          vertical-align: top;
+        }
+        .prose-editor-content table th {
+          background-color: #f3f4f6;
+          font-weight: 600;
+        }
+        .prose-editor-content p {
+          margin: 0;
+        }
+        .prose-editor-content table tr:hover {
+          background-color: #f9fafb;
+        }
+        .prose-editor-content .selectedCell {
+          outline: 3px solid #667eea;
+          outline-offset: -3px;
+          position: relative;
+        }
+        .prose-editor-content .ProseMirror-selectednode {
+          outline: 3px solid #667eea;
+        }
+        .prose-editor-content .column-resize-handle {
+          position: absolute;
+          right: -2px;
+          top: 0;
+          bottom: 0;
+          width: 4px;
+          background-color: #667eea;
+          cursor: col-resize;
+          opacity: 0;
+          transition: opacity 0.2s;
+        }
+        .prose-editor-content table td:hover .column-resize-handle,
+        .prose-editor-content table th:hover .column-resize-handle {
+          opacity: 1;
+        }
       `}</style>
       <div className="markdown-editor-wrapper">
         <input
@@ -408,6 +604,7 @@ const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
         />
 
         <div className="editor-toolbar-sticky">
+          {/* Formato de texto básico */}
           <MenuButton
             onClick={() => editor.chain().focus().toggleBold().run()}
             isActive={editor.isActive('bold')}
@@ -424,8 +621,132 @@ const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
             <Italic className="w-4 h-4" />
           </MenuButton>
 
+          <div style={{ position: 'relative' }}>
+            <MenuButton
+              onClick={(e) => {
+                e?.stopPropagation();
+                setShowTextColorPicker(!showTextColorPicker);
+              }}
+              title="Color de texto"
+            >
+              <Pipette className="w-4 h-4" />
+            </MenuButton>
+
+            {showTextColorPicker && (
+              <div
+                onClick={(e) => e.stopPropagation()}
+                style={{
+                  position: 'absolute',
+                  top: '100%',
+                  left: 0,
+                  marginTop: '4px',
+                  background: 'white',
+                  border: '2px solid #667eea',
+                  borderRadius: '8px',
+                  padding: '12px',
+                  boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
+                  zIndex: 1000,
+                  minWidth: '220px'
+                }}
+              >
+                <div style={{ fontSize: '11px', fontWeight: '600', color: '#667eea', marginBottom: '8px' }}>
+                  COLOR DE TEXTO
+                </div>
+
+                {/* Colores del tema */}
+                <div style={{ marginBottom: '8px' }}>
+                  <div style={{ fontSize: '10px', color: '#6b7280', marginBottom: '4px' }}>Colores del tema:</div>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: '4px' }}>
+                    {themeColors.map(color => (
+                      <button
+                        key={color}
+                        onClick={() => applyTextColor(color)}
+                        style={{
+                          width: '28px',
+                          height: '28px',
+                          backgroundColor: color,
+                          border: '2px solid #e5e7eb',
+                          borderRadius: '4px',
+                          cursor: 'pointer',
+                          transition: 'transform 0.1s'
+                        }}
+                        onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.1)'}
+                        onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
+                        title={color}
+                      />
+                    ))}
+                  </div>
+                </div>
+
+                {/* Colores recientes */}
+                {recentTextColors.length > 0 && (
+                  <div style={{ marginBottom: '8px' }}>
+                    <div style={{ fontSize: '10px', color: '#6b7280', marginBottom: '4px' }}>Recientes:</div>
+                    <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap' }}>
+                      {recentTextColors.map((color, idx) => (
+                        <button
+                          key={idx}
+                          onClick={() => applyTextColor(color)}
+                          style={{
+                            width: '28px',
+                            height: '28px',
+                            backgroundColor: color,
+                            border: '2px solid #e5e7eb',
+                            borderRadius: '4px',
+                            cursor: 'pointer',
+                            transition: 'transform 0.1s'
+                          }}
+                          onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.1)'}
+                          onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
+                          title={color}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Input hexadecimal personalizado para texto */}
+                <div style={{ borderTop: '1px solid #e5e7eb', paddingTop: '8px' }}>
+                  <div style={{ fontSize: '10px', color: '#6b7280', marginBottom: '4px' }}>Personalizado (hex):</div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <div style={{
+                      width: '28px',
+                      height: '28px',
+                      borderRadius: '4px',
+                      backgroundColor: tempTextColor,
+                      border: '2px solid #e5e7eb',
+                      flexShrink: 0
+                    }} />
+                    <input
+                      ref={textColorInputRef}
+                      type="text"
+                      value={tempTextColor}
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        setTempTextColor(value);
+                        if (/^#[0-9A-Fa-f]{6}$/.test(value)) {
+                          applyTextColor(value);
+                        }
+                      }}
+                      placeholder="#000000"
+                      style={{
+                        flex: 1,
+                        padding: '6px 10px',
+                        border: '1px solid #e5e7eb',
+                        borderRadius: '4px',
+                        fontSize: '12px',
+                        fontFamily: 'monospace'
+                      }}
+                    />
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+
           <div style={{ width: '1px', background: '#e5e7eb', margin: '0 4px' }} />
 
+          {/* Títulos */}
           <MenuButton
             onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
             isActive={editor.isActive('heading', { level: 1 })}
@@ -452,6 +773,7 @@ const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
 
           <div style={{ width: '1px', background: '#e5e7eb', margin: '0 4px' }} />
 
+          {/* Listas */}
           <MenuButton
             onClick={() => editor.chain().focus().toggleBulletList().run()}
             isActive={editor.isActive('bulletList')}
@@ -470,6 +792,7 @@ const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
 
           <div style={{ width: '1px', background: '#e5e7eb', margin: '0 4px' }} />
 
+          {/* Otros formatos */}
           <MenuButton
             onClick={() => editor.chain().focus().toggleBlockquote().run()}
             isActive={editor.isActive('blockquote')}
@@ -488,6 +811,7 @@ const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
 
           <div style={{ width: '1px', background: '#e5e7eb', margin: '0 4px' }} />
 
+          {/* Media */}
           <MenuButton
             onClick={addImage}
             title="Subir imagen desde tu computador"
@@ -505,6 +829,253 @@ const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
 
           <div style={{ width: '1px', background: '#e5e7eb', margin: '0 4px' }} />
 
+          {/* Tabla */}
+          <div style={{ position: 'relative' }}>
+            <MenuButton
+              onClick={(e) => {
+                e?.stopPropagation();
+                const inTable = editor.isActive('tableCell') || editor.isActive('tableHeader');
+                console.log('🔧 Click en botón tabla. inTable:', inTable, 'showTableMenu:', showTableMenu);
+                if (inTable) {
+                  setShowTableMenu(!showTableMenu);
+                  console.log('🔧 Nuevo estado showTableMenu:', !showTableMenu);
+                } else {
+                  editor.chain().focus().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run();
+                }
+              }}
+              isActive={editor.isActive('tableCell') || editor.isActive('tableHeader')}
+              title={(editor.isActive('tableCell') || editor.isActive('tableHeader')) ? "Editar tabla" : "Insertar tabla"}
+            >
+              <TableIcon className="w-4 h-4" />
+            </MenuButton>
+
+            {/* Menú desplegable de edición de tabla */}
+            {showTableMenu && (editor.isActive('tableCell') || editor.isActive('tableHeader')) && (
+              <div
+                onClick={(e) => {
+                  console.log('🎯 Click en el menú de tabla');
+                  e.stopPropagation();
+                }}
+                style={{
+                position: 'absolute',
+                top: '100%',
+                left: 0,
+                marginTop: '4px',
+                background: 'white',
+                border: '2px solid #667eea',
+                borderRadius: '8px',
+                padding: '8px',
+                boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
+                zIndex: 1000,
+                minWidth: '200px',
+                pointerEvents: 'auto'
+              }}>
+                <div style={{
+                  fontSize: '11px',
+                  fontWeight: '600',
+                  color: '#667eea',
+                  marginBottom: '8px',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.5px'
+                }}>
+                  Editar Tabla
+                </div>
+
+                {/* Instrucción de selección múltiple */}
+                <div style={{
+                  background: '#f0f9ff',
+                  border: '1px solid #bae6fd',
+                  borderRadius: '4px',
+                  padding: '6px',
+                  marginBottom: '8px',
+                  fontSize: '10px',
+                  color: '#0c4a6e',
+                  lineHeight: '1.4'
+                }}>
+                  💡 <strong>Tip:</strong> Mantén <kbd style={{
+                    background: 'white',
+                    padding: '1px 4px',
+                    borderRadius: '2px',
+                    border: '1px solid #cbd5e1',
+                    fontFamily: 'monospace',
+                    fontSize: '9px'
+                  }}>Shift</kbd> y arrastra con el mouse para seleccionar varias celdas
+                </div>
+
+                {/* Selección */}
+                <div style={{ marginBottom: '8px' }}>
+                  <div style={{ fontSize: '10px', color: '#6b7280', marginBottom: '4px' }}>Selección rápida:</div>
+                  <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap' }}>
+                    <button
+                      onClick={() => {
+                        editor.chain().focus().selectNodeBackward().run();
+                      }}
+                      style={{
+                        padding: '4px 8px',
+                        fontSize: '11px',
+                        background: '#f3f4f6',
+                        border: '1px solid #e5e7eb',
+                        borderRadius: '4px',
+                        cursor: 'pointer',
+                        fontWeight: '500'
+                      }}
+                    >
+                      📋 Toda la tabla
+                    </button>
+                  </div>
+                </div>
+
+                {/* Alineación */}
+                <div style={{ marginBottom: '8px' }}>
+                  <div style={{ fontSize: '10px', color: '#6b7280', marginBottom: '4px' }}>Alineación:</div>
+                  <div style={{ display: 'flex', gap: '4px' }}>
+                    <MenuButton
+                      onClick={() => editor.chain().focus().setTextAlign('left').run()}
+                      isActive={editor.isActive({ textAlign: 'left' })}
+                      title="Izquierda"
+                    >
+                      <AlignLeft className="w-4 h-4" />
+                    </MenuButton>
+                    <MenuButton
+                      onClick={() => editor.chain().focus().setTextAlign('center').run()}
+                      isActive={editor.isActive({ textAlign: 'center' })}
+                      title="Centro"
+                    >
+                      <AlignCenter className="w-4 h-4" />
+                    </MenuButton>
+                    <MenuButton
+                      onClick={() => editor.chain().focus().setTextAlign('right').run()}
+                      isActive={editor.isActive({ textAlign: 'right' })}
+                      title="Derecha"
+                    >
+                      <AlignRight className="w-4 h-4" />
+                    </MenuButton>
+                  </div>
+                </div>
+
+                {/* Color de fondo */}
+                <div style={{ marginBottom: '8px' }}>
+                  <div style={{ fontSize: '10px', color: '#6b7280', marginBottom: '4px' }}>Color de fondo celda:</div>
+
+                  {/* Colores del tema para celda */}
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: '4px', marginBottom: '8px' }}>
+                    {themeColors.map(color => (
+                      <button
+                        key={color}
+                        type="button"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          applyCellColor(color);
+                        }}
+                        style={{
+                          width: '24px',
+                          height: '24px',
+                          backgroundColor: color,
+                          border: '2px solid #e5e7eb',
+                          borderRadius: '4px',
+                          cursor: 'pointer',
+                          transition: 'transform 0.1s'
+                        }}
+                        onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.1)'}
+                        onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
+                        title={color}
+                      />
+                    ))}
+                  </div>
+
+                  {/* Colores recientes para celda */}
+                  {recentCellColors.length > 0 && (
+                    <div style={{ marginBottom: '8px' }}>
+                      <div style={{ fontSize: '9px', color: '#6b7280', marginBottom: '4px' }}>Recientes:</div>
+                      <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap' }}>
+                        {recentCellColors.map((color, idx) => (
+                          <button
+                            key={idx}
+                            onClick={() => applyCellColor(color)}
+                            style={{
+                              width: '24px',
+                              height: '24px',
+                              backgroundColor: color,
+                              border: '2px solid #e5e7eb',
+                              borderRadius: '4px',
+                              cursor: 'pointer',
+                              transition: 'transform 0.1s'
+                            }}
+                            onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.1)'}
+                            onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
+                            title={color}
+                          />
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Input hexadecimal personalizado para celda */}
+                  <div>
+                    <div style={{ fontSize: '9px', color: '#6b7280', marginBottom: '4px' }}>Personalizado (hex):</div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                      <div style={{
+                        width: '24px',
+                        height: '24px',
+                        borderRadius: '4px',
+                        backgroundColor: tempCellColor,
+                        border: '2px solid #e5e7eb',
+                        flexShrink: 0
+                      }} />
+                      <input
+                        ref={cellColorInputRef}
+                        type="text"
+                        value={tempCellColor}
+                        onChange={(e) => {
+                          const value = e.target.value;
+                          setTempCellColor(value);
+                          if (/^#[0-9A-Fa-f]{6}$/.test(value)) {
+                            applyCellColor(value);
+                          }
+                        }}
+                        placeholder="#000000"
+                        style={{
+                          flex: 1,
+                          padding: '4px 8px',
+                          border: '1px solid #e5e7eb',
+                          borderRadius: '4px',
+                          fontSize: '11px',
+                          fontFamily: 'monospace'
+                        }}
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div style={{ borderTop: '1px solid #e5e7eb', marginTop: '8px', paddingTop: '8px' }}>
+                  <button
+                    onClick={() => {
+                      editor.chain().focus().deleteTable().run();
+                      setShowTableMenu(false);
+                    }}
+                    style={{
+                      width: '100%',
+                      padding: '6px',
+                      background: '#fee2e2',
+                      color: '#dc2626',
+                      border: 'none',
+                      borderRadius: '4px',
+                      fontSize: '12px',
+                      fontWeight: '600',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    🗑️ Eliminar tabla
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+
+          <div style={{ width: '1px', background: '#e5e7eb', margin: '0 4px' }} />
+
+          {/* Deshacer/Rehacer */}
           <MenuButton
             onClick={() => editor.chain().focus().undo().run()}
             title="Deshacer (Ctrl+Z)"
@@ -531,7 +1102,7 @@ const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
           fontSize: '12px',
           color: '#6b7280'
         }}>
-          💡 Tip: Puedes pegar contenido desde ChatGPT y mantener el formato
+          💡 Tip: Puedes pegar contenido desde ChatGPT y mantener el formato (incluyendo tablas)
         </div>
       </div>
 

@@ -58,7 +58,7 @@ export default function SmartChatixAcademyPage() {
         }
       `}</style>
 
-      {/* Header Minimalista */}
+      {/* Header */}
       <header style={{
         position: 'sticky',
         top: 0,
@@ -77,37 +77,50 @@ export default function SmartChatixAcademyPage() {
         }}>
           <Link href="/">
             <img
-              src="/images/logo_samartchatix.png"
+              src="/images/logo_smartchatix_horiz.png"
               alt="SmartChatix"
-              style={{ height: '40px', cursor: 'pointer' }}
+              style={{ height: '50px', cursor: 'pointer' }}
             />
           </Link>
 
-          <div className="mobile-hidden" style={{ display: 'flex', gap: '2rem', alignItems: 'center' }}>
-            <Link href="/cursos" style={{
+          <div className="mobile-hidden" style={{ display: 'flex', gap: '2.5rem', alignItems: 'center' }}>
+            <Link href="/" style={{
               color: '#666',
               textDecoration: 'none',
               fontSize: '15px',
               fontWeight: '500',
               transition: 'color 0.2s'
-            }}>
-              Cursos
+            }}
+            onMouseEnter={(e) => e.currentTarget.style.color = '#0066CC'}
+            onMouseLeave={(e) => e.currentTarget.style.color = '#666'}
+            >
+              Inicio
             </Link>
-            <Link href="/login">
-              <button style={{
-                background: '#000',
+            <button
+              onClick={() => setShowModal(true)}
+              style={{
+                background: 'linear-gradient(135deg, #0066CC 0%, #00D9FF 100%)',
                 color: '#fff',
                 border: 'none',
-                padding: '10px 24px',
-                borderRadius: '8px',
+                padding: '12px 28px',
+                borderRadius: '10px',
                 fontSize: '15px',
                 fontWeight: '600',
                 cursor: 'pointer',
-                transition: 'all 0.2s'
-              }}>
-                Crear mi Academia
-              </button>
-            </Link>
+                transition: 'all 0.2s',
+                boxShadow: '0 4px 12px rgba(0, 102, 204, 0.3)'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = 'translateY(-2px)';
+                e.currentTarget.style.boxShadow = '0 6px 20px rgba(0, 102, 204, 0.4)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = 'translateY(0)';
+                e.currentTarget.style.boxShadow = '0 4px 12px rgba(0, 102, 204, 0.3)';
+              }}
+            >
+              Solicitar Demo
+            </button>
           </div>
         </div>
       </header>
@@ -151,7 +164,7 @@ export default function SmartChatixAcademyPage() {
             margin: '0 auto 3rem',
             textShadow: '0 1px 3px rgba(0,0,0,0.3)'
           }}>
-            Desde la idea hasta el certificado. SmartChatix Academy ayuda a docentes y estudiantes en cada paso del camino.
+           Diseña, administra y certifica programas de formación para empresas, consultoras, academias e instructores desde una sola plataforma.
           </p>
 
           <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap', marginBottom: '3rem' }}>
@@ -294,7 +307,7 @@ export default function SmartChatixAcademyPage() {
                 border: '1px solid #e0e0e0'
               }}>
                 <img
-                  src="/images/paso2_desarrolla.png"
+                  src="/images/paso2_edita.png"
                   alt="Desarrolla contenido con IA"
                   style={{
                     width: '100%',

@@ -230,6 +230,27 @@ export default function InstructorPanel() {
                 </div>
               </div>
               <Link
+                href="/perfil"
+                onClick={() => setUserMenuOpen(false)}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '12px',
+                  padding: '12px 16px',
+                  textDecoration: 'none',
+                  color: '#374151',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  transition: 'background 0.2s',
+                  borderBottom: '1px solid #f3f4f6'
+                }}
+                onMouseEnter={(e) => e.currentTarget.style.background = '#f9fafb'}
+                onMouseLeave={(e) => e.currentTarget.style.background = 'white'}
+              >
+                <span style={{ fontSize: '16px' }}>👤</span>
+                Mi Perfil
+              </Link>
+              <Link
                 href="/aula-virtual"
                 onClick={() => setUserMenuOpen(false)}
                 style={{

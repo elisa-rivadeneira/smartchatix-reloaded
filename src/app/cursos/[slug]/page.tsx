@@ -2,7 +2,6 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { getProductBySlug, getCourses } from '@/data/courses';
 import { notFound } from 'next/navigation';
 import Footer from '@/components/Footer';
 
@@ -10,19 +9,39 @@ export default function CursoPage({ params }: { params: Promise<{ slug: string }
   const [showModal, setShowModal] = React.useState(false);
   const [showMobileMenu, setShowMobileMenu] = React.useState(false);
   const [slug, setSlug] = React.useState<string>('');
-  const [curso, setCurso] = React.useState<ReturnType<typeof getProductBySlug> | undefined>(undefined);
+  const [curso, setCurso] = React.useState<any>(undefined);
   const [stickyPosition, setStickyPosition] = React.useState<'fixed' | 'absolute'>('fixed');
   const [stickyTop, setStickyTop] = React.useState(80);
   const [scrollPosition, setScrollPosition] = React.useState(0);
-  const allCourses = getCourses();
+  const [allCourses, setAllCourses] = React.useState<any[]>([]);
+  const [loading, setLoading] = React.useState(true);
 
   React.useEffect(() => {
-    params.then(({ slug }) => {
+    params.then(async ({ slug }) => {
       setSlug(slug);
-      const foundCurso = getProductBySlug(slug);
-      setCurso(foundCurso);
+      try {
+        const response = await fetch(`/api/public/courses/${slug}`);
+        if (response.ok) {
+          const data = await response.json();
+          setCurso(data.course);
+        } else {
+          setCurso(null);
+        }
+      } catch (error) {
+        console.error('Error fetching course:', error);
+        setCurso(null);
+      } finally {
+        setLoading(false);
+      }
     });
   }, [params]);
+
+  React.useEffect(() => {
+    fetch('/api/public/courses')
+      .then(res => res.json())
+      .then(data => setAllCourses(data.courses || []))
+      .catch(err => console.error('Error fetching courses:', err));
+  }, []);
 
   React.useEffect(() => {
     window.scrollTo(0, 0);
@@ -56,7 +75,7 @@ export default function CursoPage({ params }: { params: Promise<{ slug: string }
     return () => window.removeEventListener('scroll', handleScroll);
   }, [curso]);
 
-  if (curso === undefined) {
+  if (loading || curso === undefined) {
     return (
       <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh' }}>
         <div style={{ fontSize: '1.2rem', color: '#666' }}>Cargando...</div>
@@ -64,7 +83,7 @@ export default function CursoPage({ params }: { params: Promise<{ slug: string }
     );
   }
 
-  if (!curso || curso.type !== 'course') {
+  if (!curso) {
     notFound();
   }
 
@@ -399,30 +418,6 @@ export default function CursoPage({ params }: { params: Promise<{ slug: string }
             </div>
           </div>
 
-          {/* Botón CTA */}
-          <Link href={`/comprar-grabado?curso=${slug}`} style={{ textDecoration: 'none', display: 'block' }}>
-            <button
-              style={{
-                width: '100%',
-                backgroundColor: colors.accent,
-                color: colors.white,
-                border: 'none',
-                padding: spacing.md,
-                borderRadius: '8px',
-                fontSize: '1.1rem',
-                fontWeight: '700',
-                cursor: 'pointer',
-                marginBottom: spacing.md,
-                boxShadow: '0 4px 12px rgba(255,102,0,0.4)',
-                transition: 'transform 0.2s'
-              }}
-              onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.02)'}
-              onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
-            >
-              COMPRAR AHORA →
-            </button>
-          </Link>
-
           {/* Incluye */}
           <div style={{
             backgroundColor: 'rgba(255,255,255,0.1)',
@@ -514,7 +509,7 @@ export default function CursoPage({ params }: { params: Promise<{ slug: string }
                   gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
                   gap: spacing.xs
                 }}>
-                  {curso.keyTopics.map((topic, idx) => (
+                  {curso.keyTopics.map((topic: string, idx: number) => (
                     <li key={idx} style={{
                       fontSize: '0.9rem',
                       display: 'flex',
@@ -559,22 +554,48 @@ export default function CursoPage({ params }: { params: Promise<{ slug: string }
               </div>
             </div>
 
-            <button
-              onClick={() => setShowModal(true)}
-              style={{
-                backgroundColor: colors.accent,
-                color: colors.white,
-                border: 'none',
-                padding: `${spacing.md} ${spacing.xl}`,
-                borderRadius: '8px',
-                fontSize: '0.95rem',
-                fontWeight: '700',
-                cursor: 'pointer',
-                boxShadow: '0 4px 12px rgba(255,102,0,0.3)'
-              }}
-            >
-              ELIGE TU ACCESO AL CURSO →
-            </button>
+            {curso?.hasLiveMode ? (
+              <button
+                onClick={() => setShowModal(true)}
+                style={{
+                  backgroundColor: colors.accent,
+                  color: colors.white,
+                  border: 'none',
+                  padding: `${spacing.md} ${spacing.xl}`,
+                  borderRadius: '8px',
+                  fontSize: '0.95rem',
+                  fontWeight: '700',
+                  cursor: 'pointer',
+                  boxShadow: '0 4px 12px rgba(255,102,0,0.3)',
+                  transition: 'transform 0.2s'
+                }}
+                onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.02)'}
+                onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
+              >
+                ELIGE TU ACCESO AL CURSO →
+              </button>
+            ) : (
+              <Link href={`/comprar-grabado?curso=${slug}`} style={{ textDecoration: 'none' }}>
+                <button
+                  style={{
+                    backgroundColor: colors.accent,
+                    color: colors.white,
+                    border: 'none',
+                    padding: `${spacing.md} ${spacing.xl}`,
+                    borderRadius: '8px',
+                    fontSize: '0.95rem',
+                    fontWeight: '700',
+                    cursor: 'pointer',
+                    boxShadow: '0 4px 12px rgba(255,102,0,0.3)',
+                    transition: 'transform 0.2s'
+                  }}
+                  onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.02)'}
+                  onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
+                >
+                  COMPRAR AHORA →
+                </button>
+              </Link>
+            )}
           </div>
         </div>
       </section>
@@ -608,7 +629,7 @@ export default function CursoPage({ params }: { params: Promise<{ slug: string }
             gridTemplateColumns: '1fr',
             gap: spacing.lg
           }}>
-            {curso.modules.map((modulo) => (
+            {curso.modules.map((modulo: any) => (
               <div key={modulo.num} style={{
                 backgroundColor: colors.gray[50],
                 padding: spacing.md,
