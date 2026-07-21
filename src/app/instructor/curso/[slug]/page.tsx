@@ -2760,7 +2760,7 @@ export default function InstructorCourseEditPage() {
                 </p>
               </div>
 
-              {course?.is_certification_enabled && (
+              {course?.is_certification_enabled ? (
                 <div style={{ marginTop: '20px', paddingTop: '20px', borderTop: '1px solid #e5e7eb' }}>
                   <label style={{
                     display: 'block',
@@ -2811,7 +2811,7 @@ export default function InstructorCourseEditPage() {
                     Los estudiantes deben obtener al menos este porcentaje en el promedio general de todos los quizzes para recibir el certificado.
                   </p>
                 </div>
-              )}
+              ) : null}
             </div>
 
             {/* Otras configuraciones (placeholder) */}
