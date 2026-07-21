@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { writeFile, mkdir } from 'fs/promises';
-import { existsSync } from 'fs';
-import path from 'path';
 import { verifyToken } from '@/lib/auth';
+import { uploadToR2 } from '@/lib/r2';
 
 export async function POST(request: NextRequest) {
   console.log('📤 Upload request received');
@@ -30,19 +28,15 @@ export async function POST(request: NextRequest) {
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
 
-    const uploadsDir = path.join(process.cwd(), 'public', 'uploads');
-    if (!existsSync(uploadsDir)) {
-      await mkdir(uploadsDir, { recursive: true });
-    }
-
     const timestamp = Date.now();
     const sanitizedName = file.name.replace(/[^a-zA-Z0-9.-]/g, '_');
     const fileName = `${timestamp}_${sanitizedName}`;
-    const filePath = path.join(uploadsDir, fileName);
 
-    await writeFile(filePath, buffer);
+    const key = `uploads/${fileName}`;
 
-    const fileUrl = `/uploads/${fileName}`;
+    console.log('☁️ Uploading to Cloudflare R2:', key);
+    const fileUrl = await uploadToR2(buffer, key, file.type || 'application/octet-stream');
+    console.log('✅ Uploaded successfully:', fileUrl);
 
     return NextResponse.json({
       success: true,

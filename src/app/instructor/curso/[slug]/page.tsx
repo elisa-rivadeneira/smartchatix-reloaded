@@ -80,6 +80,7 @@ interface Lesson {
   video_file: string;
   main_content: string;
   document_url: string;
+  documents_urls: string | string[] | null;
   markdown_content: string;
   markdown_image: string;
   markdown_video: string;
@@ -999,7 +1000,7 @@ function SortableLesson({ lesson, lessonIdx, onQuiz, onPreview, onEdit }: any) {
             fontSize: '12px',
             color: '#6b7280'
           }}>
-            {lesson.content_type === 'video' ? '📹 Video' : lesson.content_type === 'document' ? '📄 Documento PDF' : lesson.content_type === 'markdown' ? '📝 Markdown' : lesson.content_type === 'quiz' ? '❓ Quiz' : '📋 Tarea'}
+            {lesson.content_type === 'video' ? '📚 Lección' : lesson.content_type === 'quiz' ? '❓ Quiz' : '📋 Tarea'}
           </span>
           {lesson.duration && (
             <span style={{
@@ -1518,6 +1519,50 @@ function CourseConfigForm({ course, onUpdate }: { course: Course | null; onUpdat
         </>
       )}
 
+
+
+      <div style={{ marginBottom: '16px' }}>
+        <label style={{
+          display: 'block',
+          fontSize: '14px',
+          fontWeight: '500',
+          color: '#374151',
+          marginBottom: '8px'
+        }}>
+          ✓ Módulos especializados
+        </label>
+        <p style={{ fontSize: '12px', color: '#6b7280', marginBottom: '12px' }}>
+          Títulos cargados automáticamente del aula virtual (editables)
+        </p>
+        {(formData.module_titles || []).map((moduleTitle: string, index: number) => (
+          <div key={index} style={{ marginBottom: '8px' }}>
+            <input
+              type="text"
+              value={moduleTitle}
+              onChange={(e) => {
+                const newTitles = [...(formData.module_titles || [])];
+                newTitles[index] = e.target.value;
+                setFormData(prev => ({ ...prev, module_titles: newTitles }));
+              }}
+              placeholder={`Módulo ${index + 1}`}
+              style={{
+                width: '100%',
+                padding: '8px 12px',
+                border: '1px solid #d1d5db',
+                borderRadius: '6px',
+                fontSize: '13px',
+                boxSizing: 'border-box'
+              }}
+            />
+          </div>
+        ))}
+        {(!formData.module_titles || formData.module_titles.length === 0) && (
+          <p style={{ fontSize: '13px', color: '#9ca3af', fontStyle: 'italic' }}>
+            No hay módulos creados aún. Crea módulos en la pestaña "Contenido".
+          </p>
+        )}
+      </div>
+
       <hr style={{ margin: '32px 0', border: 'none', borderTop: '1px solid #e5e7eb' }} />
 
       <h3 style={{
@@ -1587,35 +1632,25 @@ function CourseConfigForm({ course, onUpdate }: { course: Course | null; onUpdat
           ✓ Módulos especializados
         </label>
         <p style={{ fontSize: '12px', color: '#6b7280', marginBottom: '12px' }}>
-          Títulos cargados automáticamente del aula virtual (editables)
+          Calculado automáticamente del aula virtual (editable)
         </p>
-        {(formData.module_titles || []).map((moduleTitle: string, index: number) => (
-          <div key={index} style={{ marginBottom: '8px' }}>
-            <input
-              type="text"
-              value={moduleTitle}
-              onChange={(e) => {
-                const newTitles = [...(formData.module_titles || [])];
-                newTitles[index] = e.target.value;
-                setFormData(prev => ({ ...prev, module_titles: newTitles }));
-              }}
-              placeholder={`Módulo ${index + 1}`}
-              style={{
-                width: '100%',
-                padding: '8px 12px',
-                border: '1px solid #d1d5db',
-                borderRadius: '6px',
-                fontSize: '13px',
-                boxSizing: 'border-box'
-              }}
-            />
-          </div>
-        ))}
-        {(!formData.module_titles || formData.module_titles.length === 0) && (
-          <p style={{ fontSize: '13px', color: '#9ca3af', fontStyle: 'italic' }}>
-            No hay módulos creados aún. Crea módulos en la pestaña "Contenido".
-          </p>
-        )}
+        <input
+          type="text"
+          value={formData.recorded_features.modules || ''}
+          onChange={(e) => setFormData(prev => ({
+            ...prev,
+            recorded_features: { ...prev.recorded_features, modules: e.target.value }
+          }))}
+          placeholder={`${course?.modules?.length || 0} módulos especializados`}
+          style={{
+            width: '100%',
+            padding: '10px 12px',
+            border: '1px solid #d1d5db',
+            borderRadius: '6px',
+            fontSize: '14px',
+            boxSizing: 'border-box'
+          }}
+        />
       </div>
 
       <div style={{ marginBottom: '16px' }}>
@@ -3276,6 +3311,72 @@ export default function InstructorCourseEditPage() {
                       />
                     </div>
                   )}
+                  {previewModal.lesson.documents_urls && (() => {
+                    const urls = typeof previewModal.lesson.documents_urls === 'string'
+                      ? JSON.parse(previewModal.lesson.documents_urls)
+                      : previewModal.lesson.documents_urls;
+                    return urls && urls.length > 0 && (
+                      <div style={{
+                        padding: '20px',
+                        background: '#f0fdf4',
+                        borderRadius: '12px',
+                        marginBottom: '24px',
+                        border: '2px solid #10b981'
+                      }}>
+                        <h3 style={{
+                          fontSize: '18px',
+                          fontWeight: '700',
+                          color: '#111827',
+                          marginBottom: '12px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '8px'
+                        }}>
+                          📎 Archivos Adjuntos
+                        </h3>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                          {urls.map((url: string, index: number) => {
+                            const fullFilename = url.split('/').pop() || `Archivo ${index + 1}`;
+                            const filename = fullFilename.replace(/^\d+_/, '');
+                            return (
+                              <a
+                                key={index}
+                                href={url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                style={{
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  gap: '10px',
+                                  padding: '12px',
+                                  background: 'white',
+                                  borderRadius: '6px',
+                                  border: '1px solid #10b981',
+                                  textDecoration: 'none',
+                                  color: '#047857',
+                                  fontWeight: '600',
+                                  fontSize: '14px',
+                                  transition: 'all 0.2s'
+                                }}
+                                onMouseEnter={(e) => {
+                                  e.currentTarget.style.background = '#dcfce7';
+                                  e.currentTarget.style.transform = 'translateX(4px)';
+                                }}
+                                onMouseLeave={(e) => {
+                                  e.currentTarget.style.background = 'white';
+                                  e.currentTarget.style.transform = 'translateX(0)';
+                                }}
+                              >
+                                <span style={{ fontSize: '20px' }}>📄</span>
+                                <span style={{ flex: 1 }}>{filename}</span>
+                                <span style={{ fontSize: '16px' }}>⬇️</span>
+                              </a>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    );
+                  })()}
                 </>
               )}
             </div>
@@ -3672,6 +3773,9 @@ function LessonModal({ lesson, course, moduleId, onClose, onSave, onDelete, savi
   const [videoFile, setVideoFile] = useState(lesson?.video_file || '');
   const [mainContent, setMainContent] = useState(lesson?.main_content || '');
   const [documentUrl, setDocumentUrl] = useState(lesson?.document_url || '');
+  const [documentsUrls, setDocumentsUrls] = useState<string[]>(
+    lesson?.documents_urls ? (typeof lesson.documents_urls === 'string' ? JSON.parse(lesson.documents_urls) : lesson.documents_urls) : []
+  );
   const [markdownContent, setMarkdownContent] = useState(lesson?.markdown_content || '');
   const [markdownImage, setMarkdownImage] = useState(lesson?.markdown_image || '');
   const [markdownVideo, setMarkdownVideo] = useState(lesson?.markdown_video || '');
@@ -3760,31 +3864,34 @@ function LessonModal({ lesson, course, moduleId, onClose, onSave, onDelete, savi
   };
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
 
-    if (!file.name.endsWith('.pdf')) {
-      alert('Solo se permiten archivos PDF');
-      return;
-    }
+    const fileArray = Array.from(files);
 
     setUploading(true);
     try {
-      const formData = new FormData();
-      formData.append('file', file);
+      const uploadedUrls: string[] = [];
 
-      const response = await fetch('/api/upload', {
-        method: 'POST',
-        body: formData
-      });
+      for (const file of fileArray) {
+        const formData = new FormData();
+        formData.append('file', file);
 
-      if (!response.ok) throw new Error('Error al subir archivo');
+        const response = await fetch('/api/upload', {
+          method: 'POST',
+          body: formData
+        });
 
-      const data = await response.json();
-      setDocumentUrl(data.url);
+        if (!response.ok) throw new Error(`Error al subir ${file.name}`);
+
+        const data = await response.json();
+        uploadedUrls.push(data.url);
+      }
+
+      setDocumentsUrls(prev => [...prev, ...uploadedUrls]);
     } catch (error) {
-      console.error('Error uploading file:', error);
-      alert('Error al subir el archivo');
+      console.error('Error uploading files:', error);
+      alert('Error al subir los archivos');
     } finally {
       setUploading(false);
     }
@@ -3987,9 +4094,7 @@ function LessonModal({ lesson, course, moduleId, onClose, onSave, onDelete, savi
             onFocus={(e) => e.target.style.borderColor = '#667eea'}
             onBlur={(e) => e.target.style.borderColor = '#e5e7eb'}
           >
-            <option value="video">Video</option>
-            <option value="document">Documento PDF</option>
-            <option value="markdown">Markdown (Texto Enriquecido)</option>
+            <option value="video">Lección</option>
             <option value="quiz">Quiz</option>
             <option value="assignment">Tarea</option>
           </select>
@@ -4174,215 +4279,10 @@ Genera el contenido completo.`;
           </>
         )}
 
-        {contentType === 'document' && (
-          <>
-            <div style={{ marginBottom: '12px' }}>
-              <label style={{ display: 'block', fontSize: '13px', fontWeight: '600', color: '#374151', marginBottom: '6px' }}>
-                Subir Archivo PDF
-              </label>
-              <input
-                type="file"
-                accept=".pdf"
-                onChange={handleFileUpload}
-                disabled={uploading}
-                style={{
-                  width: '100%',
-                  padding: '8px 12px',
-                  border: '2px solid #e5e7eb',
-                  borderRadius: '8px',
-                  fontSize: '13px',
-                  cursor: uploading ? 'not-allowed' : 'pointer',
-                  boxSizing: 'border-box'
-                }}
-              />
-              {uploading && (
-                <p style={{ fontSize: '11px', color: '#667eea', marginTop: '4px', fontWeight: '500' }}>
-                  📤 Subiendo archivo...
-                </p>
-              )}
-            </div>
 
-            <div style={{ marginBottom: '12px', textAlign: 'center', color: '#9ca3af', fontSize: '12px', fontWeight: '500' }}>
-              - O -
-            </div>
-
-            <div style={{ marginBottom: '12px' }}>
-              <label style={{ display: 'block', fontSize: '13px', fontWeight: '600', color: '#374151', marginBottom: '6px' }}>
-                URL del Documento
-              </label>
-              <input
-                type="text"
-                value={documentUrl}
-                onChange={(e) => setDocumentUrl(e.target.value)}
-                style={{
-                  width: '100%',
-                  padding: '8px 12px',
-                  border: '2px solid #e5e7eb',
-                  borderRadius: '8px',
-                  fontSize: '14px',
-                  outline: 'none',
-                  boxSizing: 'border-box'
-                }}
-                onFocus={(e) => e.target.style.borderColor = '#667eea'}
-                onBlur={(e) => e.target.style.borderColor = '#e5e7eb'}
-                placeholder="/documents/archivo.pdf"
-              />
-              {documentUrl && (
-                <p style={{ fontSize: '11px', color: '#10b981', marginTop: '4px', fontWeight: '500' }}>
-                  ✓ Archivo configurado: {documentUrl}
-                </p>
-              )}
-            </div>
-          </>
-        )}
-
-        {contentType === 'markdown' && (
-          <>
-            <div style={{ marginBottom: '12px' }}>
-              <label style={{ display: 'block', fontSize: '13px', fontWeight: '600', color: '#374151', marginBottom: '6px' }}>
-                Imagen de portada
-              </label>
-              <input
-                type="file"
-                accept="image/*"
-                onChange={handleImageUpload}
-                disabled={uploadingImage}
-                style={{
-                  width: '100%',
-                  padding: '8px 12px',
-                  border: '2px solid #e5e7eb',
-                  borderRadius: '8px',
-                  fontSize: '13px',
-                  cursor: uploadingImage ? 'not-allowed' : 'pointer',
-                  boxSizing: 'border-box'
-                }}
-              />
-              {uploadingImage && (
-                <p style={{ fontSize: '11px', color: '#667eea', marginTop: '4px', fontWeight: '500' }}>
-                  📎 Subiendo imagen...
-                </p>
-              )}
-              {markdownImage && (
-                <div style={{ marginTop: '8px' }}>
-                  <img
-                    src={markdownImage}
-                    alt="Vista previa"
-                    style={{
-                      maxWidth: '100%',
-                      maxHeight: '200px',
-                      borderRadius: '8px',
-                      objectFit: 'cover',
-                      border: '2px solid #e5e7eb'
-                    }}
-                  />
-                  <p style={{ fontSize: '11px', color: '#10b981', marginTop: '4px', fontWeight: '500' }}>
-                    ✓ Imagen configurada
-                  </p>
-                </div>
-              )}
-            </div>
-            <div style={{ marginBottom: '12px' }}>
-              <label style={{ display: 'block', fontSize: '13px', fontWeight: '600', color: '#374151', marginBottom: '6px' }}>
-                Video de YouTube (opcional)
-              </label>
-              <input
-                type="text"
-                value={markdownVideo}
-                onChange={(e) => setMarkdownVideo(e.target.value)}
-                style={{
-                  width: '100%',
-                  padding: '8px 12px',
-                  border: '2px solid #e5e7eb',
-                  borderRadius: '8px',
-                  fontSize: '14px',
-                  outline: 'none',
-                  boxSizing: 'border-box'
-                }}
-                onFocus={(e) => e.target.style.borderColor = '#667eea'}
-                onBlur={(e) => e.target.style.borderColor = '#e5e7eb'}
-                placeholder="ID o URL de YouTube (ej: dQw4w9WgXcQ)"
-              />
-            </div>
-            <div style={{ marginBottom: '12px' }}>
-              <label style={{ display: 'block', fontSize: '13px', fontWeight: '600', color: '#374151', marginBottom: '6px' }}>
-                Contenido Markdown
-              </label>
-              <MarkdownEditor
-                value={markdownContent}
-                onChange={setMarkdownContent}
-                placeholder="Escribe el contenido de la lección en Markdown. Puedes copiar y pegar desde ChatGPT, Notion, etc."
-              />
-            </div>
-          </>
-        )}
 
         {contentType === 'assignment' && (
           <>
-            <div style={{ marginBottom: '12px' }}>
-              <label style={{ display: 'block', fontSize: '13px', fontWeight: '600', color: '#374151', marginBottom: '6px' }}>
-                Imagen de portada
-              </label>
-              <input
-                type="file"
-                accept="image/*"
-                onChange={handleImageUpload}
-                disabled={uploadingImage}
-                style={{
-                  width: '100%',
-                  padding: '8px 12px',
-                  border: '2px solid #e5e7eb',
-                  borderRadius: '8px',
-                  fontSize: '13px',
-                  cursor: uploadingImage ? 'not-allowed' : 'pointer',
-                  boxSizing: 'border-box'
-                }}
-              />
-              {uploadingImage && (
-                <p style={{ fontSize: '11px', color: '#667eea', marginTop: '4px', fontWeight: '500' }}>
-                  📎 Subiendo imagen...
-                </p>
-              )}
-              {markdownImage && (
-                <div style={{ marginTop: '8px' }}>
-                  <img
-                    src={markdownImage}
-                    alt="Vista previa"
-                    style={{
-                      maxWidth: '100%',
-                      maxHeight: '200px',
-                      borderRadius: '8px',
-                      objectFit: 'cover',
-                      border: '2px solid #e5e7eb'
-                    }}
-                  />
-                  <p style={{ fontSize: '11px', color: '#10b981', marginTop: '4px', fontWeight: '500' }}>
-                    ✓ Imagen configurada
-                  </p>
-                </div>
-              )}
-            </div>
-            <div style={{ marginBottom: '12px' }}>
-              <label style={{ display: 'block', fontSize: '13px', fontWeight: '600', color: '#374151', marginBottom: '6px' }}>
-                Video de YouTube (opcional)
-              </label>
-              <input
-                type="text"
-                value={markdownVideo}
-                onChange={(e) => setMarkdownVideo(e.target.value)}
-                style={{
-                  width: '100%',
-                  padding: '8px 12px',
-                  border: '2px solid #e5e7eb',
-                  borderRadius: '8px',
-                  fontSize: '14px',
-                  outline: 'none',
-                  boxSizing: 'border-box'
-                }}
-                onFocus={(e) => e.target.style.borderColor = '#667eea'}
-                onBlur={(e) => e.target.style.borderColor = '#e5e7eb'}
-                placeholder="ID o URL de YouTube (ej: dQw4w9WgXcQ)"
-              />
-            </div>
             <div style={{ marginBottom: '12px' }}>
               <label style={{ display: 'block', fontSize: '13px', fontWeight: '600', color: '#374151', marginBottom: '6px' }}>
                 Instrucciones de la Tarea
@@ -4420,6 +4320,56 @@ Genera el contenido completo.`;
                 Define cuántos puntos vale esta tarea (por defecto 20)
               </p>
             </div>
+            <div style={{ marginBottom: '12px' }}>
+              <label style={{ display: 'block', fontSize: '13px', fontWeight: '600', color: '#374151', marginBottom: '6px' }}>
+                Adjuntar Archivos
+              </label>
+              <input
+                type="file"
+                multiple
+                onChange={handleFileUpload}
+                disabled={uploading}
+                style={{
+                  width: '100%',
+                  padding: '8px 12px',
+                  border: '2px solid #e5e7eb',
+                  borderRadius: '8px',
+                  fontSize: '13px',
+                  cursor: uploading ? 'not-allowed' : 'pointer',
+                  boxSizing: 'border-box'
+                }}
+              />
+              {uploading && (
+                <p style={{ fontSize: '11px', color: '#667eea', marginTop: '4px', fontWeight: '500' }}>
+                  📤 Subiendo archivos...
+                </p>
+              )}
+            </div>
+
+            {documentsUrls.length > 0 && (
+              <div style={{ marginBottom: '16px', padding: '12px', backgroundColor: '#f9fafb', borderRadius: '8px', border: '1px solid #e5e7eb' }}>
+                <p style={{ fontSize: '13px', fontWeight: '600', color: '#374151', marginBottom: '8px' }}>
+                  📎 Archivos subidos ({documentsUrls.length}):
+                </p>
+                {documentsUrls.map((url, index) => {
+                  const fullFilename = url.split('/').pop() || `Archivo ${index + 1}`;
+                  const filename = fullFilename.replace(/^\d+_/, '');
+                  return (
+                    <div key={index} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '6px 8px', backgroundColor: 'white', borderRadius: '6px', marginBottom: '6px', border: '1px solid #e5e7eb' }}>
+                      <a href={url} target="_blank" rel="noopener noreferrer" style={{ fontSize: '12px', color: '#667eea', textDecoration: 'none', flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        {filename}
+                      </a>
+                      <button
+                        onClick={() => setDocumentsUrls(prev => prev.filter((_, i) => i !== index))}
+                        style={{ marginLeft: '8px', padding: '4px 8px', fontSize: '11px', color: '#ef4444', backgroundColor: 'white', border: '1px solid #ef4444', borderRadius: '4px', cursor: 'pointer' }}
+                      >
+                        ✕
+                      </button>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
           </>
         )}
 
@@ -4458,7 +4408,7 @@ Genera el contenido completo.`;
           </label>
         </div>
 
-        {(contentType === 'video' || contentType === 'markdown' || contentType === 'assignment') && (mainContent || markdownContent) && (
+        {(contentType === 'video' || contentType === 'assignment') && (mainContent || markdownContent) && (
           <>
             <div style={{
               marginBottom: '12px',
@@ -4550,6 +4500,7 @@ Genera el contenido completo.`;
                 video_file: videoFile,
                 main_content: mainContent,
                 document_url: documentUrl,
+                documents_urls: documentsUrls,
                 markdown_content: markdownContent,
                 markdown_image: markdownImage,
                 markdown_video: markdownVideo,

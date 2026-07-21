@@ -54,6 +54,7 @@ interface Lesson {
   video_file: string | null;
   main_content: string | null;
   document_url: string | null;
+  documents_urls: string | string[] | null;
   markdown_content: string | null;
   markdown_image: string | null;
   markdown_video: string | null;
@@ -1199,15 +1200,26 @@ export default function CoursePage({ params }: { params: Promise<{ slug: string 
                           width: 100%;
                           border-collapse: collapse;
                           margin: 1rem 0;
+                          overflow: hidden;
                         }
                         .html-content th, .html-content td {
-                          border: 1px solid #e5e7eb;
-                          padding: 0.5rem;
+                          border: 2px solid #e5e7eb;
+                          padding: 8px 12px;
                           text-align: left;
+                          min-width: 100px;
                         }
                         .html-content th {
                           background: #f3f4f6;
                           font-weight: 600;
+                        }
+                        .html-content table tr:hover {
+                          background-color: #f9fafb;
+                        }
+                        .html-content p {
+                          margin: 0.5rem 0;
+                        }
+                        .html-content table p {
+                          margin: 0;
                         }
                         .html-content strong, .html-content b {
                           font-weight: 700;
@@ -1504,6 +1516,73 @@ export default function CoursePage({ params }: { params: Promise<{ slug: string 
                       </>
                     )}
                   </div>
+                  {selectedLesson.documents_urls && (() => {
+                    const urls = typeof selectedLesson.documents_urls === 'string'
+                      ? JSON.parse(selectedLesson.documents_urls)
+                      : selectedLesson.documents_urls;
+                    return urls && urls.length > 0 && (
+                      <div style={{
+                        background: 'white',
+                        borderRadius: '12px',
+                        padding: '32px',
+                        boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
+                        marginBottom: '20px',
+                        border: '2px solid #10b981'
+                      }}>
+                        <h3 style={{
+                          fontSize: '20px',
+                          fontWeight: '700',
+                          color: '#111827',
+                          marginBottom: '16px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '8px'
+                        }}>
+                          📎 Archivos Adjuntos
+                        </h3>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                          {urls.map((url: string, index: number) => {
+                            const fullFilename = url.split('/').pop() || `Archivo ${index + 1}`;
+                            const filename = fullFilename.replace(/^\d+_/, '');
+                            return (
+                              <a
+                                key={index}
+                                href={url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                style={{
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  gap: '12px',
+                                  padding: '16px',
+                                  background: '#f0fdf4',
+                                  borderRadius: '8px',
+                                  border: '2px solid #10b981',
+                                  textDecoration: 'none',
+                                  color: '#047857',
+                                  fontWeight: '600',
+                                  fontSize: '16px',
+                                  transition: 'all 0.2s'
+                                }}
+                                onMouseEnter={(e) => {
+                                  e.currentTarget.style.background = '#dcfce7';
+                                  e.currentTarget.style.transform = 'translateX(4px)';
+                                }}
+                                onMouseLeave={(e) => {
+                                  e.currentTarget.style.background = '#f0fdf4';
+                                  e.currentTarget.style.transform = 'translateX(0)';
+                                }}
+                              >
+                                <span style={{ fontSize: '24px' }}>📄</span>
+                                <span style={{ flex: 1 }}>{filename}</span>
+                                <span style={{ fontSize: '20px' }}>⬇️</span>
+                              </a>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    );
+                  })()}
                   <div style={{
                     background: 'white',
                     borderRadius: '12px',

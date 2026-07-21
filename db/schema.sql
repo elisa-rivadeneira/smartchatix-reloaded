@@ -66,6 +66,7 @@ CREATE TABLE IF NOT EXISTS lessons (
   video_url VARCHAR(500), -- YouTube video ID
   main_content TEXT, -- Contenido principal de la lección (HTML)
   document_url VARCHAR(500), -- Path al PDF/archivo
+  documents_urls JSON, -- Array de URLs de múltiples documentos (PDF, Word, Excel)
   markdown_content TEXT, -- Contenido Markdown
   markdown_image VARCHAR(500), -- Imagen de portada para Markdown
   markdown_video VARCHAR(500), -- Video de YouTube para Markdown

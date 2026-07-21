@@ -15,7 +15,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { module_id, title, description, content_type, video_url, video_file, main_content, document_url, markdown_content, markdown_image, markdown_video, duration, is_free, has_quiz, quiz_questions_count, quiz_data } = body;
+    const { module_id, title, description, content_type, video_url, video_file, main_content, document_url, documents_urls, markdown_content, markdown_image, markdown_video, duration, is_free, has_quiz, quiz_questions_count, quiz_data } = body;
 
     const moduleCheck = await query(`
       SELECT m.id FROM modules m
@@ -35,9 +35,9 @@ export async function POST(request: NextRequest) {
     const order_index = (maxOrder[0]?.max_order || -1) + 1;
 
     const result = await query(
-      `INSERT INTO lessons (module_id, title, description, content_type, video_url, video_file, main_content, document_url, markdown_content, markdown_image, markdown_video, duration, is_free, has_quiz, quiz_questions_count, quiz_data, order_index)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-      [module_id, title, description || '', content_type, video_url || '', video_file || '', main_content || '', document_url || '', markdown_content || '', markdown_image || '', markdown_video || '', duration || '', is_free ? 1 : 0, has_quiz ? 1 : 0, quiz_questions_count || 0, quiz_data ? JSON.stringify(quiz_data) : null, order_index]
+      `INSERT INTO lessons (module_id, title, description, content_type, video_url, video_file, main_content, document_url, documents_urls, markdown_content, markdown_image, markdown_video, duration, is_free, has_quiz, quiz_questions_count, quiz_data, order_index)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [module_id, title, description || '', content_type, video_url || '', video_file || '', main_content || '', document_url || '', documents_urls ? JSON.stringify(documents_urls) : null, markdown_content || '', markdown_image || '', markdown_video || '', duration || '', is_free ? 1 : 0, has_quiz ? 1 : 0, quiz_questions_count || 0, quiz_data ? JSON.stringify(quiz_data) : null, order_index]
     );
 
     return NextResponse.json({
