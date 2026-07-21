@@ -29,6 +29,16 @@ export async function GET(
 
     const course = courseData[0];
 
+    if (typeof course.module_titles === 'string') {
+      course.module_titles = JSON.parse(course.module_titles);
+    }
+    if (typeof course.learning_outcomes === 'string') {
+      course.learning_outcomes = JSON.parse(course.learning_outcomes);
+    }
+    if (typeof course.recorded_features === 'string') {
+      course.recorded_features = JSON.parse(course.recorded_features);
+    }
+
     const modules = await query(`
       SELECT * FROM modules WHERE course_id = ? ORDER BY order_index ASC
     `, [course.id]);
