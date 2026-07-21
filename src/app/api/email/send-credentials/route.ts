@@ -125,7 +125,7 @@ export async function POST(request: NextRequest) {
       </html>
     `;
 
-    if (!process.env.RESEND_API_KEY) {
+    if (!resend) {
       console.log('⚠️  RESEND_API_KEY no está configurada. Credenciales:');
       console.log(`📧 Email: ${email}`);
       console.log(`🔑 Contraseña: ${password}`);
