@@ -39,10 +39,14 @@ export async function createClaim(data: CreateClaimInput) {
       userAgent,
     });
 
-    await Promise.all([
-      claimEmailService.sendConsumerConfirmation(claim),
-      claimEmailService.sendAdminNotification(claim),
-    ]);
+    try {
+      await Promise.all([
+        claimEmailService.sendConsumerConfirmation(claim),
+        claimEmailService.sendAdminNotification(claim),
+      ]);
+    } catch (emailError: any) {
+      console.error('Error sending emails:', emailError);
+    }
 
     return { success: true, data: claim };
   } catch (error: any) {

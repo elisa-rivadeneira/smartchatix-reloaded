@@ -7,27 +7,44 @@ const ADMIN_EMAIL = process.env.ADMIN_EMAIL || process.env.RESEND_FROM_EMAIL;
 
 export class ClaimEmailService {
   async sendConsumerConfirmation(claim: Claim): Promise<void> {
-    const html = this.generateConsumerEmailHTML(claim);
+    try {
+      const html = this.generateConsumerEmailHTML(claim);
 
-    await resend.emails.send({
-      from: FROM_EMAIL,
-      to: claim.email,
-      subject: `Confirmación de ${claim.type.toLowerCase()} - ${claim.claimCode}`,
-      html,
-    });
+      const result = await resend.emails.send({
+        from: FROM_EMAIL,
+        to: claim.email,
+        subject: `Confirmación de ${claim.type.toLowerCase()} - ${claim.claimCode}`,
+        html,
+      });
+
+      console.log(`✓ Consumer email sent to ${claim.email}:`, result);
+    } catch (error) {
+      console.error(`✗ Failed to send consumer email to ${claim.email}:`, error);
+      throw error;
+    }
   }
 
   async sendAdminNotification(claim: Claim): Promise<void> {
-    if (!ADMIN_EMAIL) return;
+    if (!ADMIN_EMAIL) {
+      console.warn('⚠ ADMIN_EMAIL not configured, skipping admin notification');
+      return;
+    }
 
-    const html = this.generateAdminEmailHTML(claim);
+    try {
+      const html = this.generateAdminEmailHTML(claim);
 
-    await resend.emails.send({
-      from: FROM_EMAIL,
-      to: ADMIN_EMAIL,
-      subject: `Nuevo ${claim.type.toLowerCase()} registrado - ${claim.claimCode}`,
-      html,
-    });
+      const result = await resend.emails.send({
+        from: FROM_EMAIL,
+        to: ADMIN_EMAIL,
+        subject: `Nuevo ${claim.type.toLowerCase()} registrado - ${claim.claimCode}`,
+        html,
+      });
+
+      console.log(`✓ Admin email sent to ${ADMIN_EMAIL}:`, result);
+    } catch (error) {
+      console.error(`✗ Failed to send admin email to ${ADMIN_EMAIL}:`, error);
+      throw error;
+    }
   }
 
   private generateConsumerEmailHTML(claim: Claim): string {
