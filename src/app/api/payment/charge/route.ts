@@ -140,6 +140,7 @@ export async function POST(request: NextRequest) {
 
           if (isNewUser && temporaryPassword) {
             console.log('📧 Queuing credentials email to:', metadata.student_email);
+            console.log('📧 Password:', temporaryPassword);
 
             fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/email/send-credentials`, {
               method: 'POST',
@@ -150,10 +151,11 @@ export async function POST(request: NextRequest) {
                 password: temporaryPassword,
                 courseTitle: course.title
               })
-            }).then(() => {
-              console.log('📧 Email sent successfully');
+            }).then(async (response) => {
+              const result = await response.json();
+              console.log('📧 Email response:', result);
             }).catch((emailError) => {
-              console.error('⚠️ Error enviando correo:', emailError);
+              console.error('⚠️ Error enviando correo:', emailError.message);
             });
           }
 
