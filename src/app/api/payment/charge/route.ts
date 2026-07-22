@@ -139,29 +139,22 @@ export async function POST(request: NextRequest) {
           }
 
           if (isNewUser && temporaryPassword) {
-            try {
-              console.log('📧 Sending credentials email to:', metadata.student_email);
+            console.log('📧 Queuing credentials email to:', metadata.student_email);
 
-              const emailPromise = fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/email/send-credentials`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                  email: metadata.student_email,
-                  name: metadata.student_name || 'Estudiante',
-                  password: temporaryPassword,
-                  courseTitle: course.title
-                })
-              });
-
-              const timeoutPromise = new Promise((_, reject) =>
-                setTimeout(() => reject(new Error('Email timeout')), 10000)
-              );
-
-              await Promise.race([emailPromise, timeoutPromise]);
+            fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/email/send-credentials`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                email: metadata.student_email,
+                name: metadata.student_name || 'Estudiante',
+                password: temporaryPassword,
+                courseTitle: course.title
+              })
+            }).then(() => {
               console.log('📧 Email sent successfully');
-            } catch (emailError) {
-              console.error('⚠️ Error enviando correo (continuando):', emailError);
-            }
+            }).catch((emailError) => {
+              console.error('⚠️ Error enviando correo:', emailError);
+            });
           }
 
           return NextResponse.json({
