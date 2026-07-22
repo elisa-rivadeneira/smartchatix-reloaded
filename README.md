@@ -256,3 +256,4 @@ Configurar todas las variables listadas arriba en el panel de EasyPanel.
 **Desarrollado con ❤️ para transformar la educación online**
 
 © 2025 SmartChatix. Todos los derechos reservados.
+# Force rebuild Wed Jul 22 11:21:35 AM -05 2026
