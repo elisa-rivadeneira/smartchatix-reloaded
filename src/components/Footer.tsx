@@ -240,7 +240,7 @@ export default function Footer() {
           color: 'rgba(255,255,255,0.7)',
           textAlign: 'center'
         }}>
-          © 2025 SmartChatix. Todos los derechos reservados. |
+          © 2026 SmartChatix. Todos los derechos reservados. |
           Tel: +51 967 717 179 |{' '}
           <Link href="/terminos-condiciones" style={{
             color: 'rgba(255,255,255,0.9)',
