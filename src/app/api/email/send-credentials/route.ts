@@ -139,7 +139,7 @@ export async function POST(request: NextRequest) {
     }
 
     const { data, error } = await resend.emails.send({
-      from: 'SmartChatix <no-reply@smartchatix.com>',
+      from: 'SmartChatix <onboarding@resend.dev>',
       to: [email],
       subject: `🎉 Bienvenido a ${courseTitle} - Tus credenciales de acceso`,
       html: emailHTML,
