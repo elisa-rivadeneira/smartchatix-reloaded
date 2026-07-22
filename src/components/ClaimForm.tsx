@@ -73,7 +73,7 @@ export default function ClaimForm() {
 
     const result = await createClaim(submitData);
 
-    if (result.success && result.data) {
+    if (result.success && result.data && result.data.claimCode) {
       router.push(`/libro-de-reclamaciones/exito?code=${result.data.claimCode}`);
     } else {
       setError(result.error || 'Error al registrar');

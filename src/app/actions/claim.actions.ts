@@ -49,9 +49,31 @@ export async function createClaim(data: CreateClaimInput) {
     console.error('Error creating claim:', error);
     console.error('Error stack:', error.stack);
     console.error('Error message:', error.message);
+
+    if (error.name === 'ZodError') {
+      const firstError = error.errors[0];
+      let errorMessage = 'Datos inválidos';
+
+      if (firstError.path.includes('phone')) {
+        errorMessage = 'El teléfono debe tener entre 9 y 15 dígitos';
+      } else if (firstError.path.includes('description')) {
+        errorMessage = 'La descripción debe tener al menos 20 caracteres';
+      } else if (firstError.path.includes('consumerRequest')) {
+        errorMessage = 'El pedido debe tener al menos 10 caracteres';
+      } else if (firstError.path.includes('documentNumber')) {
+        errorMessage = 'Formato de documento inválido (DNI: 8 dígitos, CE: 9 dígitos, RUC: 11 dígitos)';
+      }
+
+      return {
+        success: false,
+        error: errorMessage,
+        details: error.errors,
+      };
+    }
+
     return {
       success: false,
-      error: error.name === 'ZodError' ? 'Datos inválidos' : 'Error al registrar el reclamo',
+      error: 'Error al registrar el reclamo',
       details: error.message || error.errors,
     };
   }
