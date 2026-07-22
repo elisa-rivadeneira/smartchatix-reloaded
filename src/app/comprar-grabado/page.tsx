@@ -781,7 +781,26 @@ function ComprarGrabadoContent() {
                       <p style={{ marginBottom: spacing.md, color: colors.gray[700] }}>
                         Serás redirigido a PayPal para completar el pago de forma segura.
                       </p>
-                      <img src="/images/paypal_icon.png" alt="PayPal" style={{ height: '60px', width: 'auto' }} />
+                      <img src="/images/paypal_icon.png" alt="PayPal" style={{ height: '60px', width: 'auto', marginBottom: spacing.md }} />
+                      <button
+                        type="button"
+                        onClick={() => alert('Integración de PayPal próximamente')}
+                        style={{
+                          width: '100%',
+                          padding: '1rem',
+                          background: 'linear-gradient(135deg, #0070BA 0%, #1546A0 100%)',
+                          color: 'white',
+                          border: 'none',
+                          borderRadius: '8px',
+                          fontSize: '1rem',
+                          fontWeight: '600',
+                          cursor: 'pointer',
+                          marginTop: spacing.md,
+                          boxShadow: '0 4px 12px rgba(0, 112, 186, 0.3)'
+                        }}
+                      >
+                        Pagar con PayPal - S/ {curso?.priceGrabado || 699}
+                      </button>
                     </div>
                   )}
                 </div>
@@ -863,101 +882,33 @@ function ComprarGrabadoContent() {
                         color: colors.white,
                         padding: spacing.sm,
                         borderRadius: '8px',
-                        fontSize: '0.85rem'
+                        fontSize: '0.85rem',
+                        marginBottom: spacing.md
                       }}>
                         💡 Monto: S/ {curso?.priceGrabado || 699}
                       </div>
+                      <button
+                        type="button"
+                        onClick={() => router.push('/pago-yape')}
+                        style={{
+                          width: '100%',
+                          padding: '1rem',
+                          background: 'linear-gradient(135deg, #6B1F7B 0%, #8B2F9B 100%)',
+                          color: 'white',
+                          border: 'none',
+                          borderRadius: '8px',
+                          fontSize: '1rem',
+                          fontWeight: '600',
+                          cursor: 'pointer',
+                          boxShadow: '0 4px 12px rgba(107, 31, 123, 0.3)'
+                        }}
+                      >
+                        Ya Yapeé - Confirmar Pago
+                      </button>
                     </div>
                   )}
                 </div>
 
-                <div className="mobile-fixed-bottom">
-                  {/* Detalles del pedido en paso 2 */}
-                  <div style={{
-                    border: `1px solid ${colors.gray[200]}`,
-                    borderRadius: '8px',
-                    padding: spacing.md,
-                    marginBottom: spacing.sm,
-                    backgroundColor: colors.gray[50]
-                  }}>
-                    {curso && (
-                      <div style={{
-                        display: 'flex',
-                        gap: spacing.sm,
-                        alignItems: 'center'
-                      }}>
-                        {curso.image && (
-                          <img
-                            src={curso.image}
-                            alt={curso.title}
-                            style={{
-                              width: '50px',
-                              height: '40px',
-                              objectFit: 'cover',
-                              borderRadius: '4px'
-                            }}
-                          />
-                        )}
-                        <div style={{ flex: 1 }}>
-                          <h4 style={{
-                            fontSize: '0.85rem',
-                            fontWeight: '600',
-                            color: colors.gray[700],
-                            marginBottom: '2px'
-                          }}>
-                            {curso.title}
-                          </h4>
-                          <p style={{
-                            fontSize: '0.75rem',
-                            color: colors.gray[500],
-                            margin: 0
-                          }}>
-                            Curso Grabado
-                          </p>
-                        </div>
-                        <div style={{
-                          fontSize: '1rem',
-                          fontWeight: '700',
-                          color: colors.primary
-                        }}>
-                          S/ {curso.priceGrabado}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-
-                  <button
-                    type="submit"
-                    style={{
-                      backgroundColor: colors.primary,
-                      color: colors.white,
-                      border: 'none',
-                      padding: `${spacing.md} ${spacing.lg}`,
-                      borderRadius: '6px',
-                      fontWeight: '600',
-                      fontSize: '1.1rem',
-                      cursor: 'pointer',
-                      width: '100%'
-                    }}
-                  >
-                    <span className="mobile-only">
-                      {paymentMethod === 'card' ? `Pagar Ahora S/ ${curso?.priceGrabado || 699}` : paymentMethod === 'yape' || paymentMethod === 'plin' ? 'Ir a Yape/Plin' : 'Continuar'}
-                    </span>
-                    <span className="desktop-only">
-                      {paymentMethod === 'card' ? 'Pagar Ahora' : paymentMethod === 'yape' || paymentMethod === 'plin' ? 'Ir a Yape/Plin' : 'Continuar'}
-                    </span>
-                  </button>
-
-                  <p style={{
-                    fontSize: '0.7rem',
-                    color: colors.gray[500],
-                    marginTop: spacing.xs,
-                    textAlign: 'center',
-                    marginBottom: 0
-                  }}>
-                    Al pagar aceptas nuestros <a href="#" style={{ color: colors.secondary, textDecoration: 'none' }}>Términos de Uso</a> y <a href="#" style={{ color: colors.secondary, textDecoration: 'none' }}>Política de Privacidad</a>.
-                  </p>
-                </div>
                 </>
               )}
 
