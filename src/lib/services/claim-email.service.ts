@@ -60,7 +60,7 @@ export class ClaimEmailService {
           <p><strong>Fecha de registro:</strong> ${formattedDate}</p>
           <div class="info-box">
             <strong>Bien contratado:</strong> ${claim.productType} - ${claim.productName}
-            ${claim.amount ? `<br><strong>Monto:</strong> S/ ${claim.amount.toFixed(2)}` : ''}
+            ${claim.amount !== null && claim.amount !== undefined ? `<br><strong>Monto:</strong> S/ ${Number(claim.amount).toFixed(2)}` : ''}
           </div>
           <p>Recibirá una respuesta en un plazo máximo de <strong>30 días calendario</strong>.</p>
           <p style="font-size: 12px; color: #666; margin-top: 20px;">© ${new Date().getFullYear()} SmartChatix</p>

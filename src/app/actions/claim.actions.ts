@@ -47,10 +47,12 @@ export async function createClaim(data: CreateClaimInput) {
     return { success: true, data: claim };
   } catch (error: any) {
     console.error('Error creating claim:', error);
+    console.error('Error stack:', error.stack);
+    console.error('Error message:', error.message);
     return {
       success: false,
       error: error.name === 'ZodError' ? 'Datos inválidos' : 'Error al registrar el reclamo',
-      details: error.errors,
+      details: error.message || error.errors,
     };
   }
 }
