@@ -253,6 +253,12 @@ export default function Footer() {
             textDecoration: 'underline'
           }}>
             Términos y Condiciones
+          </Link>{' '}|{' '}
+          <Link href="/politica-privacidad" style={{
+            color: 'rgba(255,255,255,0.9)',
+            textDecoration: 'underline'
+          }}>
+            Política de Privacidad
           </Link>
         </div>
       </div>
