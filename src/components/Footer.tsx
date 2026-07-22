@@ -259,6 +259,12 @@ export default function Footer() {
             textDecoration: 'underline'
           }}>
             Política de Privacidad
+          </Link>{' '}|{' '}
+          <Link href="/politica-cambios-reembolsos" style={{
+            color: 'rgba(255,255,255,0.9)',
+            textDecoration: 'underline'
+          }}>
+            Cambios y Reembolsos
           </Link>
         </div>
       </div>
