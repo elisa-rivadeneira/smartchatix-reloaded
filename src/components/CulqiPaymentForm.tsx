@@ -152,7 +152,14 @@ export default function CulqiPaymentForm({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    await handleDemoPayment();
+
+    if (!culqiLoaded || !window.Culqi) {
+      onError('Culqi no está cargado. Por favor, recarga la página.');
+      return;
+    }
+
+    setProcessing(true);
+    window.Culqi.createToken();
   };
 
   return (
