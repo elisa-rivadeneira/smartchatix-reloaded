@@ -242,12 +242,6 @@ export default function Footer() {
         }}>
           © 2025 SmartChatix. Todos los derechos reservados. |
           Tel: +51 967 717 179 |{' '}
-          <Link href="/aviso-legal" style={{
-            color: 'rgba(255,255,255,0.9)',
-            textDecoration: 'underline'
-          }}>
-            Aviso Legal
-          </Link>{' '}|{' '}
           <Link href="/terminos-condiciones" style={{
             color: 'rgba(255,255,255,0.9)',
             textDecoration: 'underline'
