@@ -9,6 +9,7 @@ function generateTemporaryPassword(): string {
 
 export async function POST(request: NextRequest) {
   try {
+    console.log('🔵 Charge endpoint called');
     const body = await request.json();
 
     const {
@@ -18,6 +19,8 @@ export async function POST(request: NextRequest) {
       description,
       metadata
     } = body;
+
+    console.log('🔵 Processing charge:', { token, amount, email });
 
     if (!token || !amount || !email) {
       return NextResponse.json(
@@ -137,7 +140,9 @@ export async function POST(request: NextRequest) {
 
           if (isNewUser && temporaryPassword) {
             try {
-              await fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/email/send-credentials`, {
+              console.log('📧 Sending credentials email to:', metadata.student_email);
+
+              const emailPromise = fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/email/send-credentials`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -147,8 +152,15 @@ export async function POST(request: NextRequest) {
                   courseTitle: course.title
                 })
               });
+
+              const timeoutPromise = new Promise((_, reject) =>
+                setTimeout(() => reject(new Error('Email timeout')), 10000)
+              );
+
+              await Promise.race([emailPromise, timeoutPromise]);
+              console.log('📧 Email sent successfully');
             } catch (emailError) {
-              console.error('Error enviando correo:', emailError);
+              console.error('⚠️ Error enviando correo (continuando):', emailError);
             }
           }
 

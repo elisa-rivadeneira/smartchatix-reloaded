@@ -170,6 +170,8 @@ export default function CulqiPaymentForm({
 
     setProcessing(true);
 
+    const fullYear = expYear.length === 2 ? `20${expYear}` : expYear;
+
     try {
       const tokenResponse = await fetch('/api/payment/create-token', {
         method: 'POST',
@@ -178,7 +180,7 @@ export default function CulqiPaymentForm({
           card_number: cardNumber,
           cvv: cvv,
           expiration_month: expMonth,
-          expiration_year: expYear,
+          expiration_year: fullYear,
           email: email
         })
       });
