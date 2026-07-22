@@ -218,7 +218,7 @@ export default function Footer() {
           paddingBottom: spacing.sm,
           textAlign: 'center'
         }}>
-          <Link href="#" style={{
+          <Link href="/libro-de-reclamaciones" style={{
             color: colors.white,
             textDecoration: 'none',
             fontSize: '0.9rem',

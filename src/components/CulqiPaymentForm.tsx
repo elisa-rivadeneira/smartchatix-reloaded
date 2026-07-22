@@ -153,6 +153,9 @@ export default function CulqiPaymentForm({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    console.log('🔥 PAGAR AHORA - Build:', new Date().toISOString());
+    console.log('🔥 Public Key:', process.env.NEXT_PUBLIC_CULQI_PUBLIC_KEY);
+
     if (!culqiLoaded || !window.Culqi) {
       onError('Culqi no está cargado. Por favor, recarga la página.');
       return;
