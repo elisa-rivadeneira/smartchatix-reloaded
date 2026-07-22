@@ -247,6 +247,12 @@ export default function Footer() {
             textDecoration: 'underline'
           }}>
             Aviso Legal
+          </Link>{' '}|{' '}
+          <Link href="/terminos-condiciones" style={{
+            color: 'rgba(255,255,255,0.9)',
+            textDecoration: 'underline'
+          }}>
+            Términos y Condiciones
           </Link>
         </div>
       </div>
