@@ -613,7 +613,7 @@ export default function SmartChatixPrincipalPage() {
                                 {course.title}
                               </div>
                               <div style={{ fontSize: '0.75rem', color: colors.gray[500] }}>
-                                {course.hours} • {loading ? 'S/ ' + course.priceGrabado : symbol + ' ' + convertPrice(course.priceGrabado)}
+                                {course.hours} • {loading ? 'S/ ' + course.priceGrabado : symbol + ' ' + convertPrice(course.priceGrabado || 0)}
                               </div>
                             </Link>
                           ))}
@@ -1144,14 +1144,14 @@ export default function SmartChatixPrincipalPage() {
                       fontSize: '1.2rem',
                       color: colors.accent
                     }}>
-                      {loading ? 'S/ ' + course.priceGrabado : symbol + ' ' + convertPrice(course.priceGrabado)}
+                      {loading ? 'S/ ' + course.priceGrabado : symbol + ' ' + convertPrice(course.priceGrabado || 0)}
                     </span>
                     <span style={{
                       fontSize: '0.9rem',
                       color: colors.gray[400],
                       textDecoration: 'line-through'
                     }}>
-                      {loading ? 'S/ ' + course.oldPriceGrabado : symbol + ' ' + convertPrice(course.oldPriceGrabado)}
+                      {loading ? 'S/ ' + course.oldPriceGrabado : symbol + ' ' + convertPrice(course.oldPriceGrabado || 0)}
                     </span>
                   </div>
                 </div>

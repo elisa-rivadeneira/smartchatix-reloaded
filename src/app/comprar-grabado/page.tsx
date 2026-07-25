@@ -596,7 +596,7 @@ function ComprarGrabadoContent() {
 
                       {!paymentSuccess ? (
                         <CulqiPaymentForm
-                          amount={curso.priceGrabado}
+                          amount={curso.priceGrabado ?? 0}
                           courseSlug={curso.slug}
                           courseTitle={curso.title}
                           modality="grabado"

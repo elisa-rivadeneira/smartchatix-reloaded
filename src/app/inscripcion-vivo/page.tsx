@@ -584,7 +584,7 @@ function InscripcionVivoContent() {
 
                       {!paymentSuccess ? (
                         <CulqiPaymentForm
-                          amount={curso.priceVivo}
+                          amount={curso.priceVivo || 0}
                           courseSlug={curso.slug}
                           courseTitle={curso.title}
                           modality="vivo"

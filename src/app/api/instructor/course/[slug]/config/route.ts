@@ -166,6 +166,11 @@ export async function PATCH(
       values.push(score);
     }
 
+    if (body.publication_status && ['published', 'coming_soon', 'unpublished'].includes(body.publication_status)) {
+      updates.push('publication_status = ?');
+      values.push(body.publication_status);
+    }
+
     if (updates.length === 0) {
       return NextResponse.json({ error: 'No hay cambios para actualizar' }, { status: 400 });
     }

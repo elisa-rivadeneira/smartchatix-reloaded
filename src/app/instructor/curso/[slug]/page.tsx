@@ -103,6 +103,7 @@ interface Course {
   is_active: boolean;
   is_certification_enabled?: boolean;
   passing_score?: number;
+  publication_status?: 'published' | 'coming_soon' | 'unpublished';
   modules: Module[];
 }
 
@@ -2990,6 +2991,83 @@ export default function InstructorCourseEditPage() {
                   </p>
                 </div>
               ) : null}
+            </div>
+
+            {/* Estado de Publicación */}
+            <div style={{
+              padding: '24px',
+              background: '#f9fafb',
+              borderRadius: '8px',
+              border: '1px solid #e5e7eb',
+              marginBottom: '24px'
+            }}>
+              <h3 style={{
+                fontSize: '16px',
+                fontWeight: '600',
+                color: '#374151',
+                marginBottom: '16px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px'
+              }}>
+                🌐 Estado de Publicación
+              </h3>
+
+              <div style={{ marginBottom: '16px' }}>
+                <label style={{
+                  display: 'block',
+                  fontSize: '13px',
+                  fontWeight: '600',
+                  color: '#374151',
+                  marginBottom: '8px'
+                }}>
+                  Estado del curso en la web
+                </label>
+                <select
+                  value={course?.publication_status || 'unpublished'}
+                  onChange={async (e) => {
+                    const status = e.target.value as 'published' | 'coming_soon' | 'unpublished';
+                    setSaving(true);
+                    try {
+                      const response = await fetch(`/api/instructor/course/${slug}/config`, {
+                        method: 'PATCH',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ publication_status: status })
+                      });
+                      if (response.ok) {
+                        setCourse(prev => prev ? { ...prev, publication_status: status } : null);
+                      }
+                    } catch (error) {
+                      console.error('Error:', error);
+                    } finally {
+                      setSaving(false);
+                    }
+                  }}
+                  style={{
+                    width: '100%',
+                    padding: '10px 12px',
+                    border: '2px solid #e5e7eb',
+                    borderRadius: '8px',
+                    fontSize: '14px',
+                    fontWeight: '500',
+                    cursor: 'pointer',
+                    background: 'white'
+                  }}
+                >
+                  <option value="unpublished">🔒 Sin publicar - No visible en la web</option>
+                  <option value="coming_soon">⏳ Próximamente - Visible sin precios ni inscripción</option>
+                  <option value="published">✅ Publicado - Completamente visible con precios</option>
+                </select>
+                <p style={{
+                  fontSize: '12px',
+                  color: '#6b7280',
+                  marginTop: '8px'
+                }}>
+                  {course?.publication_status === 'published' && '✅ El curso está completamente visible con precios y enlaces de inscripción.'}
+                  {course?.publication_status === 'coming_soon' && '⏳ El curso es visible pero sin precios ni enlaces de inscripción.'}
+                  {(course?.publication_status === 'unpublished' || !course?.publication_status) && '🔒 El curso no es visible en la web pública. Solo admins e instructores pueden verlo.'}
+                </p>
+              </div>
             </div>
 
             {/* Otras configuraciones (placeholder) */}

@@ -20,9 +20,10 @@ export async function GET() {
         recorded_features,
         learning_outcomes,
         module_titles,
-        is_active
+        is_active,
+        publication_status
       FROM courses
-      WHERE is_active = TRUE
+      WHERE is_active = TRUE AND publication_status IN ('published', 'coming_soon')
       ORDER BY id ASC
     `);
 
@@ -54,10 +55,10 @@ export async function GET() {
           image: course.thumbnail,
           thumbnail: course.thumbnail,
           hours: course.duration || `${recordedFeatures.duration_hours || 0}h`,
-          priceVivo: course.price_vivo,
-          oldPriceVivo: course.price_vivo,
-          priceGrabado: course.price_grabado,
-          oldPriceGrabado: course.price_grabado,
+          priceVivo: course.publication_status === 'published' ? course.price_vivo : null,
+          oldPriceVivo: course.publication_status === 'published' ? course.price_vivo : null,
+          priceGrabado: course.publication_status === 'published' ? course.price_grabado : null,
+          oldPriceGrabado: course.publication_status === 'published' ? course.price_grabado : null,
           hasLiveMode: Boolean(course.has_live_mode),
           live_start_date: course.live_start_date,
           live_schedule: course.live_schedule,
@@ -65,6 +66,7 @@ export async function GET() {
           recorded_features: recordedFeatures,
           learning_outcomes: learningOutcomes,
           module_titles: moduleTitles,
+          publication_status: course.publication_status,
           modules: moduleTitles.map((title: string, idx: number) => ({
             num: idx + 1,
             title: title,
