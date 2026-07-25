@@ -2,15 +2,14 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { getCourses } from '@/data/courses';
 import Footer from '@/components/Footer';
 import { useCurrency } from '@/hooks/useCurrency';
 import SmartChatixBusiness from '@/components/sections/SmartChatixBusiness';
 
 export default function SmartChatixPrincipalPage() {
-  const courses = getCourses();
   const { symbol, convertPrice, loading } = useCurrency();
 
+  const [courses, setCourses] = React.useState<any[]>([]);
   const [showModal, setShowModal] = React.useState(false);
   const [showServiciosMenu, setShowServiciosMenu] = React.useState(false);
   const [showCursosMenu, setShowCursosMenu] = React.useState(false);
@@ -20,6 +19,13 @@ export default function SmartChatixPrincipalPage() {
   const video1Ref = React.useRef<HTMLVideoElement>(null);
   const video2Ref = React.useRef<HTMLVideoElement>(null);
   const canvasRef = React.useRef<HTMLCanvasElement | null>(null);
+
+  React.useEffect(() => {
+    fetch('/api/public/courses')
+      .then(res => res.json())
+      .then(data => setCourses(data.courses || []))
+      .catch(err => console.error('Error fetching courses:', err));
+  }, []);
 
   // Particles animation effect
   React.useEffect(() => {
@@ -589,7 +595,7 @@ export default function SmartChatixPrincipalPage() {
                           overflowY: 'auto',
                           padding: spacing.sm
                         }}>
-                          {courses.map((course, idx) => (
+                          {courses.filter((course: any) => course.publication_status === 'published').map((course, idx) => (
                             <Link
                               key={idx}
                               href={`/cursos/${course.slug}`}
@@ -600,7 +606,7 @@ export default function SmartChatixPrincipalPage() {
                                 color: colors.gray[700],
                                 borderRadius: '6px',
                                 transition: 'all 0.2s ease',
-                                borderBottom: idx < courses.length - 1 ? `1px solid ${colors.gray[200]}` : 'none'
+                                borderBottom: idx < courses.filter((c: any) => c.publication_status === 'published').length - 1 ? `1px solid ${colors.gray[200]}` : 'none'
                               }}
                               onMouseEnter={(e) => {
                                 e.currentTarget.style.backgroundColor = colors.gray[50];
@@ -615,7 +621,7 @@ export default function SmartChatixPrincipalPage() {
                                 {course.title}
                               </div>
                               <div style={{ fontSize: '0.75rem', color: colors.gray[500] }}>
-                                {course.hours} • {loading ? 'S/ ' + course.priceGrabado : symbol + ' ' + convertPrice(course.priceGrabado)}
+                                {course.hours} • {loading ? 'S/ ' + course.priceGrabado : symbol + ' ' + convertPrice(course.priceGrabado || 0)}
                               </div>
                             </Link>
                           ))}
@@ -1084,7 +1090,11 @@ export default function SmartChatixPrincipalPage() {
             gap: spacing.lg
           }}>
             {courses.map((course, index) => (
-              <Link key={index} href={`/cursos/${course.slug}`} style={{ textDecoration: 'none', color: 'inherit' }}>
+              <div key={index} onClick={() => {
+                if (course.publication_status !== 'coming_soon' && course.publication_status !== 'unpublished') {
+                  window.location.href = `/cursos/${course.slug}`;
+                }
+              }} style={{ textDecoration: 'none', color: 'inherit' }}>
                 <div className="mobile-card-compact" style={{
                   backgroundColor: colors.white,
                   borderRadius: '8px',
@@ -1093,7 +1103,7 @@ export default function SmartChatixPrincipalPage() {
                   border: `1px solid ${colors.gray[200]}`,
                   transition: 'all 0.3s ease',
                   overflow: 'hidden',
-                  cursor: 'pointer'
+                  cursor: course.publication_status === 'coming_soon' || course.publication_status === 'unpublished' ? 'default' : 'pointer'
                 }}
                 onMouseOver={(e) => {
                   e.currentTarget.style.transform = 'translateY(-4px)';
@@ -1141,25 +1151,40 @@ export default function SmartChatixPrincipalPage() {
                     alignItems: 'center',
                     gap: '8px'
                   }}>
-                    <span style={{
-                      fontWeight: '700',
-                      fontSize: '1.2rem',
-                      color: colors.accent
-                    }}>
-                      {loading ? 'S/ ' + course.priceGrabado : symbol + ' ' + convertPrice(course.priceGrabado)}
-                    </span>
-                    <span style={{
-                      fontSize: '0.9rem',
-                      color: colors.gray[400],
-                      textDecoration: 'line-through'
-                    }}>
-                      {loading ? 'S/ ' + course.oldPriceGrabado : symbol + ' ' + convertPrice(course.oldPriceGrabado)}
-                    </span>
+                    {course.publication_status === 'coming_soon' ? (
+                      <span style={{
+                        fontWeight: '600',
+                        fontSize: '0.9rem',
+                        color: '#92400e',
+                        backgroundColor: '#fef3c7',
+                        padding: '4px 12px',
+                        borderRadius: '6px'
+                      }}>
+                        ⏳ Próximamente
+                      </span>
+                    ) : course.priceGrabado ? (
+                      <>
+                        <span style={{
+                          fontWeight: '700',
+                          fontSize: '1.2rem',
+                          color: colors.accent
+                        }}>
+                          {loading ? 'S/ ' + course.priceGrabado : symbol + ' ' + convertPrice(course.priceGrabado)}
+                        </span>
+                        <span style={{
+                          fontSize: '0.9rem',
+                          color: colors.gray[400],
+                          textDecoration: 'line-through'
+                        }}>
+                          {loading ? 'S/ ' + course.oldPriceGrabado : symbol + ' ' + convertPrice(course.oldPriceGrabado || 0)}
+                        </span>
+                      </>
+                    ) : null}
                   </div>
                 </div>
 
               </div>
-              </Link>
+              </div>
             ))}
           </div>
         </div>

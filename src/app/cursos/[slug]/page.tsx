@@ -16,6 +16,7 @@ export default function CursoPage({ params }: { params: Promise<{ slug: string }
   const [allCourses, setAllCourses] = React.useState<any[]>([]);
   const [loading, setLoading] = React.useState(true);
   const [sidebarVisible, setSidebarVisible] = React.useState(false);
+  const [showCarousel, setShowCarousel] = React.useState(true);
 
   React.useEffect(() => {
     params.then(async ({ slug }) => {
@@ -42,6 +43,13 @@ export default function CursoPage({ params }: { params: Promise<{ slug: string }
       .then(res => res.json())
       .then(data => setAllCourses(data.courses || []))
       .catch(err => console.error('Error fetching courses:', err));
+  }, []);
+
+  React.useEffect(() => {
+    fetch('/api/public/settings')
+      .then(res => res.json())
+      .then(data => setShowCarousel(data.settings?.show_courses_carousel !== false))
+      .catch(err => console.error('Error fetching settings:', err));
   }, []);
 
   React.useEffect(() => {
@@ -102,6 +110,10 @@ export default function CursoPage({ params }: { params: Promise<{ slug: string }
   }
 
   if (!curso) {
+    notFound();
+  }
+
+  if (curso.publication_status === 'coming_soon' || curso.publication_status === 'unpublished') {
     notFound();
   }
 
@@ -574,7 +586,20 @@ export default function CursoPage({ params }: { params: Promise<{ slug: string }
               </div>
             </div>
 
-            {curso?.hasLiveMode ? (
+            {curso?.publication_status === 'coming_soon' ? (
+              <div style={{
+                backgroundColor: '#fef3c7',
+                color: '#92400e',
+                border: '2px solid #fbbf24',
+                padding: `${spacing.md} ${spacing.xl}`,
+                borderRadius: '8px',
+                fontSize: '0.95rem',
+                fontWeight: '700',
+                textAlign: 'center'
+              }}>
+                ⏳ PRÓXIMAMENTE DISPONIBLE
+              </div>
+            ) : curso?.hasLiveMode ? (
               <button
                 onClick={() => setShowModal(true)}
                 style={{
@@ -958,6 +983,7 @@ export default function CursoPage({ params }: { params: Promise<{ slug: string }
       )}
 
       {/* Carrusel de Cursos Relacionados */}
+      {showCarousel && (
       <section className="related-courses-carousel" style={{
         backgroundColor: colors.gray[50],
         padding: `${spacing.xxl} ${spacing.lg}`,
@@ -1168,6 +1194,7 @@ export default function CursoPage({ params }: { params: Promise<{ slug: string }
           </div>
         </div>
       </section>
+      )}
 
       <Footer />
     </div>

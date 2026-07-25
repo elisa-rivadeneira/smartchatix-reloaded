@@ -10,11 +10,12 @@ export interface Course {
   keyTopics?: string[];
   includesDescription?: string;
 
-  priceVivo: number;
-  oldPriceVivo: number;
-  priceGrabado: number;
-  oldPriceGrabado: number;
+  priceVivo: number | null;
+  oldPriceVivo: number | null;
+  priceGrabado: number | null;
+  oldPriceGrabado: number | null;
   hasLiveMode?: boolean;
+  publication_status?: 'published' | 'coming_soon' | 'unpublished';
 
   modules: {
     num: number;
@@ -81,6 +82,7 @@ export const courses: Course[] = [
     oldPriceVivo: 299,
     priceGrabado: 69,
     oldPriceGrabado: 199,
+    publication_status: 'coming_soon',
     modules: [
       { num: 1, hours: '1h', title: 'Correos efectivos con IA', topics: [] },
       { num: 2, hours: '1h', title: 'Informes y actas profesionales', topics: [] },
@@ -112,6 +114,7 @@ export const courses: Course[] = [
     oldPriceVivo: 349,
     priceGrabado: 79,
     oldPriceGrabado: 229,
+    publication_status: 'coming_soon',
     modules: [
       { num: 1, hours: '1.5h', title: 'Fórmulas inteligentes con IA', topics: [] },
       { num: 2, hours: '1.5h', title: 'Tablas dinámicas y análisis', topics: [] },

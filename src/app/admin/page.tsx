@@ -61,6 +61,8 @@ export default function AdminPanel() {
   const [loadingUserCourses, setLoadingUserCourses] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [settings, setSettings] = useState<Record<string, any>>({});
+  const [loadingSettings, setLoadingSettings] = useState(false);
 
   useEffect(() => {
     checkAuth();
@@ -124,6 +126,38 @@ export default function AdminPanel() {
   const handleLogout = async () => {
     await fetch('/api/auth/logout', { method: 'POST' });
     router.push('/');
+  };
+
+  const loadSettings = async () => {
+    setLoadingSettings(true);
+    try {
+      const res = await fetch('/api/admin/settings');
+      if (res.ok) {
+        const data = await res.json();
+        setSettings(data.settings || {});
+      }
+    } catch (error) {
+      console.error('Error loading settings:', error);
+    } finally {
+      setLoadingSettings(false);
+    }
+  };
+
+  const updateSetting = async (key: string, value: any) => {
+    try {
+      const res = await fetch('/api/admin/settings', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ setting_key: key, setting_value: value })
+      });
+      if (res.ok) {
+        setSettings({ ...settings, [key]: value });
+      }
+    } catch (error) {
+      console.error('Error updating setting:', error);
+    }
   };
 
   const handleEditCourse = async (course: Course) => {
@@ -558,10 +592,13 @@ export default function AdminPanel() {
         grayBackground={true}
       >
         <div style={{ display: 'flex', gap: '32px' }}>
-          {['dashboard', 'usuarios', 'cursos'].map(tab => (
+          {['dashboard', 'usuarios', 'cursos', 'configuración'].map(tab => (
             <button
               key={tab}
-              onClick={() => setActiveTab(tab)}
+              onClick={() => {
+                setActiveTab(tab);
+                if (tab === 'configuración') loadSettings();
+              }}
               style={{
                 padding: '16px 0',
                 background: 'none',
@@ -1525,6 +1562,110 @@ export default function AdminPanel() {
                 </button>
               </div>
             </div>
+          </div>
+        </div>
+      )}
+
+      {activeTab === 'configuración' && (
+        <div>
+          <div style={{
+            backgroundColor: '#ffffff',
+            borderRadius: '8px',
+            padding: '24px',
+            boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1)',
+            marginBottom: '24px'
+          }}>
+            <h2 style={{
+              fontSize: '20px',
+              fontWeight: '600',
+              color: '#1a202c',
+              marginBottom: '8px'
+            }}>
+              Configuración del Sitio
+            </h2>
+            <p style={{
+              fontSize: '14px',
+              color: '#6b7280',
+              marginBottom: '24px'
+            }}>
+              Personaliza la configuración de la página principal
+            </p>
+
+            {loadingSettings ? (
+              <div style={{ textAlign: 'center', padding: '40px', color: '#6b7280' }}>
+                Cargando configuración...
+              </div>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                <div style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  padding: '16px',
+                  border: '1px solid #e5e7eb',
+                  borderRadius: '8px',
+                  backgroundColor: '#f9fafb'
+                }}>
+                  <div>
+                    <h3 style={{
+                      fontSize: '16px',
+                      fontWeight: '600',
+                      color: '#1a202c',
+                      marginBottom: '4px'
+                    }}>
+                      Mostrar Carrusel "Explora más cursos"
+                    </h3>
+                    <p style={{
+                      fontSize: '14px',
+                      color: '#6b7280',
+                      margin: 0
+                    }}>
+                      Activa o desactiva el carrusel de cursos relacionados en la página de detalle de curso
+                    </p>
+                  </div>
+                  <label style={{
+                    position: 'relative',
+                    display: 'inline-block',
+                    width: '52px',
+                    height: '28px',
+                    cursor: 'pointer'
+                  }}>
+                    <input
+                      type="checkbox"
+                      checked={settings.show_courses_carousel === true}
+                      onChange={(e) => updateSetting('show_courses_carousel', e.target.checked)}
+                      style={{
+                        opacity: 0,
+                        width: 0,
+                        height: 0
+                      }}
+                    />
+                    <span style={{
+                      position: 'absolute',
+                      top: 0,
+                      left: 0,
+                      right: 0,
+                      bottom: 0,
+                      backgroundColor: settings.show_courses_carousel === true ? '#667eea' : '#cbd5e0',
+                      borderRadius: '28px',
+                      transition: 'background-color 0.3s'
+                    }}>
+                      <span style={{
+                        position: 'absolute',
+                        content: '',
+                        height: '20px',
+                        width: '20px',
+                        left: settings.show_courses_carousel === true ? '28px' : '4px',
+                        bottom: '4px',
+                        backgroundColor: 'white',
+                        borderRadius: '50%',
+                        transition: 'left 0.3s'
+                      }}></span>
+                    </span>
+                  </label>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       )}
