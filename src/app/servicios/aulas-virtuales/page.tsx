@@ -197,30 +197,29 @@ export default function AulasVirtualesPage() {
           <div>
             <div style={{
               display: 'inline-block',
-              background: 'rgba(139, 92, 246, 0.1)',
-              border: '1px solid rgba(139, 92, 246, 0.3)',
-              padding: '6px 16px',
-              borderRadius: '20px',
+              background: 'transparent',
+              padding: '0',
               marginBottom: '1.5rem'
             }}>
               <span style={{
-                fontSize: '13px',
-                fontWeight: '600',
-                color: '#a78bfa',
+                fontSize: '11px',
+                fontWeight: '700',
+                color: '#94a3b8',
                 textTransform: 'uppercase',
-                letterSpacing: '0.05em'
+                letterSpacing: '0.1em'
               }}>PLATAFORMA PARA CAPACITACIÓN Y EDUCACIÓN</span>
             </div>
 
             <h1 style={{
-              fontSize: '3.5rem',
-              fontWeight: '800',
+              fontSize: '3.75rem',
+              fontWeight: '700',
               lineHeight: '1.1',
               marginBottom: '1.5rem',
-              color: '#ffffff'
+              color: '#ffffff',
+              letterSpacing: '-0.02em'
             }}>
-              Crea cursos increíbles con <span style={{
-                background: 'linear-gradient(135deg, #8b5cf6 0%, #d946ef 100%)',
+              Crea cursos increíbles<br/>con <span style={{
+                background: 'linear-gradient(90deg, #3b82f6 0%, #d946ef 100%)',
                 WebkitBackgroundClip: 'text',
                 WebkitTextFillColor: 'transparent',
                 backgroundClip: 'text'
@@ -228,12 +227,14 @@ export default function AulasVirtualesPage() {
             </h1>
 
             <p style={{
-              fontSize: '1.25rem',
+              fontSize: '1.125rem',
               color: '#cbd5e1',
               marginBottom: '2.5rem',
-              lineHeight: '1.7'
+              lineHeight: '1.65',
+              maxWidth: '520px'
             }}>
-              Convierte tus ideas en cursos completos. Nuestra IA diseña, estructura y genera contenidos listos para enseñar.
+              Convierte tus ideas en cursos completos.<br/>
+              Nuestra IA diseña, estructura y genera contenidos listos para enseñar.
             </p>
 
             <div style={{ display: 'flex', gap: '1rem', marginBottom: '3rem' }}>
@@ -243,13 +244,16 @@ export default function AulasVirtualesPage() {
                   background: 'linear-gradient(135deg, #8b5cf6 0%, #d946ef 100%)',
                   color: '#fff',
                   border: 'none',
-                  padding: '16px 32px',
-                  borderRadius: '10px',
-                  fontSize: '16px',
+                  padding: '14px 28px',
+                  borderRadius: '12px',
+                  fontSize: '15px',
                   fontWeight: '600',
                   cursor: 'pointer',
                   transition: 'all 0.2s',
-                  boxShadow: '0 8px 24px rgba(139, 92, 246, 0.4)'
+                  boxShadow: '0 8px 24px rgba(139, 92, 246, 0.4)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.5rem'
                 }}
                 onMouseEnter={(e) => {
                   e.currentTarget.style.transform = 'translateY(-2px)';
@@ -260,47 +264,71 @@ export default function AulasVirtualesPage() {
                   e.currentTarget.style.boxShadow = '0 8px 24px rgba(139, 92, 246, 0.4)';
                 }}
               >
-                📖 Solicitar demostración
+                <span style={{ fontSize: '16px' }}>📖</span>
+                Solicitar demostración
               </button>
 
               <button
                 style={{
-                  background: 'rgba(255, 255, 255, 0.1)',
+                  background: 'transparent',
                   color: '#fff',
-                  border: '1px solid rgba(255, 255, 255, 0.2)',
-                  padding: '16px 32px',
-                  borderRadius: '10px',
-                  fontSize: '16px',
+                  border: '1px solid rgba(255, 255, 255, 0.3)',
+                  padding: '14px 28px',
+                  borderRadius: '12px',
+                  fontSize: '15px',
                   fontWeight: '600',
                   cursor: 'pointer',
                   transition: 'all 0.2s',
-                  backdropFilter: 'blur(10px)'
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.5rem'
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.background = 'rgba(255, 255, 255, 0.15)';
+                  e.currentTarget.style.background = 'rgba(255, 255, 255, 0.1)';
+                  e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.5)';
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.background = 'rgba(255, 255, 255, 0.1)';
+                  e.currentTarget.style.background = 'transparent';
+                  e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.3)';
                 }}
               >
-                ▶ Ver la plataforma
+                <span style={{
+                  width: '20px',
+                  height: '20px',
+                  borderRadius: '50%',
+                  border: '1.5px solid currentColor',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: '10px'
+                }}>▶</span>
+                Ver la plataforma
               </button>
             </div>
 
             {/* Features Pills */}
-            <div style={{ display: 'flex', gap: '1.5rem', flexWrap: 'wrap' }}>
+            <div style={{ display: 'flex', gap: '2rem', flexWrap: 'wrap' }}>
               {[
-                { icon: '✨', text: 'IA que entiende tu contenido' },
-                { icon: '⏱️', text: 'Ahorra horas de trabajo' },
-                { icon: '📚', text: 'Cursos listos para enseñar y vender' }
+                { icon: '💎', text: 'IA que entiende\ntu contenido' },
+                { icon: '👥', text: 'Ahorra horas\nde trabajo' },
+                { icon: '📊', text: 'Cursos listos para\nenseñar y vender' }
               ].map((item, idx) => (
                 <div key={idx} style={{
                   display: 'flex',
-                  alignItems: 'center',
-                  gap: '0.5rem'
+                  alignItems: 'flex-start',
+                  gap: '0.65rem'
                 }}>
-                  <span style={{ fontSize: '1.2rem' }}>{item.icon}</span>
-                  <span style={{ fontSize: '14px', color: '#cbd5e1', fontWeight: '500' }}>{item.text}</span>
+                  <span style={{
+                    fontSize: '1.5rem',
+                    marginTop: '2px'
+                  }}>{item.icon}</span>
+                  <span style={{
+                    fontSize: '13px',
+                    color: '#cbd5e1',
+                    fontWeight: '500',
+                    lineHeight: '1.4',
+                    whiteSpace: 'pre-line'
+                  }}>{item.text}</span>
                 </div>
               ))}
             </div>
