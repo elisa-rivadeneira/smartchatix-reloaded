@@ -2,9 +2,10 @@
 
 import React from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import Footer from '@/components/Footer';
 
-export default function SmartChatixAcademyPage() {
+export default function AulasVirtualesPage() {
   const [showModal, setShowModal] = React.useState(false);
 
   return (
@@ -25,30 +26,8 @@ export default function SmartChatixAcademyPage() {
           }
         }
 
-        @keyframes gradientShift {
-          0% {
-            background-position: 0% center;
-          }
-          50% {
-            background-position: 100% center;
-          }
-          100% {
-            background-position: 0% center;
-          }
-        }
-
         .fade-in-up {
           animation: fadeInUp 0.8s ease-out;
-        }
-
-        .animated-gradient {
-          display: inline-block;
-          background: linear-gradient(90deg, #0066CC, #00D9FF, #FF00FF, #00D9FF, #0066CC);
-          background-size: 300% 100%;
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
-          background-clip: text;
-          animation: gradientShift 5s linear infinite;
         }
 
         @media (max-width: 768px) {
@@ -62,961 +41,493 @@ export default function SmartChatixAcademyPage() {
       <header style={{
         position: 'sticky',
         top: 0,
-        backgroundColor: 'rgba(255, 255, 255, 0.95)',
+        backgroundColor: 'rgba(255, 255, 255, 0.98)',
         backdropFilter: 'blur(10px)',
-        borderBottom: '1px solid #f0f0f0',
-        zIndex: 1000
+        borderBottom: '1px solid #e5e7eb',
+        zIndex: 1000,
+        padding: '1rem 3rem'
       }}>
         <div style={{
           maxWidth: '1400px',
           margin: '0 auto',
-          padding: '1.5rem 3rem',
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center'
         }}>
           <Link href="/">
-            <img
+            <Image
               src="/images/logo_smartchatix_horiz.png"
               alt="SmartChatix"
-              style={{ height: '50px', cursor: 'pointer' }}
+              width={160}
+              height={50}
+              style={{ cursor: 'pointer' }}
             />
           </Link>
 
-          <div className="mobile-hidden" style={{ display: 'flex', gap: '2.5rem', alignItems: 'center' }}>
+          <nav className="mobile-hidden" style={{ display: 'flex', gap: '2rem', alignItems: 'center' }}>
             <Link href="/" style={{
-              color: '#666',
+              color: '#6b7280',
               textDecoration: 'none',
-              fontSize: '15px',
+              fontSize: '14px',
               fontWeight: '500',
               transition: 'color 0.2s'
             }}
-            onMouseEnter={(e) => e.currentTarget.style.color = '#0066CC'}
-            onMouseLeave={(e) => e.currentTarget.style.color = '#666'}
+            onMouseEnter={(e) => e.currentTarget.style.color = '#8b5cf6'}
+            onMouseLeave={(e) => e.currentTarget.style.color = '#6b7280'}
             >
-              Inicio
+              Funciones
+            </Link>
+            <Link href="/" style={{
+              color: '#6b7280',
+              textDecoration: 'none',
+              fontSize: '14px',
+              fontWeight: '500',
+              transition: 'color 0.2s'
+            }}
+            onMouseEnter={(e) => e.currentTarget.style.color = '#8b5cf6'}
+            onMouseLeave={(e) => e.currentTarget.style.color = '#6b7280'}
+            >
+              Para empresas
+            </Link>
+            <Link href="/" style={{
+              color: '#6b7280',
+              textDecoration: 'none',
+              fontSize: '14px',
+              fontWeight: '500',
+              transition: 'color 0.2s'
+            }}
+            onMouseEnter={(e) => e.currentTarget.style.color = '#8b5cf6'}
+            onMouseLeave={(e) => e.currentTarget.style.color = '#6b7280'}
+            >
+              Para creadores
+            </Link>
+            <Link href="/" style={{
+              color: '#6b7280',
+              textDecoration: 'none',
+              fontSize: '14px',
+              fontWeight: '500',
+              transition: 'color 0.2s'
+            }}
+            onMouseEnter={(e) => e.currentTarget.style.color = '#8b5cf6'}
+            onMouseLeave={(e) => e.currentTarget.style.color = '#6b7280'}
+            >
+              Casos de uso
+            </Link>
+            <Link href="/" style={{
+              color: '#6b7280',
+              textDecoration: 'none',
+              fontSize: '14px',
+              fontWeight: '500',
+              transition: 'color 0.2s'
+            }}
+            onMouseEnter={(e) => e.currentTarget.style.color = '#8b5cf6'}
+            onMouseLeave={(e) => e.currentTarget.style.color = '#6b7280'}
+            >
+              Precios
+            </Link>
+            <Link href="/" style={{
+              color: '#6b7280',
+              textDecoration: 'none',
+              fontSize: '14px',
+              fontWeight: '500',
+              transition: 'color 0.2s'
+            }}
+            onMouseEnter={(e) => e.currentTarget.style.color = '#8b5cf6'}
+            onMouseLeave={(e) => e.currentTarget.style.color = '#6b7280'}
+            >
+              Recursos
+            </Link>
+            <Link href="/login" style={{
+              color: '#6b7280',
+              textDecoration: 'none',
+              fontSize: '14px',
+              fontWeight: '500',
+              transition: 'color 0.2s'
+            }}
+            onMouseEnter={(e) => e.currentTarget.style.color = '#8b5cf6'}
+            onMouseLeave={(e) => e.currentTarget.style.color = '#6b7280'}
+            >
+              Iniciar sesión
             </Link>
             <button
               onClick={() => setShowModal(true)}
               style={{
-                background: 'linear-gradient(135deg, #0066CC 0%, #00D9FF 100%)',
+                background: 'linear-gradient(135deg, #8b5cf6 0%, #d946ef 100%)',
                 color: '#fff',
                 border: 'none',
-                padding: '12px 28px',
-                borderRadius: '10px',
-                fontSize: '15px',
+                padding: '10px 24px',
+                borderRadius: '8px',
+                fontSize: '14px',
                 fontWeight: '600',
                 cursor: 'pointer',
                 transition: 'all 0.2s',
-                boxShadow: '0 4px 12px rgba(0, 102, 204, 0.3)'
+                boxShadow: '0 4px 12px rgba(139, 92, 246, 0.3)'
               }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.transform = 'translateY(-2px)';
-                e.currentTarget.style.boxShadow = '0 6px 20px rgba(0, 102, 204, 0.4)';
+                e.currentTarget.style.boxShadow = '0 6px 20px rgba(139, 92, 246, 0.4)';
               }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.transform = 'translateY(0)';
-                e.currentTarget.style.boxShadow = '0 4px 12px rgba(0, 102, 204, 0.3)';
+                e.currentTarget.style.boxShadow = '0 4px 12px rgba(139, 92, 246, 0.3)';
               }}
             >
-              Solicitar Demo
+              Solicitar demostración
             </button>
-          </div>
+          </nav>
         </div>
       </header>
 
       {/* Hero Section */}
       <section style={{
-        padding: '8rem 3rem 6rem',
-        backgroundImage: 'url(/images/aulavirtual_hero.jpeg)',
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundRepeat: 'no-repeat',
+        padding: '6rem 3rem 4rem',
+        background: 'linear-gradient(180deg, #0a0e27 0%, #1a1f3a 100%)',
         position: 'relative',
-        textAlign: 'center'
+        overflow: 'hidden'
       }} className="fade-in-up">
         <div style={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          background: 'rgba(0, 18, 39, 0.62)',
-          zIndex: 1
-        }}></div>
-        <div style={{ maxWidth: '1400px', margin: '0 auto', position: 'relative', zIndex: 2 }}>
-          <h1 className="animated-gradient" style={{
-            fontSize: '4.5rem',
-            fontWeight: '700',
-            lineHeight: '1.2',
-            marginBottom: '1.5rem',
-            letterSpacing: '-0.02em'
-          }}>
-            La plataforma para crear cursos con Inteligencia Artificial
-          </h1>
+          maxWidth: '1400px',
+          margin: '0 auto',
+          display: 'grid',
+          gridTemplateColumns: '1fr 1fr',
+          gap: '4rem',
+          alignItems: 'center'
+        }}>
+          {/* Left Column */}
+          <div>
+            <div style={{
+              display: 'inline-block',
+              background: 'rgba(139, 92, 246, 0.1)',
+              border: '1px solid rgba(139, 92, 246, 0.3)',
+              padding: '6px 16px',
+              borderRadius: '20px',
+              marginBottom: '1.5rem'
+            }}>
+              <span style={{
+                fontSize: '13px',
+                fontWeight: '600',
+                color: '#a78bfa',
+                textTransform: 'uppercase',
+                letterSpacing: '0.05em'
+              }}>PLATAFORMA PARA CAPACITACIÓN Y EDUCACIÓN</span>
+            </div>
 
-          <p style={{
-            fontSize: '1.4rem',
-            color: '#f0f9ff',
-            marginBottom: '3rem',
-            lineHeight: '1.6',
-            maxWidth: '700px',
-            margin: '0 auto 3rem',
-            textShadow: '0 1px 3px rgba(0,0,0,0.3)'
-          }}>
-           Diseña, administra y certifica programas de formación para empresas, consultoras, academias e instructores desde una sola plataforma.
-          </p>
+            <h1 style={{
+              fontSize: '3.5rem',
+              fontWeight: '800',
+              lineHeight: '1.1',
+              marginBottom: '1.5rem',
+              color: '#ffffff'
+            }}>
+              Crea cursos increíbles con <span style={{
+                background: 'linear-gradient(135deg, #8b5cf6 0%, #d946ef 100%)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                backgroundClip: 'text'
+              }}>IA en minutos</span>
+            </h1>
 
-          <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap', marginBottom: '3rem' }}>
-            <button
-              onClick={() => setShowModal(true)}
-              style={{
-                background: 'linear-gradient(135deg, #0066CC 0%, #00D9FF 100%)',
+            <p style={{
+              fontSize: '1.25rem',
+              color: '#cbd5e1',
+              marginBottom: '2.5rem',
+              lineHeight: '1.7'
+            }}>
+              Convierte tus ideas en cursos completos. Nuestra IA diseña, estructura y genera contenidos listos para enseñar.
+            </p>
+
+            <div style={{ display: 'flex', gap: '1rem', marginBottom: '3rem' }}>
+              <button
+                onClick={() => setShowModal(true)}
+                style={{
+                  background: 'linear-gradient(135deg, #8b5cf6 0%, #d946ef 100%)',
+                  color: '#fff',
+                  border: 'none',
+                  padding: '16px 32px',
+                  borderRadius: '10px',
+                  fontSize: '16px',
+                  fontWeight: '600',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s',
+                  boxShadow: '0 8px 24px rgba(139, 92, 246, 0.4)'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = 'translateY(-2px)';
+                  e.currentTarget.style.boxShadow = '0 12px 32px rgba(139, 92, 246, 0.5)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = 'translateY(0)';
+                  e.currentTarget.style.boxShadow = '0 8px 24px rgba(139, 92, 246, 0.4)';
+                }}
+              >
+                📖 Solicitar demostración
+              </button>
+
+              <button
+                style={{
+                  background: 'rgba(255, 255, 255, 0.1)',
+                  color: '#fff',
+                  border: '1px solid rgba(255, 255, 255, 0.2)',
+                  padding: '16px 32px',
+                  borderRadius: '10px',
+                  fontSize: '16px',
+                  fontWeight: '600',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s',
+                  backdropFilter: 'blur(10px)'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = 'rgba(255, 255, 255, 0.15)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = 'rgba(255, 255, 255, 0.1)';
+                }}
+              >
+                ▶ Ver la plataforma
+              </button>
+            </div>
+
+            {/* Features Pills */}
+            <div style={{ display: 'flex', gap: '1.5rem', flexWrap: 'wrap' }}>
+              {[
+                { icon: '✨', text: 'IA que entiende tu contenido' },
+                { icon: '⏱️', text: 'Ahorra horas de trabajo' },
+                { icon: '📚', text: 'Cursos listos para enseñar y vender' }
+              ].map((item, idx) => (
+                <div key={idx} style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.5rem'
+                }}>
+                  <span style={{ fontSize: '1.2rem' }}>{item.icon}</span>
+                  <span style={{ fontSize: '14px', color: '#cbd5e1', fontWeight: '500' }}>{item.text}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Right Column - Mockup */}
+          <div style={{
+            position: 'relative'
+          }}>
+            <div style={{
+              background: 'rgba(255, 255, 255, 0.05)',
+              borderRadius: '20px',
+              border: '1px solid rgba(255, 255, 255, 0.1)',
+              padding: '2rem',
+              backdropFilter: 'blur(20px)',
+              boxShadow: '0 20px 60px rgba(0, 0, 0, 0.3)'
+            }}>
+              {/* Simplified Mockup */}
+              <div style={{
+                background: '#1e293b',
+                borderRadius: '12px',
+                padding: '1.5rem',
+                marginBottom: '1rem'
+              }}>
+                <div style={{
+                  color: '#8b5cf6',
+                  fontSize: '14px',
+                  fontWeight: '600',
+                  marginBottom: '1rem',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.5rem'
+                }}>
+                  <span style={{
+                    width: '32px',
+                    height: '32px',
+                    background: 'linear-gradient(135deg, #8b5cf6 0%, #d946ef 100%)',
+                    borderRadius: '8px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: '18px'
+                  }}>✨</span>
+                  Asistente de Diseño de Cursos IA
+                </div>
+                <div style={{
+                  color: '#cbd5e1',
+                  fontSize: '13px',
+                  lineHeight: '1.6',
+                  marginBottom: '1rem'
+                }}>
+                  Conversa con la IA para estructurar tu curso
+                </div>
+              </div>
+
+              {/* Chat messages */}
+              <div style={{ marginBottom: '1rem' }}>
+                <div style={{
+                  background: '#6366f1',
+                  color: '#fff',
+                  padding: '1rem',
+                  borderRadius: '12px',
+                  fontSize: '13px',
+                  lineHeight: '1.6',
+                  marginBottom: '0.8rem'
+                }}>
+                  ¿Cuánto tiempo de curso tienes planificado?
+                </div>
+
+                <div style={{
+                  background: '#334155',
+                  color: '#e2e8f0',
+                  padding: '1rem',
+                  borderRadius: '12px',
+                  fontSize: '13px',
+                  lineHeight: '1.6',
+                  marginLeft: '2rem'
+                }}>
+                  30 horas
+                </div>
+              </div>
+
+              {/* Structure Preview */}
+              <div style={{
+                background: '#f0fdf4',
+                borderRadius: '12px',
+                padding: '1.5rem',
+                border: '2px solid #86efac'
+              }}>
+                <div style={{
+                  color: '#059669',
+                  fontSize: '13px',
+                  fontWeight: '600',
+                  marginBottom: '1rem'
+                }}>
+                  ✓ Estructura propuesta
+                </div>
+                <div style={{ fontSize: '12px', color: '#047857', lineHeight: '1.8' }}>
+                  <div>📖 <strong>Módulo 1:</strong> Introducción a la IA</div>
+                  <div style={{ paddingLeft: '1.5rem', marginTop: '0.5rem' }}>
+                    • Fundamentos (30 min)<br/>
+                    • Aplicaciones prácticas (30 min)
+                  </div>
+                </div>
+              </div>
+
+              <button style={{
+                width: '100%',
+                background: '#8b5cf6',
                 color: '#fff',
                 border: 'none',
-                padding: '16px 32px',
-                borderRadius: '12px',
-                fontSize: '17px',
+                padding: '14px',
+                borderRadius: '10px',
+                fontSize: '14px',
                 fontWeight: '600',
                 cursor: 'pointer',
-                transition: 'all 0.2s',
-                boxShadow: '0 4px 20px rgba(0, 102, 204, 0.4)'
-              }}
-            >
-              Solicitar una demostración →
-            </button>
+                marginTop: '1rem'
+              }}>
+                ✓ Crear curso con esta estructura
+              </button>
+            </div>
           </div>
-
         </div>
-      </section>
 
-      {/* Diseña, Desarrolla, Publica */}
-      <section style={{
-        padding: '6rem 3rem',
-        backgroundColor: '#fff'
-      }}>
-        <div style={{ maxWidth: '1400px', margin: '0 auto' }}>
-          <div style={{ textAlign: 'center', marginBottom: '3rem' }}>
-            <h2 style={{
-              fontSize: '2.8rem',
-              fontWeight: '700',
-              color: '#000',
-              marginBottom: '1rem'
-            }}>
-              Diseña. Desarrolla. Publica.
-            </h2>
-            <p style={{
-              fontSize: '1.2rem',
-              color: '#666',
-              maxWidth: '800px',
-              margin: '0 auto'
-            }}>
-              La IA te acompaña en cada etapa para que crear cursos profesionales sea más rápido, fácil y eficiente.
-            </p>
-          </div>
-
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
-            gap: '3rem'
+        {/* Logos */}
+        <div style={{
+          maxWidth: '1400px',
+          margin: '4rem auto 0',
+          textAlign: 'center'
+        }}>
+          <p style={{
+            fontSize: '13px',
+            color: '#64748b',
+            marginBottom: '2rem',
+            fontWeight: '500'
           }}>
-            {/* Paso 1: Diseña */}
-            <div style={{ textAlign: 'center' }}>
-              <div style={{
-                width: '60px',
-                height: '60px',
-                borderRadius: '12px',
-                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                margin: '0 auto 1.5rem',
-                fontSize: '1.8rem'
-              }}>
-                1️⃣
-              </div>
-              <h3 style={{
-                fontSize: '1.5rem',
-                fontWeight: '700',
-                color: '#000',
-                marginBottom: '0.8rem'
-              }}>
-                Diseña
-              </h3>
-              <p style={{
-                fontSize: '1rem',
-                color: '#666',
-                lineHeight: '1.7',
-                marginBottom: '1.5rem'
-              }}>
-                La IA te ayuda a transformar tu idea en una estructura pedagógica completa, detectando módulos y lecciones de contenido que tengas o mediante chat inteligente.
-              </p>
-              <div style={{
-                borderRadius: '12px',
-                overflow: 'hidden',
-                boxShadow: '0 10px 40px rgba(0,0,0,0.1)',
-                border: '1px solid #e0e0e0'
-              }}>
-                <img
-                  src="/images/paso1_disena.png"
-                  alt="Diseña tu curso con IA"
-                  style={{
-                    width: '100%',
-                    height: 'auto',
-                    display: 'block'
-                  }}
-                />
-              </div>
-            </div>
-
-            {/* Paso 2: Desarrolla */}
-            <div style={{ textAlign: 'center' }}>
-              <div style={{
-                width: '60px',
-                height: '60px',
-                borderRadius: '12px',
-                background: 'linear-gradient(135deg, #0066CC 0%, #00D9FF 100%)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                margin: '0 auto 1.5rem',
-                fontSize: '1.8rem'
-              }}>
-                2️⃣
-              </div>
-              <h3 style={{
-                fontSize: '1.5rem',
-                fontWeight: '700',
-                color: '#000',
-                marginBottom: '0.8rem'
-              }}>
-                Desarrolla
-              </h3>
-              <p style={{
-                fontSize: '1rem',
-                color: '#666',
-                lineHeight: '1.7',
-                marginBottom: '1.5rem'
-              }}>
-                Genera contenido de calidad con ayuda de la IA. Crea lecciones, sube recursos, diseña evaluaciones inteligentes y genera preguntas automáticamente.
-              </p>
-              <div style={{
-                borderRadius: '12px',
-                overflow: 'hidden',
-                boxShadow: '0 10px 40px rgba(0,0,0,0.1)',
-                border: '1px solid #e0e0e0'
-              }}>
-                <img
-                  src="/images/paso2_edita.png"
-                  alt="Desarrolla contenido con IA"
-                  style={{
-                    width: '100%',
-                    height: 'auto',
-                    display: 'block'
-                  }}
-                />
-              </div>
-            </div>
-
-            {/* Paso 3: Publica */}
-            <div style={{ textAlign: 'center' }}>
-              <div style={{
-                width: '60px',
-                height: '60px',
-                borderRadius: '12px',
-                background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                margin: '0 auto 1.5rem',
-                fontSize: '1.8rem'
-              }}>
-                3️⃣
-              </div>
-              <h3 style={{
-                fontSize: '1.5rem',
-                fontWeight: '700',
-                color: '#000',
-                marginBottom: '0.8rem'
-              }}>
-                Publica
-              </h3>
-              <p style={{
-                fontSize: '1rem',
-                color: '#666',
-                lineHeight: '1.7',
-                marginBottom: '1.5rem'
-              }}>
-                Publica tu curso en un solo paso y ponto a disposición de tus estudiantes. Gestiona el progreso, resultados y más desde un solo lugar.
-              </p>
-              <div style={{
-                borderRadius: '12px',
-                overflow: 'hidden',
-                boxShadow: '0 10px 40px rgba(0,0,0,0.1)',
-                border: '1px solid #e0e0e0'
-              }}>
-                <img
-                  src="/images/paso3_publica.png"
-                  alt="Publica y gestiona tu curso"
-                  style={{
-                    width: '100%',
-                    height: 'auto',
-                    display: 'block'
-                  }}
-                />
-              </div>
-            </div>
-          </div>
+            Más de 1,000 creadores y empresas ya confían en SmartChatix
+          </p>
+          {/* Aquí irían los logos */}
         </div>
       </section>
 
-      {/* Problema */}
+      {/* Así funciona SmartChatix */}
       <section style={{
         padding: '6rem 3rem',
-        backgroundColor: '#fafafa',
-        borderTop: '1px solid #f0f0f0'
+        background: '#ffffff'
       }}>
         <div style={{ maxWidth: '1400px', margin: '0 auto' }}>
           <div style={{ textAlign: 'center', marginBottom: '4rem' }}>
-            <p style={{
-              fontSize: '14px',
-              fontWeight: '600',
-              color: '#ff6b6b',
-              textTransform: 'uppercase',
-              letterSpacing: '0.1em',
-              marginBottom: '1rem'
-            }}>
-              El problema
-            </p>
             <h2 style={{
               fontSize: '2.5rem',
               fontWeight: '700',
-              lineHeight: '1.2',
-              color: '#000',
-              marginBottom: '1.5rem'
+              color: '#0a0e27',
+              marginBottom: '1rem'
             }}>
-              Crear cursos no debería<br/>
-              ser tan complicado
+              Así funciona <span style={{
+                background: 'linear-gradient(135deg, #8b5cf6 0%, #d946ef 100%)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                backgroundClip: 'text'
+              }}>SmartChatix</span>
             </h2>
             <p style={{
-              fontSize: '1.2rem',
-              color: '#666',
-              maxWidth: '700px',
+              fontSize: '1.125rem',
+              color: '#64748b',
+              maxWidth: '600px',
               margin: '0 auto'
             }}>
-              Los docentes pierden semanas estructurando contenido, creando evaluaciones y organizando recursos. El proceso es lento, desorganizado y repetitivo.
+              Un flujo simple para crear experiencias de aprendizaje increíbles
             </p>
           </div>
 
           <div style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
-            gap: '2rem'
+            gridTemplateColumns: 'repeat(3, 1fr)',
+            gap: '2.5rem'
           }}>
             {[
               {
-                emoji: '⏰',
-                title: 'Tiempo perdido',
-                desc: 'Horas creando evaluaciones manualmente'
+                icon: '💡',
+                title: '1. Diseña tu curso',
+                desc: 'La IA te ayuda a estructurar módulos, lecciones y objetivos en minutos.'
               },
               {
-                emoji: '📝',
-                title: 'Desorganización',
-                desc: 'Contenido disperso sin estructura clara'
+                icon: '▶️',
+                title: '2. Agrega contenido',
+                desc: 'Sube videos, documentos, textos, audios y más.'
               },
               {
-                emoji: '🔄',
-                title: 'Trabajo repetitivo',
-                desc: 'Las mismas tareas una y otra vez'
+                icon: '📝',
+                title: '3. Evalúa y asigna tareas',
+                desc: 'Crea cuestionarios, tareas y rúbricas de evaluación.'
               },
               {
-                emoji: '😰',
-                title: 'Falta de control',
-                desc: 'No saber qué falta por completar'
+                icon: '👥',
+                title: '4. Invita estudiantes',
+                desc: 'Inscribe colaboradores o alumnos de tu curso.'
+              },
+              {
+                icon: '📊',
+                title: '5. Haz seguimiento',
+                desc: 'Monitorea el progreso con reportes en tiempo real.'
+              },
+              {
+                icon: '🎓',
+                title: '6. Certifica',
+                desc: 'Emite certificados automáticos al completar.'
               }
             ].map((item, idx) => (
               <div key={idx} style={{
-                padding: '2rem',
-                backgroundColor: '#fafafa',
-                borderRadius: '12px',
-                border: '1px solid #f0f0f0'
-              }}>
-                <div style={{ fontSize: '2.5rem', marginBottom: '1rem' }}>{item.emoji}</div>
-                <h3 style={{
-                  fontSize: '1.1rem',
-                  fontWeight: '600',
-                  marginBottom: '0.5rem',
-                  color: '#000'
-                }}>{item.title}</h3>
-                <p style={{ fontSize: '0.95rem', color: '#666', lineHeight: '1.6' }}>{item.desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Solución */}
-      <section style={{
-        padding: '6rem 3rem',
-        backgroundColor: '#fafafa'
-      }}>
-        <div style={{ maxWidth: '1400px', margin: '0 auto' }}>
-          <div style={{ textAlign: 'center', marginBottom: '4rem' }}>
-            <p style={{
-              fontSize: '14px',
-              fontWeight: '600',
-              color: '#10b981',
-              textTransform: 'uppercase',
-              letterSpacing: '0.1em',
-              marginBottom: '1rem'
-            }}>
-              La solución
-            </p>
-            <h2 style={{
-              fontSize: '2.5rem',
-              fontWeight: '700',
-              lineHeight: '1.2',
-              color: '#000',
-              marginBottom: '1.5rem'
-            }}>
-              La IA te acompaña<br/>
-              en cada paso
-            </h2>
-            <p style={{
-              fontSize: '1.2rem',
-              color: '#666',
-              maxWidth: '700px',
-              margin: '0 auto'
-            }}>
-              SmartChatix Academy no solo almacena contenido. La Inteligencia Artificial participa activamente en todo el ciclo: creación, organización, enseñanza y certificación.
-            </p>
-          </div>
-
-          <div style={{
-            background: '#fff',
-            borderRadius: '16px',
-            padding: '3rem',
-            border: '1px solid #e0e0e0'
-          }}>
-            <div style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-              gap: '2.5rem'
-            }}>
-              {[
-                { icon: '💡', label: 'Diseño de estructura' },
-                { icon: '✏️', label: 'Creación de contenido' },
-                { icon: '📚', label: 'Organización pedagógica' },
-                { icon: '✅', label: 'Generación de evaluaciones' },
-                { icon: '📊', label: 'Seguimiento de progreso' },
-                { icon: '🎓', label: 'Certificación automática' }
-              ].map((item, idx) => (
-                <div key={idx} style={{ textAlign: 'center' }}>
-                  <div style={{
-                    fontSize: '2.5rem',
-                    marginBottom: '0.8rem'
-                  }}>{item.icon}</div>
-                  <p style={{
-                    fontSize: '0.95rem',
-                    fontWeight: '500',
-                    color: '#000'
-                  }}>{item.label}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Cómo Funciona - Flujo Visual */}
-      <section style={{
-        padding: '6rem 3rem',
-        backgroundColor: '#fff'
-      }}>
-        <div style={{ maxWidth: '1400px', margin: '0 auto' }}>
-          <div style={{ textAlign: 'center', marginBottom: '4rem' }}>
-            <h2 style={{
-              fontSize: '2.5rem',
-              fontWeight: '700',
-              lineHeight: '1.2',
-              color: '#000',
-              marginBottom: '1.5rem'
-            }}>
-              Del concepto al certificado
-            </h2>
-            <p style={{
-              fontSize: '1.2rem',
-              color: '#666',
-              maxWidth: '700px',
-              margin: '0 auto'
-            }}>
-              Un recorrido completo guiado por IA
-            </p>
-          </div>
-
-          <div style={{
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '1rem'
-          }}>
-            {[
-              { step: '1', title: 'Idea del curso', desc: 'El docente tiene una idea o contenido existente' },
-              { step: '2', title: 'Asistente IA conversa', desc: 'La IA hace preguntas o analiza el contenido pegado' },
-              { step: '3', title: 'Propuesta de estructura', desc: 'La IA genera módulos, lecciones y duración estimada' },
-              { step: '4', title: 'El profesor decide', desc: 'Edita, reorganiza o acepta la propuesta' },
-              { step: '5', title: 'Carga de contenido', desc: 'Videos, PDFs, recursos - con indicadores visuales' },
-              { step: '6', title: 'Publicación', desc: 'El curso queda disponible para los estudiantes' },
-              { step: '7', title: 'Aprendizaje activo', desc: 'Estudiantes avanzan lección por lección' },
-              { step: '8', title: 'Evaluaciones', desc: 'Cuestionarios generados automáticamente por IA' },
-              { step: '9', title: 'Certificado', desc: 'Emisión automática al completar requisitos' }
-            ].map((item, idx) => (
-              <div key={idx} style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '1.5rem',
-                padding: '1.5rem',
-                background: idx % 2 === 0 ? '#fafafa' : '#fff',
-                borderRadius: '12px',
-                border: '1px solid #f0f0f0'
-              }}>
-                <div style={{
-                  minWidth: '50px',
-                  height: '50px',
-                  borderRadius: '50%',
-                  background: '#000',
-                  color: '#fff',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  fontSize: '1.2rem',
-                  fontWeight: '700'
-                }}>
-                  {item.step}
-                </div>
-                <div style={{ flex: 1 }}>
-                  <h3 style={{
-                    fontSize: '1.1rem',
-                    fontWeight: '600',
-                    color: '#000',
-                    marginBottom: '0.3rem'
-                  }}>{item.title}</h3>
-                  <p style={{
-                    fontSize: '0.95rem',
-                    color: '#666'
-                  }}>{item.desc}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Diseña tu curso con IA */}
-      <section style={{
-        padding: '6rem 3rem',
-        backgroundColor: '#fafafa'
-      }}>
-        <div style={{ maxWidth: '1400px', margin: '0 auto' }}>
-          <div style={{ textAlign: 'center', marginBottom: '4rem' }}>
-            <h2 style={{
-              fontSize: '2.5rem',
-              fontWeight: '700',
-              lineHeight: '1.2',
-              color: '#000',
-              marginBottom: '1.5rem'
-            }}>
-              Dos formas de empezar
-            </h2>
-            <p style={{
-              fontSize: '1.2rem',
-              color: '#666'
-            }}>
-              Elige la que mejor se adapte a tu flujo de trabajo
-            </p>
-          </div>
-
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(450px, 1fr))',
-            gap: '2rem'
-          }}>
-            {/* Opción 1 */}
-            <div style={{
-              background: '#fff',
-              borderRadius: '16px',
-              padding: '2.5rem',
-              border: '2px solid #e0e0e0'
-            }}>
-              <div style={{
-                fontSize: '2.5rem',
-                marginBottom: '1.5rem'
-              }}>📋</div>
-              <h3 style={{
-                fontSize: '1.5rem',
-                fontWeight: '700',
-                color: '#000',
-                marginBottom: '1rem'
-              }}>Pega tu contenido</h3>
-              <p style={{
-                fontSize: '1rem',
-                color: '#666',
-                lineHeight: '1.7',
-                marginBottom: '1.5rem'
-              }}>
-                Ya generaste el curso en ChatGPT, Claude o Gemini. Simplemente pégalo aquí.
-              </p>
-              <div style={{
-                background: '#fafafa',
-                padding: '1.5rem',
-                borderRadius: '12px',
-                marginBottom: '1.5rem'
-              }}>
-                <p style={{ fontSize: '0.9rem', color: '#000', fontWeight: '600', marginBottom: '0.8rem' }}>
-                  La IA detecta automáticamente:
-                </p>
-                <ul style={{
-                  margin: 0,
-                  paddingLeft: '1.2rem',
-                  fontSize: '0.9rem',
-                  color: '#666',
-                  lineHeight: '1.8'
-                }}>
-                  <li>Módulos principales</li>
-                  <li>Lecciones por módulo</li>
-                  <li>Duración estimada</li>
-                  <li>Organización pedagógica</li>
-                </ul>
-              </div>
-              <p style={{
-                fontSize: '0.85rem',
-                color: '#999',
-                fontStyle: 'italic'
-              }}>
-                ✨ Perfecto si ya tienes el contenido listo
-              </p>
-            </div>
-
-            {/* Opción 2 */}
-            <div style={{
-              background: '#fff',
-              borderRadius: '16px',
-              padding: '2.5rem',
-              border: '2px solid #e0e0e0'
-            }}>
-              <div style={{
-                fontSize: '2.5rem',
-                marginBottom: '1.5rem'
-              }}>💬</div>
-              <h3 style={{
-                fontSize: '1.5rem',
-                fontWeight: '700',
-                color: '#000',
-                marginBottom: '1rem'
-              }}>Conversa con la IA</h3>
-              <p style={{
-                fontSize: '1rem',
-                color: '#666',
-                lineHeight: '1.7',
-                marginBottom: '1.5rem'
-              }}>
-                Aún no tienes contenido. El Asistente Pedagógico te guiará mediante preguntas.
-              </p>
-              <div style={{
-                background: '#fafafa',
-                padding: '1.5rem',
-                borderRadius: '12px',
-                marginBottom: '1.5rem'
-              }}>
-                <p style={{ fontSize: '0.9rem', color: '#000', fontWeight: '600', marginBottom: '0.8rem' }}>
-                  La IA te pregunta sobre:
-                </p>
-                <ul style={{
-                  margin: 0,
-                  paddingLeft: '1.2rem',
-                  fontSize: '0.9rem',
-                  color: '#666',
-                  lineHeight: '1.8'
-                }}>
-                  <li>Tema del curso</li>
-                  <li>Público objetivo</li>
-                  <li>Duración estimada</li>
-                  <li>Objetivos de aprendizaje</li>
-                </ul>
-              </div>
-              <p style={{
-                fontSize: '0.85rem',
-                color: '#999',
-                fontStyle: 'italic'
-              }}>
-                ✨ Ideal para crear desde cero
-              </p>
-            </div>
-          </div>
-
-          <div style={{
-            marginTop: '3rem',
-            textAlign: 'center',
-            padding: '2rem',
-            background: '#fff',
-            borderRadius: '12px',
-            border: '1px solid #e0e0e0'
-          }}>
-            <p style={{
-              fontSize: '1.1rem',
-              color: '#000',
-              fontWeight: '600'
-            }}>
-              En ambos casos: <span style={{ color: '#10b981' }}>tú decides si aceptar la propuesta</span>
-            </p>
-          </div>
-        </div>
-      </section>
-
-      {/* Tú siempre tienes el control */}
-      <section style={{
-        padding: '6rem 3rem',
-        backgroundColor: '#fff'
-      }}>
-        <div style={{ maxWidth: '900px', margin: '0 auto', textAlign: 'center' }}>
-          <h2 style={{
-            fontSize: '2.5rem',
-            fontWeight: '700',
-            lineHeight: '1.2',
-            color: '#000',
-            marginBottom: '1.5rem'
-          }}>
-            Tú siempre tienes el control
-          </h2>
-          <p style={{
-            fontSize: '1.3rem',
-            color: '#666',
-            marginBottom: '3rem',
-            lineHeight: '1.7'
-          }}>
-            La IA <strong style={{ color: '#000' }}>propone</strong>. El profesor <strong style={{ color: '#000' }}>decide</strong>.
-          </p>
-
-          <div style={{
-            background: '#fafafa',
-            borderRadius: '16px',
-            padding: '3rem 2rem',
-            border: '1px solid #e0e0e0'
-          }}>
-            <div style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-              gap: '2rem'
-            }}>
-              {[
-                { icon: '✏️', text: 'Edita módulos' },
-                { icon: '➕', text: 'Agrega lecciones' },
-                { icon: '🗑️', text: 'Elimina contenido' },
-                { icon: '🔄', text: 'Reorganiza el curso' },
-                { icon: '✅', text: 'Acepta cuando estés listo' }
-              ].map((item, idx) => (
-                <div key={idx} style={{ textAlign: 'center' }}>
-                  <div style={{ fontSize: '2.5rem', marginBottom: '0.8rem' }}>{item.icon}</div>
-                  <p style={{ fontSize: '1rem', fontWeight: '500', color: '#000' }}>{item.text}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <p style={{
-            marginTop: '2.5rem',
-            fontSize: '1.1rem',
-            color: '#666',
-            fontStyle: 'italic'
-          }}>
-            La IA elimina el trabajo repetitivo. Tú te enfocas en enseñar.
-          </p>
-        </div>
-      </section>
-
-      {/* Producción del contenido */}
-      <section style={{
-        padding: '6rem 3rem',
-        backgroundColor: '#fafafa'
-      }}>
-        <div style={{ maxWidth: '1400px', margin: '0 auto' }}>
-          <div style={{ textAlign: 'center', marginBottom: '4rem' }}>
-            <h2 style={{
-              fontSize: '2.5rem',
-              fontWeight: '700',
-              lineHeight: '1.2',
-              color: '#000',
-              marginBottom: '1.5rem'
-            }}>
-              Completa tu curso<br/>
-              sin perder el control
-            </h2>
-            <p style={{
-              fontSize: '1.2rem',
-              color: '#666',
-              maxWidth: '700px',
-              margin: '0 auto'
-            }}>
-              La plataforma muestra visualmente qué lecciones ya están completas y cuáles aún necesitan contenido.
-            </p>
-          </div>
-
-          <div style={{
-            background: '#fff',
-            borderRadius: '16px',
-            padding: '2.5rem',
-            border: '1px solid #e0e0e0'
-          }}>
-            <div style={{
-              display: 'flex',
-              flexDirection: 'column',
-              gap: '1.5rem'
-            }}>
-              {/* Lección completa */}
-              <div style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '1rem',
-                padding: '1.2rem',
-                background: '#f0fdf4',
-                border: '2px solid #86efac',
-                borderRadius: '10px'
-              }}>
-                <div style={{
-                  width: '40px',
-                  height: '40px',
-                  borderRadius: '50%',
-                  background: '#10b981',
-                  color: '#fff',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  fontSize: '1.2rem'
-                }}>✓</div>
-                <div style={{ flex: 1 }}>
-                  <p style={{
-                    fontSize: '1rem',
-                    fontWeight: '600',
-                    color: '#000',
-                    marginBottom: '0.2rem'
-                  }}>Lección 1.1: Introducción</p>
-                  <p style={{ fontSize: '0.85rem', color: '#10b981' }}>Video, PDF y evaluación agregados</p>
-                </div>
-              </div>
-
-              {/* Lección incompleta */}
-              <div style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '1rem',
-                padding: '1.2rem',
-                background: '#fef3c7',
-                border: '2px dashed #fbbf24',
-                borderRadius: '10px'
-              }}>
-                <div style={{
-                  width: '40px',
-                  height: '40px',
-                  borderRadius: '50%',
-                  background: '#fbbf24',
-                  color: '#fff',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  fontSize: '1.2rem'
-                }}>⚠</div>
-                <div style={{ flex: 1 }}>
-                  <p style={{
-                    fontSize: '1rem',
-                    fontWeight: '600',
-                    color: '#000',
-                    marginBottom: '0.2rem'
-                  }}>Lección 1.2: Conceptos básicos</p>
-                  <p style={{ fontSize: '0.85rem', color: '#d97706' }}>Falta agregar contenido</p>
-                </div>
-              </div>
-
-              <p style={{
-                marginTop: '1rem',
-                fontSize: '0.95rem',
-                color: '#666',
                 textAlign: 'center',
-                fontStyle: 'italic'
-              }}>
-                Nunca pierdes el rastro de qué falta por completar
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Experiencia del estudiante */}
-      <section style={{
-        padding: '6rem 3rem',
-        backgroundColor: '#fff'
-      }}>
-        <div style={{ maxWidth: '1400px', margin: '0 auto' }}>
-          <div style={{ textAlign: 'center', marginBottom: '4rem' }}>
-            <h2 style={{
-              fontSize: '2.5rem',
-              fontWeight: '700',
-              lineHeight: '1.2',
-              color: '#000',
-              marginBottom: '1.5rem'
-            }}>
-              Experiencia del estudiante
-            </h2>
-            <p style={{
-              fontSize: '1.2rem',
-              color: '#666',
-              maxWidth: '700px',
-              margin: '0 auto'
-            }}>
-              Un recorrido claro desde la matrícula hasta el certificado
-            </p>
-          </div>
-
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
-            gap: '2rem'
-          }}>
-            {[
-              { num: '1', title: 'Se matricula', desc: 'Acceso inmediato al curso' },
-              { num: '2', title: 'Visualiza módulos', desc: 'Estructura clara y ordenada' },
-              { num: '3', title: 'Avanza lección a lección', desc: 'Progreso paso a paso' },
-              { num: '4', title: 'Responde cuestionarios', desc: 'Evaluación continua' },
-              { num: '5', title: 'Completa requisitos', desc: 'Seguimiento automático' },
-              { num: '6', title: 'Recibe certificado', desc: 'Emisión automática' }
-            ].map((item, idx) => (
-              <div key={idx} style={{
-                padding: '2rem 1.5rem',
-                background: '#fafafa',
-                borderRadius: '12px',
-                border: '1px solid #f0f0f0',
-                textAlign: 'center'
+                padding: '2rem 1.5rem'
               }}>
                 <div style={{
-                  width: '50px',
-                  height: '50px',
-                  borderRadius: '50%',
-                  background: '#000',
-                  color: '#fff',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  fontSize: '1.3rem',
-                  fontWeight: '700',
-                  margin: '0 auto 1.2rem'
-                }}>{item.num}</div>
+                  fontSize: '3rem',
+                  marginBottom: '1rem'
+                }}>{item.icon}</div>
                 <h3 style={{
-                  fontSize: '1.1rem',
-                  fontWeight: '600',
-                  color: '#000',
-                  marginBottom: '0.5rem'
+                  fontSize: '1.125rem',
+                  fontWeight: '700',
+                  color: '#0a0e27',
+                  marginBottom: '0.75rem'
                 }}>{item.title}</h3>
                 <p style={{
-                  fontSize: '0.9rem',
-                  color: '#666'
+                  fontSize: '0.875rem',
+                  color: '#64748b',
+                  lineHeight: '1.6'
                 }}>{item.desc}</p>
               </div>
             ))}
@@ -1024,226 +535,346 @@ export default function SmartChatixAcademyPage() {
         </div>
       </section>
 
-      {/* Certificación automática */}
+      {/* Una plataforma, dos formas de enseñar */}
       <section style={{
         padding: '6rem 3rem',
-        backgroundColor: '#000',
-        color: '#fff'
+        background: '#f9fafb'
       }}>
-        <div style={{ maxWidth: '900px', margin: '0 auto', textAlign: 'center' }}>
-          <div style={{
-            fontSize: '3rem',
-            marginBottom: '2rem'
-          }}>🎓</div>
-          <h2 style={{
-            fontSize: '2.5rem',
-            fontWeight: '700',
-            lineHeight: '1.2',
-            marginBottom: '1.5rem'
-          }}>
-            Certificación automática
-          </h2>
-          <p style={{
-            fontSize: '1.3rem',
-            color: '#ccc',
-            marginBottom: '3rem',
-            lineHeight: '1.7',
-            maxWidth: '700px',
-            margin: '0 auto 3rem'
-          }}>
-            No más emisión manual de certificados. Cuando el estudiante cumple los requisitos definidos por el instructor, el sistema genera y entrega el certificado automáticamente.
-          </p>
+        <div style={{ maxWidth: '1400px', margin: '0 auto' }}>
+          <div style={{ textAlign: 'center', marginBottom: '4rem' }}>
+            <h2 style={{
+              fontSize: '2.5rem',
+              fontWeight: '700',
+              color: '#0a0e27',
+              marginBottom: '1rem'
+            }}>
+              Una plataforma, dos formas de enseñar
+            </h2>
+          </div>
 
           <div style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-            gap: '2rem',
-            marginTop: '3rem'
+            gridTemplateColumns: '1fr 1fr',
+            gap: '2rem'
+          }}>
+            {/* Para Empresas */}
+            <div style={{
+              background: 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)',
+              borderRadius: '20px',
+              padding: '3rem',
+              color: '#fff',
+              position: 'relative',
+              overflow: 'hidden'
+            }}>
+              <div style={{
+                position: 'absolute',
+                top: '-50px',
+                right: '-50px',
+                width: '200px',
+                height: '200px',
+                background: 'rgba(255, 255, 255, 0.1)',
+                borderRadius: '50%',
+                filter: 'blur(40px)'
+              }}></div>
+
+              <div style={{
+                display: 'inline-block',
+                background: 'rgba(255, 255, 255, 0.2)',
+                borderRadius: '12px',
+                padding: '0.75rem 1.25rem',
+                fontSize: '14px',
+                fontWeight: '600',
+                marginBottom: '1.5rem'
+              }}>
+                🏢 PARA EMPRESAS
+              </div>
+
+              <h3 style={{
+                fontSize: '2rem',
+                fontWeight: '700',
+                marginBottom: '1rem',
+                lineHeight: '1.2'
+              }}>
+                Capacita a tu equipo<br/>y mide resultados
+              </h3>
+
+              <p style={{
+                fontSize: '1rem',
+                color: '#dbeafe',
+                marginBottom: '2rem',
+                lineHeight: '1.7'
+              }}>
+                Centraliza la capacitación de tu organización, asigna el compromiso y desarrollo del talento de tu equipo.
+              </p>
+
+              <div style={{ marginBottom: '2rem' }}>
+                {[
+                  'Cursos de inducción y entrenamiento',
+                  'Cumplimiento normativo',
+                  'Evaluaciones y reportes',
+                  'Certificados corporativos',
+                  'Roles y permisos personalizados'
+                ].map((item, idx) => (
+                  <div key={idx} style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.75rem',
+                    marginBottom: '0.75rem'
+                  }}>
+                    <div style={{
+                      width: '20px',
+                      height: '20px',
+                      background: '#10b981',
+                      borderRadius: '50%',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontSize: '12px'
+                    }}>✓</div>
+                    <span style={{ fontSize: '0.9rem' }}>{item}</span>
+                  </div>
+                ))}
+              </div>
+
+              <button style={{
+                background: '#fff',
+                color: '#1d4ed8',
+                border: 'none',
+                padding: '14px 28px',
+                borderRadius: '10px',
+                fontSize: '15px',
+                fontWeight: '600',
+                cursor: 'pointer',
+                boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)'
+              }}>
+                Conoce la solución para empresas
+              </button>
+            </div>
+
+            {/* Para Creadores */}
+            <div style={{
+              background: 'linear-gradient(135deg, #ec4899 0%, #8b5cf6 100%)',
+              borderRadius: '20px',
+              padding: '3rem',
+              color: '#fff',
+              position: 'relative',
+              overflow: 'hidden'
+            }}>
+              <div style={{
+                position: 'absolute',
+                top: '-50px',
+                right: '-50px',
+                width: '200px',
+                height: '200px',
+                background: 'rgba(255, 255, 255, 0.1)',
+                borderRadius: '50%',
+                filter: 'blur(40px)'
+              }}></div>
+
+              <div style={{
+                display: 'inline-block',
+                background: 'rgba(255, 255, 255, 0.2)',
+                borderRadius: '12px',
+                padding: '0.75rem 1.25rem',
+                fontSize: '14px',
+                fontWeight: '600',
+                marginBottom: '1.5rem'
+              }}>
+                👨‍🏫 PARA CREADORES
+              </div>
+
+              <h3 style={{
+                fontSize: '2rem',
+                fontWeight: '700',
+                marginBottom: '1rem',
+                lineHeight: '1.2'
+              }}>
+                Crea tu academia<br/>y vende cursos online
+              </h3>
+
+              <p style={{
+                fontSize: '1rem',
+                color: '#fce7f3',
+                marginBottom: '2rem',
+                lineHeight: '1.7'
+              }}>
+                Construye tu marca, publica tus cursos y haz crecer tu negocio de educación con contenido de técnica.
+              </p>
+
+              <div style={{ marginBottom: '2rem' }}>
+                {[
+                  'Tu propia academia online',
+                  'Página de ventas integrada',
+                  'Gestión de estudiantes',
+                  'Certificados personalizados',
+                  'Cobros y matrículas'
+                ].map((item, idx) => (
+                  <div key={idx} style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.75rem',
+                    marginBottom: '0.75rem'
+                  }}>
+                    <div style={{
+                      width: '20px',
+                      height: '20px',
+                      background: '#fbbf24',
+                      borderRadius: '50%',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontSize: '12px'
+                    }}>✓</div>
+                    <span style={{ fontSize: '0.9rem' }}>{item}</span>
+                  </div>
+                ))}
+              </div>
+
+              <button style={{
+                background: '#fff',
+                color: '#8b5cf6',
+                border: 'none',
+                padding: '14px 28px',
+                borderRadius: '10px',
+                fontSize: '15px',
+                fontWeight: '600',
+                cursor: 'pointer',
+                boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)'
+              }}>
+                Conoce la solución para creadores
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Todo lo que necesitas */}
+      <section style={{
+        padding: '6rem 3rem',
+        background: '#ffffff'
+      }}>
+        <div style={{ maxWidth: '1400px', margin: '0 auto' }}>
+          <div style={{ textAlign: 'center', marginBottom: '4rem' }}>
+            <h2 style={{
+              fontSize: '2.5rem',
+              fontWeight: '700',
+              color: '#0a0e27',
+              marginBottom: '1rem'
+            }}>
+              Todo lo que necesitas para enseñar sin límites
+            </h2>
+          </div>
+
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(3, 1fr)',
+            gap: '2rem'
           }}>
             {[
-              { icon: '⏱️', text: 'Ahorro de tiempo para el instructor' },
-              { icon: '📊', text: 'Control total de requisitos' },
-              { icon: '✅', text: 'Emisión instantánea' },
-              { icon: '🏢', text: 'Ideal para empresas y academias' }
+              {
+                icon: '🤖',
+                title: 'Asistente IA',
+                desc: 'Crea estructuras, contenidos, quizzes y más sin esfuerzo.'
+              },
+              {
+                icon: '📹',
+                title: 'Lecciones flexibles',
+                desc: 'Videos, textos, markdown, PDFs, quizzes, y más.'
+              },
+              {
+                icon: '❓',
+                title: 'Quizzes inteligentes',
+                desc: 'La IA programa respuestas apropiadas para cada tema.'
+              },
+              {
+                icon: '✍️',
+                title: 'Tareas y asignaciones',
+                desc: 'Recibe entregas, califica y da feedback.'
+              },
+              {
+                icon: '📜',
+                title: 'Certificados automáticos',
+                desc: 'Personalizados con tu logo y código de verificación.'
+              },
+              {
+                icon: '📊',
+                title: 'Reportes y analíticas',
+                desc: 'Visualiza el progreso y desempeño en tiempo real.'
+              }
             ].map((item, idx) => (
-              <div key={idx} style={{ textAlign: 'center' }}>
-                <div style={{ fontSize: '2.5rem', marginBottom: '0.8rem' }}>{item.icon}</div>
+              <div key={idx} style={{
+                background: '#f9fafb',
+                borderRadius: '16px',
+                padding: '2rem',
+                border: '1px solid #e5e7eb',
+                textAlign: 'center'
+              }}>
+                <div style={{
+                  fontSize: '3rem',
+                  marginBottom: '1rem'
+                }}>{item.icon}</div>
+                <h3 style={{
+                  fontSize: '1.125rem',
+                  fontWeight: '700',
+                  color: '#0a0e27',
+                  marginBottom: '0.75rem'
+                }}>{item.title}</h3>
                 <p style={{
-                  fontSize: '1rem',
-                  fontWeight: '500',
-                  color: '#ccc'
-                }}>{item.text}</p>
+                  fontSize: '0.875rem',
+                  color: '#64748b',
+                  lineHeight: '1.6'
+                }}>{item.desc}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Comparativa */}
+      {/* ¿Por qué elegir SmartChatix? */}
       <section style={{
         padding: '6rem 3rem',
-        backgroundColor: '#fafafa'
+        background: '#f9fafb'
       }}>
-        <div style={{ maxWidth: '1400px', margin: '0 auto' }}>
-          <div style={{ textAlign: 'center', marginBottom: '4rem' }}>
-            <h2 style={{
-              fontSize: '2.5rem',
-              fontWeight: '700',
-              lineHeight: '1.2',
-              color: '#000',
-              marginBottom: '1.5rem'
-            }}>
-              LMS tradicional vs<br/>
-              SmartChatix Academy
-            </h2>
-          </div>
-
-          <div style={{
-            background: '#fff',
-            borderRadius: '16px',
-            overflow: 'hidden',
-            border: '1px solid #e0e0e0'
+        <div style={{ maxWidth: '900px', margin: '0 auto', textAlign: 'center' }}>
+          <h2 style={{
+            fontSize: '2.5rem',
+            fontWeight: '700',
+            color: '#0a0e27',
+            marginBottom: '3rem'
           }}>
-            <table style={{
-              width: '100%',
-              borderCollapse: 'collapse'
-            }}>
-              <thead>
-                <tr style={{ background: '#fafafa' }}>
-                  <th style={{
-                    padding: '1.5rem',
-                    textAlign: 'left',
-                    fontSize: '1rem',
-                    fontWeight: '600',
-                    color: '#000',
-                    borderBottom: '1px solid #e0e0e0'
-                  }}>Característica</th>
-                  <th style={{
-                    padding: '1.5rem',
-                    textAlign: 'center',
-                    fontSize: '1rem',
-                    fontWeight: '600',
-                    color: '#666',
-                    borderBottom: '1px solid #e0e0e0'
-                  }}>LMS Tradicional</th>
-                 
-                </tr>
-              </thead>
-              <tbody>
-                {[
-                  { feature: 'Diseño de estructura del curso', traditional: '❌', smartchatix: '✅ IA asistida' },
-                  { feature: 'Generación de evaluaciones', traditional: '❌ Manual', smartchatix: '✅ Automático con IA' },
-                  { feature: 'Organización pedagógica', traditional: '⚠️ Manual', smartchatix: '✅ Sugerida por IA' },
-                  { feature: 'Indicadores visuales de progreso', traditional: '❌', smartchatix: '✅' },
-                  { feature: 'Asistente conversacional', traditional: '❌', smartchatix: '✅ IA pedagógica' },
-                  { feature: 'Certificación automática', traditional: '⚠️ Limitada', smartchatix: '✅ Completa' },
-                  { feature: 'Detección de contenido pegado', traditional: '❌', smartchatix: '✅' }
-                ].map((row, idx) => (
-                  <tr key={idx} style={{
-                    borderBottom: idx < 6 ? '1px solid #f0f0f0' : 'none'
-                  }}>
-                    <td style={{
-                      padding: '1.2rem 1.5rem',
-                      fontSize: '0.95rem',
-                      color: '#000',
-                      fontWeight: '500'
-                    }}>{row.feature}</td>
-                    <td style={{
-                      padding: '1.2rem 1.5rem',
-                      textAlign: 'center',
-                      fontSize: '0.95rem',
-                      color: '#666'
-                    }}>{row.traditional}</td>
-                    <td style={{
-                      padding: '1.2rem 1.5rem',
-                      textAlign: 'center',
-                      fontSize: '0.95rem',
-                      color: '#10b981',
-                      fontWeight: '600'
-                    }}>{row.smartchatix}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </section>
-
-      {/* Casos de uso */}
-      <section style={{
-        padding: '6rem 3rem',
-        backgroundColor: '#fff'
-      }}>
-        <div style={{ maxWidth: '1400px', margin: '0 auto' }}>
-          <div style={{ textAlign: 'center', marginBottom: '4rem' }}>
-            <h2 style={{
-              fontSize: '2.5rem',
-              fontWeight: '700',
-              lineHeight: '1.2',
-              color: '#000',
-              marginBottom: '1.5rem'
-            }}>
-              Diseñado para diferentes necesidades
-            </h2>
-          </div>
+            ¿Por qué elegir SmartChatix?
+          </h2>
 
           <div style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
-            gap: '2rem'
+            gridTemplateColumns: 'repeat(2, 1fr)',
+            gap: '1.5rem'
           }}>
             {[
-              {
-                icon: '👨‍🏫',
-                title: 'Docentes',
-                desc: 'Crea y vende tus cursos sin depender de plataformas que se quedan con tu audiencia'
-              },
-              {
-                icon: '🏢',
-                title: 'Empresas',
-                desc: 'Capacita a tu equipo con cursos internos y certifica automáticamente'
-              },
-              {
-                icon: '🎓',
-                title: 'Academias',
-                desc: 'Escala tu oferta educativa sin contratar más personal administrativo'
-              },
-              {
-                icon: '🏛️',
-                title: 'Universidades',
-                desc: 'Digitaliza programas completos con acompañamiento IA en todo el proceso'
-              },
-              {
-                icon: '💼',
-                title: 'Consultores',
-                desc: 'Monetiza tu conocimiento mediante cursos estructurados profesionalmente'
-              },
-              {
-                icon: '📚',
-                title: 'Capacitadores corporativos',
-                desc: 'Reduce tiempo de preparación y enfócate en el contenido de valor'
-              }
+              { icon: '💎', title: 'Tú Cuentas, Tus Datos', desc: 'Mantienes control total en tu propia servidor e infraestructura.' },
+              { icon: '⚡', title: 'IA que sí Acompaña', desc: 'IA IA te ayuda en todo el proceso, no es solo alcanza.' },
+              { icon: '🎯', title: 'Implementación Rápida', desc: 'Agiliza los tiempos de configuración y actualización en cada paso del proceso.' },
+              { icon: '🛡️', title: 'Seguridad y Privacidad', desc: 'Cumple con las políticas internas de tu empresa y normativas.' },
+              { icon: '📈', title: 'Escalable', desc: 'Desde pequeños equipos hasta grandes organización.' },
+              { icon: '🤝', title: 'Soporte Humano', desc: 'Entrenamiento contigo antes, durante y después de la implementación.' }
             ].map((item, idx) => (
               <div key={idx} style={{
-                padding: '2.5rem',
-                background: '#fafafa',
-                borderRadius: '16px',
-                border: '1px solid #e0e0e0',
-                textAlign: 'center'
+                background: '#fff',
+                borderRadius: '12px',
+                padding: '2rem',
+                border: '1px solid #e5e7eb',
+                textAlign: 'left'
               }}>
-                <div style={{
-                  fontSize: '3rem',
-                  marginBottom: '1.5rem'
-                }}>{item.icon}</div>
+                <div style={{ fontSize: '2rem', marginBottom: '1rem' }}>{item.icon}</div>
                 <h3 style={{
-                  fontSize: '1.3rem',
+                  fontSize: '1.125rem',
                   fontWeight: '700',
-                  color: '#000',
-                  marginBottom: '1rem'
+                  color: '#0a0e27',
+                  marginBottom: '0.5rem'
                 }}>{item.title}</h3>
                 <p style={{
-                  fontSize: '1rem',
-                  color: '#666',
+                  fontSize: '0.875rem',
+                  color: '#64748b',
                   lineHeight: '1.6'
                 }}>{item.desc}</p>
               </div>
@@ -1255,47 +886,65 @@ export default function SmartChatixAcademyPage() {
       {/* CTA Final */}
       <section style={{
         padding: '6rem 3rem',
-        backgroundColor: '#000',
+        background: 'linear-gradient(135deg, #1e1b4b 0%, #312e81 100%)',
         color: '#fff',
         textAlign: 'center'
       }}>
         <div style={{ maxWidth: '800px', margin: '0 auto' }}>
           <h2 style={{
             fontSize: '3rem',
-            fontWeight: '700',
+            fontWeight: '800',
             lineHeight: '1.2',
             marginBottom: '1.5rem'
           }}>
-            Crea tu primera<br/>
-            academia hoy
+            ¿Listo para transformar<br/>la forma en que enseñas<br/>o capacitas?
           </h2>
           <p style={{
-            fontSize: '1.4rem',
-            color: '#ccc',
+            fontSize: '1.25rem',
+            color: '#cbd5e1',
             marginBottom: '3rem',
             lineHeight: '1.7'
           }}>
-            La IA te acompañará desde la idea hasta el certificado
+            Solicita una demostración personalizada y descubre<br/>
+            todo lo que SmartChatix puede hacer por ti.
           </p>
 
-          <button
-            onClick={() => setShowModal(true)}
-            style={{
-              background: '#fff',
-              color: '#000',
-              border: 'none',
-              padding: '18px 40px',
-              borderRadius: '12px',
-              fontSize: '18px',
-              fontWeight: '700',
-              cursor: 'pointer',
-              transition: 'all 0.2s',
-              boxShadow: '0 4px 20px rgba(255,255,255,0.2)'
-            }}
-          >
-            Solicitar una demostración →
-          </button>
+          <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
+            <button
+              onClick={() => setShowModal(true)}
+              style={{
+                background: 'linear-gradient(135deg, #8b5cf6 0%, #d946ef 100%)',
+                color: '#fff',
+                border: 'none',
+                padding: '18px 36px',
+                borderRadius: '12px',
+                fontSize: '17px',
+                fontWeight: '700',
+                cursor: 'pointer',
+                transition: 'all 0.2s',
+                boxShadow: '0 8px 24px rgba(139, 92, 246, 0.4)'
+              }}
+            >
+              📅 Solicitar demostración
+            </button>
 
+            <button
+              style={{
+                background: 'rgba(255, 255, 255, 0.1)',
+                color: '#fff',
+                border: '1px solid rgba(255, 255, 255, 0.3)',
+                padding: '18px 36px',
+                borderRadius: '12px',
+                fontSize: '17px',
+                fontWeight: '700',
+                cursor: 'pointer',
+                transition: 'all 0.2s',
+                backdropFilter: 'blur(10px)'
+              }}
+            >
+              💬 Hablar con un especialista
+            </button>
+          </div>
         </div>
       </section>
 
@@ -1310,7 +959,7 @@ export default function SmartChatixAcademyPage() {
             left: 0,
             right: 0,
             bottom: 0,
-            backgroundColor: 'rgba(0, 0, 0, 0.6)',
+            backgroundColor: 'rgba(0, 0, 0, 0.7)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -1322,10 +971,10 @@ export default function SmartChatixAcademyPage() {
           <div
             style={{
               backgroundColor: '#fff',
-              borderRadius: '16px',
+              borderRadius: '20px',
               maxWidth: '500px',
               width: '100%',
-              padding: '2.5rem',
+              padding: '3rem',
               position: 'relative'
             }}
             onClick={(e) => e.stopPropagation()}
@@ -1338,99 +987,117 @@ export default function SmartChatixAcademyPage() {
                 right: '20px',
                 background: 'none',
                 border: 'none',
-                fontSize: '24px',
+                fontSize: '28px',
                 cursor: 'pointer',
-                color: '#999'
+                color: '#999',
+                lineHeight: '1'
               }}
             >
               ×
             </button>
 
             <h2 style={{
-              fontSize: '1.8rem',
+              fontSize: '2rem',
               fontWeight: '700',
               marginBottom: '0.5rem',
-              color: '#000'
+              color: '#0a0e27'
             }}>
-              Crea tu academia
+              Solicita tu demostración
             </h2>
             <p style={{
               fontSize: '1rem',
-              color: '#666',
+              color: '#64748b',
               marginBottom: '2rem'
             }}>
-              Te contactaremos para activar tu plataforma
+              Te contactaremos en menos de 24 horas
             </p>
 
             <form style={{ display: 'flex', flexDirection: 'column', gap: '1.2rem' }}>
               <input
                 type="text"
-                placeholder="Nombre completo"
+                placeholder="Nombre completo *"
                 required
                 style={{
-                  padding: '14px',
-                  borderRadius: '8px',
-                  border: '1px solid #e0e0e0',
+                  padding: '14px 16px',
+                  borderRadius: '10px',
+                  border: '2px solid #e5e7eb',
                   fontSize: '15px',
-                  outline: 'none'
+                  outline: 'none',
+                  fontFamily: 'inherit'
                 }}
               />
               <input
                 type="email"
-                placeholder="Email"
+                placeholder="Email corporativo *"
                 required
                 style={{
-                  padding: '14px',
-                  borderRadius: '8px',
-                  border: '1px solid #e0e0e0',
+                  padding: '14px 16px',
+                  borderRadius: '10px',
+                  border: '2px solid #e5e7eb',
                   fontSize: '15px',
-                  outline: 'none'
+                  outline: 'none',
+                  fontFamily: 'inherit'
                 }}
               />
               <input
                 type="tel"
-                placeholder="Teléfono"
+                placeholder="Teléfono *"
                 required
                 style={{
-                  padding: '14px',
-                  borderRadius: '8px',
-                  border: '1px solid #e0e0e0',
+                  padding: '14px 16px',
+                  borderRadius: '10px',
+                  border: '2px solid #e5e7eb',
                   fontSize: '15px',
-                  outline: 'none'
+                  outline: 'none',
+                  fontFamily: 'inherit'
+                }}
+              />
+              <input
+                type="text"
+                placeholder="Empresa u organización"
+                style={{
+                  padding: '14px 16px',
+                  borderRadius: '10px',
+                  border: '2px solid #e5e7eb',
+                  fontSize: '15px',
+                  outline: 'none',
+                  fontFamily: 'inherit'
                 }}
               />
               <select
                 required
                 style={{
-                  padding: '14px',
-                  borderRadius: '8px',
-                  border: '1px solid #e0e0e0',
+                  padding: '14px 16px',
+                  borderRadius: '10px',
+                  border: '2px solid #e5e7eb',
                   fontSize: '15px',
-                  outline: 'none'
+                  outline: 'none',
+                  fontFamily: 'inherit',
+                  color: '#64748b'
                 }}
               >
-                <option value="">Tipo de institución</option>
-                <option>Academia</option>
-                <option>Universidad</option>
-                <option>Empresa</option>
-                <option>Docente independiente</option>
+                <option value="">¿Qué te interesa? *</option>
+                <option>Capacitación empresarial</option>
+                <option>Crear mi academia online</option>
+                <option>Vender cursos</option>
+                <option>Otro</option>
               </select>
 
               <button
                 type="submit"
                 style={{
-                  background: '#000',
+                  background: 'linear-gradient(135deg, #8b5cf6 0%, #d946ef 100%)',
                   color: '#fff',
                   border: 'none',
                   padding: '16px',
-                  borderRadius: '8px',
+                  borderRadius: '10px',
                   fontSize: '16px',
                   fontWeight: '600',
                   cursor: 'pointer',
                   marginTop: '0.5rem'
                 }}
               >
-                Solicitar activación
+                Solicitar demostración
               </button>
             </form>
           </div>
