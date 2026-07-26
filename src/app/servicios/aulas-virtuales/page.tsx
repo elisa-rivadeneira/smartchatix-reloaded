@@ -181,7 +181,10 @@ export default function AulasVirtualesPage() {
       {/* Hero Section */}
       <section style={{
         padding: '6rem 3rem 4rem',
-        background: 'linear-gradient(180deg, #0a0e27 0%, #1a1f3a 100%)',
+        background: '#0a0e27',
+        backgroundImage: 'url(/images/background_hero.png)',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
         position: 'relative',
         overflow: 'hidden'
       }} className="fade-in-up">
@@ -211,15 +214,15 @@ export default function AulasVirtualesPage() {
             </div>
 
             <h1 style={{
-              fontSize: '3.75rem',
-              fontWeight: '700',
-              lineHeight: '1.1',
+              fontSize: '4rem',
+              fontWeight: '800',
+              lineHeight: '1.15',
               marginBottom: '1.5rem',
               color: '#ffffff',
               letterSpacing: '-0.02em'
             }}>
               Crea cursos increíbles<br/>con <span style={{
-                background: 'linear-gradient(90deg, #3b82f6 0%, #d946ef 100%)',
+                background: 'linear-gradient(90deg, #6366f1 0%, #e91e63 100%)',
                 WebkitBackgroundClip: 'text',
                 WebkitTextFillColor: 'transparent',
                 backgroundClip: 'text'
@@ -227,14 +230,15 @@ export default function AulasVirtualesPage() {
             </h1>
 
             <p style={{
-              fontSize: '1.125rem',
+              fontSize: '1.0625rem',
               color: '#cbd5e1',
               marginBottom: '2.5rem',
-              lineHeight: '1.65',
+              lineHeight: '1.7',
               maxWidth: '520px'
             }}>
               Convierte tus ideas en cursos completos.<br/>
-              Nuestra IA diseña, estructura y genera contenidos listos para enseñar.
+              Nuestra IA diseña, estructura y genera contenidos listos para<br/>
+              enseñar.
             </p>
 
             <div style={{ display: 'flex', gap: '1rem', marginBottom: '3rem' }}>
@@ -307,7 +311,7 @@ export default function AulasVirtualesPage() {
             </div>
 
             {/* Features Pills */}
-            <div style={{ display: 'flex', gap: '2rem', flexWrap: 'wrap' }}>
+            <div style={{ display: 'flex', gap: '2.5rem', flexWrap: 'wrap' }}>
               {[
                 { icon: '💎', text: 'IA que entiende\ntu contenido' },
                 { icon: '👥', text: 'Ahorra horas\nde trabajo' },
@@ -316,18 +320,26 @@ export default function AulasVirtualesPage() {
                 <div key={idx} style={{
                   display: 'flex',
                   alignItems: 'flex-start',
-                  gap: '0.65rem'
+                  gap: '0.75rem'
                 }}>
-                  <span style={{
-                    fontSize: '1.5rem',
-                    marginTop: '2px'
-                  }}>{item.icon}</span>
+                  <div style={{
+                    width: '36px',
+                    height: '36px',
+                    borderRadius: '8px',
+                    background: 'rgba(99, 102, 241, 0.15)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: '18px',
+                    flexShrink: 0
+                  }}>{item.icon}</div>
                   <span style={{
                     fontSize: '13px',
                     color: '#cbd5e1',
                     fontWeight: '500',
-                    lineHeight: '1.4',
-                    whiteSpace: 'pre-line'
+                    lineHeight: '1.45',
+                    whiteSpace: 'pre-line',
+                    paddingTop: '2px'
                   }}>{item.text}</span>
                 </div>
               ))}
