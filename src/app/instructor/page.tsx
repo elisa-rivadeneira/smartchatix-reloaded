@@ -95,6 +95,8 @@ export default function InstructorPanel() {
 
   const handleStructureCreated = async (structure: any) => {
     try {
+      console.log('📤 Enviando estructura a API:', structure);
+
       const response = await fetch('/api/instructor/courses', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -107,17 +109,21 @@ export default function InstructorPanel() {
         })
       });
 
+      const data = await response.json();
+      console.log('📥 Respuesta de API:', data);
+
       if (!response.ok) {
-        alert('Error al crear el curso');
+        const errorMsg = data.details || data.error || 'Error desconocido';
+        console.error('❌ Error del servidor:', errorMsg);
+        alert(`Error al crear el curso: ${errorMsg}`);
         return;
       }
 
-      const data = await response.json();
       alert('Curso creado exitosamente');
       router.push(`/instructor/curso/${data.course.slug}`);
-    } catch (error) {
-      console.error('Error creating course:', error);
-      alert('Error al crear el curso');
+    } catch (error: any) {
+      console.error('❌ Error creating course:', error);
+      alert(`Error al crear el curso: ${error.message}`);
     }
   };
 
