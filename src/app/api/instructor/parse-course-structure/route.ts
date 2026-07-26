@@ -81,8 +81,9 @@ Reglas:
 - Si no hay estructura clara, organiza el contenido de forma lógica
 - Las descripciones deben resumir el contenido real, no ser genéricas
 - La descripción del curso debe ser atractiva y explicar claramente qué aprenderá el estudiante
-- CRÍTICO: El campo "content_type" SOLO puede ser uno de estos valores exactos: "video", "document", "quiz", "assignment", "markdown"
-- Por defecto usa "video" para todas las lecciones a menos que el contenido indique claramente que es un quiz, taller (assignment), o documento
+- CRÍTICO: SIEMPRE usa "video" como content_type (el instructor lo cambiará después si es necesario)
+- NO generes quizzes ni assignments, solo lecciones de contenido
+- Si el contenido menciona "taller", "práctica", "quiz", o "evaluación", créalo como una lección normal con "content_type": "video"
 - IMPORTANTE: Calcula la duración de cada lección de forma que la suma total de todas las lecciones sea aproximadamente igual a la duración total del curso indicada`;
 
     const response = await openai.chat.completions.create({

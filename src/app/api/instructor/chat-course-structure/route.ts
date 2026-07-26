@@ -116,8 +116,10 @@ IMPORTANTE:
 - Genera entre 3 y 8 módulos, con 2 a 6 lecciones cada uno
 - Distribuye las duraciones según el tiempo total del curso mencionado
 - NUNCA muestres el JSON en el chat, solo actualízalo internamente
-- CRÍTICO: El campo "content_type" SOLO puede ser uno de estos valores exactos: "video", "document", "quiz", "assignment", "markdown"
-- Por defecto usa "video" para todas las lecciones a menos que el contenido indique claramente que es un quiz, taller (assignment), o documento
+- CRÍTICO: SIEMPRE usa "video" como content_type para TODAS las lecciones
+- NO generes quizzes ni assignments en la estructura, solo lecciones de contenido
+- Si mencionan "taller", "práctica", "quiz", créalo como lección normal con título descriptivo
+- El instructor agregará quizzes y tareas manualmente después
 - Sé amigable y conversacional`;
 
     const aiMessages = messages.map(m => ({

@@ -121,13 +121,7 @@ export async function POST(request: NextRequest) {
               continue;
             }
 
-            const validContentTypes = ['video', 'document', 'quiz', 'assignment', 'markdown'];
-            let contentType = (lesson.content_type || 'video').toLowerCase();
-
-            if (!validContentTypes.includes(contentType)) {
-              console.warn(`⚠️ content_type inválido "${contentType}" en lección "${lesson.title}", usando "video" por defecto`);
-              contentType = 'video';
-            }
+            const contentType = 'video';
 
             await query(
               `INSERT INTO lessons (module_id, title, description, content_type, duration, order_index, is_free)
