@@ -557,84 +557,146 @@ export default function AdminPanel() {
                 </div>
 
                 {/* Line Chart */}
-                <div style={{ position: 'relative', height: '220px', padding: '1rem 0.5rem' }}>
-                  <svg width="100%" height="100%" viewBox="0 0 600 200" preserveAspectRatio="none">
+                <div style={{ position: 'relative', height: '240px', padding: '1rem 0.5rem' }}>
+                  {/* Legend */}
+                  <div style={{
+                    display: 'flex',
+                    gap: '1.5rem',
+                    marginBottom: '1rem',
+                    justifyContent: 'center'
+                  }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                      <div style={{
+                        width: '12px',
+                        height: '12px',
+                        borderRadius: '50%',
+                        background: '#3b82f6'
+                      }}></div>
+                      <span style={{ fontSize: '13px', color: '#6b7280', fontWeight: '500' }}>📈 Estudiantes inscritos</span>
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                      <div style={{
+                        width: '12px',
+                        height: '12px',
+                        borderRadius: '50%',
+                        background: '#8b5cf6'
+                      }}></div>
+                      <span style={{ fontSize: '13px', color: '#6b7280', fontWeight: '500' }}>📊 Cursos completados</span>
+                    </div>
+                  </div>
+
+                  <svg width="100%" height="180" viewBox="0 0 700 160" preserveAspectRatio="none">
                     {/* Grid lines */}
                     {[0, 1, 2, 3, 4].map((i) => (
                       <line
                         key={i}
-                        x1="0"
-                        y1={i * 50}
-                        x2="600"
-                        y2={i * 50}
+                        x1="50"
+                        y1={i * 40}
+                        x2="700"
+                        y2={i * 40}
                         stroke="#f3f4f6"
                         strokeWidth="1"
                       />
                     ))}
 
-                    {/* Gradient fill under line */}
+                    {/* Area bajo línea azul (Estudiantes) */}
                     <defs>
-                      <linearGradient id="lineGradient" x1="0%" y1="0%" x2="0%" y2="100%">
-                        <stop offset="0%" style={{ stopColor: '#8b5cf6', stopOpacity: 0.3 }} />
-                        <stop offset="100%" style={{ stopColor: '#d946ef', stopOpacity: 0.05 }} />
+                      <linearGradient id="blueGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                        <stop offset="0%" style={{ stopColor: '#3b82f6', stopOpacity: 0.15 }} />
+                        <stop offset="100%" style={{ stopColor: '#3b82f6', stopOpacity: 0.02 }} />
                       </linearGradient>
                     </defs>
-
-                    {/* Area under curve */}
                     <path
-                      d="M 0,160 L 100,120 L 200,110 L 300,80 L 400,60 L 500,30 L 600,20 L 600,200 L 0,200 Z"
-                      fill="url(#lineGradient)"
+                      d="M 50,90 L 150,75 L 250,95 L 350,70 L 450,80 L 550,65 L 650,55 L 700,50 L 700,160 L 50,160 Z"
+                      fill="url(#blueGradient)"
                     />
 
-                    {/* Main line */}
+                    {/* Línea Azul (Estudiantes inscritos) */}
                     <path
-                      d="M 0,160 L 100,120 L 200,110 L 300,80 L 400,60 L 500,30 L 600,20"
+                      d="M 50,90 L 150,75 L 250,95 L 350,70 L 450,80 L 550,65 L 650,55 L 700,50"
                       fill="none"
-                      stroke="url(#lineStroke)"
-                      strokeWidth="3"
+                      stroke="#3b82f6"
+                      strokeWidth="2.5"
                       strokeLinecap="round"
                       strokeLinejoin="round"
                     />
 
+                    {/* Puntos línea azul */}
+                    {[
+                      { x: 50, y: 90 },
+                      { x: 150, y: 75 },
+                      { x: 250, y: 95 },
+                      { x: 350, y: 70 },
+                      { x: 450, y: 80 },
+                      { x: 550, y: 65 },
+                      { x: 650, y: 55 },
+                      { x: 700, y: 50 }
+                    ].map((point, idx) => (
+                      <circle
+                        key={`blue-${idx}`}
+                        cx={point.x}
+                        cy={point.y}
+                        r="4"
+                        fill="#fff"
+                        stroke="#3b82f6"
+                        strokeWidth="2.5"
+                      />
+                    ))}
+
+                    {/* Area bajo línea morada (Cursos completados) */}
                     <defs>
-                      <linearGradient id="lineStroke" x1="0%" y1="0%" x2="100%" y2="0%">
-                        <stop offset="0%" style={{ stopColor: '#8b5cf6' }} />
-                        <stop offset="100%" style={{ stopColor: '#d946ef' }} />
+                      <linearGradient id="purpleGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                        <stop offset="0%" style={{ stopColor: '#8b5cf6', stopOpacity: 0.15 }} />
+                        <stop offset="100%" style={{ stopColor: '#8b5cf6', stopOpacity: 0.02 }} />
                       </linearGradient>
                     </defs>
+                    <path
+                      d="M 50,120 L 150,110 L 250,125 L 350,105 L 450,100 L 550,95 L 650,85 L 700,80 L 700,160 L 50,160 Z"
+                      fill="url(#purpleGradient)"
+                    />
 
-                    {/* Data points */}
+                    {/* Línea Morada (Cursos completados) */}
+                    <path
+                      d="M 50,120 L 150,110 L 250,125 L 350,105 L 450,100 L 550,95 L 650,85 L 700,80"
+                      fill="none"
+                      stroke="#8b5cf6"
+                      strokeWidth="2.5"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+
+                    {/* Puntos línea morada */}
                     {[
-                      { x: 0, y: 160, value: 45 },
-                      { x: 100, y: 120, value: 68 },
-                      { x: 200, y: 110, value: 72 },
-                      { x: 300, y: 80, value: 95 },
-                      { x: 400, y: 60, value: 118 },
-                      { x: 500, y: 30, value: 142 },
-                      { x: 600, y: 20, value: 165 }
+                      { x: 50, y: 120 },
+                      { x: 150, y: 110 },
+                      { x: 250, y: 125 },
+                      { x: 350, y: 105 },
+                      { x: 450, y: 100 },
+                      { x: 550, y: 95 },
+                      { x: 650, y: 85 },
+                      { x: 700, y: 80 }
                     ].map((point, idx) => (
-                      <g key={idx}>
-                        <circle
-                          cx={point.x}
-                          cy={point.y}
-                          r="5"
-                          fill="#fff"
-                          stroke={idx === 6 ? '#d946ef' : '#8b5cf6'}
-                          strokeWidth="3"
-                        />
-                      </g>
+                      <circle
+                        key={`purple-${idx}`}
+                        cx={point.x}
+                        cy={point.y}
+                        r="4"
+                        fill="#fff"
+                        stroke="#8b5cf6"
+                        strokeWidth="2.5"
+                      />
                     ))}
                   </svg>
 
-                  {/* Labels */}
+                  {/* Labels de meses */}
                   <div style={{
                     display: 'flex',
                     justifyContent: 'space-between',
                     marginTop: '0.5rem',
-                    paddingLeft: '0.5rem',
+                    paddingLeft: '3rem',
                     paddingRight: '0.5rem'
                   }}>
-                    {['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul'].map((month, idx) => (
+                    {['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago'].map((month, idx) => (
                       <div key={idx} style={{
                         fontSize: '12px',
                         color: '#9ca3af',
@@ -643,26 +705,6 @@ export default function AdminPanel() {
                         {month}
                       </div>
                     ))}
-                  </div>
-
-                  {/* Values on hover effect - showing current trend */}
-                  <div style={{
-                    position: 'absolute',
-                    top: '1rem',
-                    right: '1rem',
-                    background: '#f0fdf4',
-                    border: '1px solid #86efac',
-                    borderRadius: '8px',
-                    padding: '0.5rem 0.75rem',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '0.5rem'
-                  }}>
-                    <span style={{ fontSize: '20px', color: '#16a34a' }}>↗</span>
-                    <div>
-                      <div style={{ fontSize: '11px', color: '#15803d', fontWeight: '600' }}>+267%</div>
-                      <div style={{ fontSize: '10px', color: '#16a34a' }}>vs. año anterior</div>
-                    </div>
                   </div>
                 </div>
               </div>
