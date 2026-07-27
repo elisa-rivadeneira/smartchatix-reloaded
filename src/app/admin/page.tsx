@@ -556,35 +556,114 @@ export default function AdminPanel() {
                   <p style={{ fontSize: '14px', color: '#6b7280' }}>Inscripciones en los últimos 6 meses</p>
                 </div>
 
-                {/* Simple Line Chart */}
-                <div style={{ position: 'relative', height: '200px', display: 'flex', alignItems: 'flex-end', gap: '1rem', padding: '1rem 0' }}>
-                  {[40, 65, 45, 80, 60, 95].map((height, idx) => (
-                    <div key={idx} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem' }}>
-                      <div style={{
-                        width: '100%',
-                        height: `${height}%`,
-                        background: `linear-gradient(180deg, #8b5cf6 0%, #d946ef 100%)`,
-                        borderRadius: '6px 6px 0 0',
-                        position: 'relative',
-                        transition: 'height 0.3s ease'
+                {/* Line Chart */}
+                <div style={{ position: 'relative', height: '220px', padding: '1rem 0.5rem' }}>
+                  <svg width="100%" height="100%" viewBox="0 0 600 200" preserveAspectRatio="none">
+                    {/* Grid lines */}
+                    {[0, 1, 2, 3, 4].map((i) => (
+                      <line
+                        key={i}
+                        x1="0"
+                        y1={i * 50}
+                        x2="600"
+                        y2={i * 50}
+                        stroke="#f3f4f6"
+                        strokeWidth="1"
+                      />
+                    ))}
+
+                    {/* Gradient fill under line */}
+                    <defs>
+                      <linearGradient id="lineGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                        <stop offset="0%" style={{ stopColor: '#8b5cf6', stopOpacity: 0.3 }} />
+                        <stop offset="100%" style={{ stopColor: '#d946ef', stopOpacity: 0.05 }} />
+                      </linearGradient>
+                    </defs>
+
+                    {/* Area under curve */}
+                    <path
+                      d="M 0,160 L 100,120 L 200,110 L 300,80 L 400,60 L 500,30 L 600,20 L 600,200 L 0,200 Z"
+                      fill="url(#lineGradient)"
+                    />
+
+                    {/* Main line */}
+                    <path
+                      d="M 0,160 L 100,120 L 200,110 L 300,80 L 400,60 L 500,30 L 600,20"
+                      fill="none"
+                      stroke="url(#lineStroke)"
+                      strokeWidth="3"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+
+                    <defs>
+                      <linearGradient id="lineStroke" x1="0%" y1="0%" x2="100%" y2="0%">
+                        <stop offset="0%" style={{ stopColor: '#8b5cf6' }} />
+                        <stop offset="100%" style={{ stopColor: '#d946ef' }} />
+                      </linearGradient>
+                    </defs>
+
+                    {/* Data points */}
+                    {[
+                      { x: 0, y: 160, value: 45 },
+                      { x: 100, y: 120, value: 68 },
+                      { x: 200, y: 110, value: 72 },
+                      { x: 300, y: 80, value: 95 },
+                      { x: 400, y: 60, value: 118 },
+                      { x: 500, y: 30, value: 142 },
+                      { x: 600, y: 20, value: 165 }
+                    ].map((point, idx) => (
+                      <g key={idx}>
+                        <circle
+                          cx={point.x}
+                          cy={point.y}
+                          r="5"
+                          fill="#fff"
+                          stroke={idx === 6 ? '#d946ef' : '#8b5cf6'}
+                          strokeWidth="3"
+                        />
+                      </g>
+                    ))}
+                  </svg>
+
+                  {/* Labels */}
+                  <div style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    marginTop: '0.5rem',
+                    paddingLeft: '0.5rem',
+                    paddingRight: '0.5rem'
+                  }}>
+                    {['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul'].map((month, idx) => (
+                      <div key={idx} style={{
+                        fontSize: '12px',
+                        color: '#9ca3af',
+                        fontWeight: '500'
                       }}>
-                        <div style={{
-                          position: 'absolute',
-                          top: '-2rem',
-                          left: '50%',
-                          transform: 'translateX(-50%)',
-                          fontSize: '12px',
-                          fontWeight: '600',
-                          color: '#8b5cf6'
-                        }}>
-                          {Math.floor(height * 2)}
-                        </div>
+                        {month}
                       </div>
-                      <div style={{ fontSize: '12px', color: '#9ca3af', fontWeight: '500' }}>
-                        {['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun'][idx]}
-                      </div>
+                    ))}
+                  </div>
+
+                  {/* Values on hover effect - showing current trend */}
+                  <div style={{
+                    position: 'absolute',
+                    top: '1rem',
+                    right: '1rem',
+                    background: '#f0fdf4',
+                    border: '1px solid #86efac',
+                    borderRadius: '8px',
+                    padding: '0.5rem 0.75rem',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.5rem'
+                  }}>
+                    <span style={{ fontSize: '20px', color: '#16a34a' }}>↗</span>
+                    <div>
+                      <div style={{ fontSize: '11px', color: '#15803d', fontWeight: '600' }}>+267%</div>
+                      <div style={{ fontSize: '10px', color: '#16a34a' }}>vs. año anterior</div>
                     </div>
-                  ))}
+                  </div>
                 </div>
               </div>
 
