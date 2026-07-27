@@ -184,8 +184,8 @@ export default function AdminPanel() {
               <Image
                 src="/images/logo_smartchatix_horiz.png"
                 alt="SmartChatix"
-                width={180}
-                height={54}
+                width={200}
+                height={34}
                 style={{ cursor: 'pointer' }}
               />
             </Link>
