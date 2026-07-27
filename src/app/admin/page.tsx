@@ -557,7 +557,7 @@ export default function AdminPanel() {
                 </div>
 
                 {/* Line Chart */}
-                <div style={{ position: 'relative', height: '240px', padding: '1rem 0.5rem' }}>
+                <div style={{ position: 'relative', height: '260px', padding: '1rem 0.5rem' }}>
                   {/* Legend */}
                   <div style={{
                     display: 'flex',
@@ -585,7 +585,19 @@ export default function AdminPanel() {
                     </div>
                   </div>
 
-                  <svg width="100%" height="180" viewBox="0 0 800 160" preserveAspectRatio="xMidYMid meet">
+                  <div style={{ display: 'flex', gap: '0.5rem' }}>
+                    {/* Eje Y izquierdo (Estudiantes) */}
+                    <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', paddingTop: '0.5rem', paddingBottom: '1.5rem' }}>
+                      {[200, 150, 100, 50, 0].map((val, idx) => (
+                        <div key={idx} style={{ fontSize: '11px', color: '#3b82f6', fontWeight: '500', textAlign: 'right', width: '30px' }}>
+                          {val}
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* SVG Chart */}
+                    <div style={{ flex: 1 }}>
+                      <svg width="100%" height="180" viewBox="0 0 800 160" preserveAspectRatio="xMidYMid meet">
                     {/* Grid lines */}
                     {[0, 1, 2, 3, 4].map((i) => (
                       <line
@@ -702,25 +714,35 @@ export default function AdminPanel() {
                         strokeWidth="2.5"
                       />
                     ))}
-                  </svg>
+                      </svg>
 
-                  {/* Labels de meses */}
-                  <div style={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    marginTop: '0.5rem',
-                    paddingLeft: '2.5rem',
-                    paddingRight: '1.5rem'
-                  }}>
-                    {['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago'].map((month, idx) => (
-                      <div key={idx} style={{
-                        fontSize: '12px',
-                        color: '#9ca3af',
-                        fontWeight: '500'
+                      {/* Labels de meses - Alineados al centro de cada mes */}
+                      <div style={{
+                        display: 'grid',
+                        gridTemplateColumns: 'repeat(8, 1fr)',
+                        marginTop: '0.5rem'
                       }}>
-                        {month}
+                        {['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago'].map((month, idx) => (
+                          <div key={idx} style={{
+                            fontSize: '11px',
+                            color: '#9ca3af',
+                            fontWeight: '500',
+                            textAlign: 'center'
+                          }}>
+                            {month}
+                          </div>
+                        ))}
                       </div>
-                    ))}
+                    </div>
+
+                    {/* Eje Y derecho (Cursos completados) */}
+                    <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', paddingTop: '0.5rem', paddingBottom: '1.5rem' }}>
+                      {[100, 75, 50, 25, 0].map((val, idx) => (
+                        <div key={idx} style={{ fontSize: '11px', color: '#8b5cf6', fontWeight: '500', textAlign: 'left', width: '30px' }}>
+                          {val}
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 </div>
               </div>
