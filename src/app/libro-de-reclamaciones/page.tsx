@@ -77,7 +77,7 @@ export default function LibroReclamacionesPage() {
             alignItems: 'center'
           }}>
             <div>
-              📧 contacto@smartchatix.com | 📞 +51 967 717 179
+              📧 admin@smartchatix.com | 📞 +51 967 717 179
             </div>
             <div style={{ display: 'flex', gap: spacing.sm }}>
               <span>🌐 ES</span>
@@ -99,12 +99,12 @@ export default function LibroReclamacionesPage() {
           {/* Logo */}
           <Link href="/" style={{
             display: 'flex',
-            alignItems: 'center',
-            gap: spacing.sm,
+            flexDirection: 'column',
+            gap: '0.1rem',
             textDecoration: 'none'
           }}>
             <img
-              src="/images/logo_samartchatix.png"
+              src="/images/smartchatix_logov3.png"
               alt="SMARTCHATIX"
               style={{
                 height: '65px',
@@ -112,6 +112,17 @@ export default function LibroReclamacionesPage() {
                 cursor: 'pointer'
               }}
             />
+            <div style={{
+              fontSize: '9px',
+              fontWeight: '600',
+              letterSpacing: '0.15em',
+              color: '#64748b',
+              textAlign: 'center',
+              textTransform: 'uppercase',
+              marginTop: '-0.25rem'
+            }}>
+              Interactúa <span style={{ margin: '0 0.35rem', color: '#8b5cf6' }}>•</span> Automatiza <span style={{ margin: '0 0.35rem', color: '#8b5cf6' }}>•</span> Evoluciona
+            </div>
           </Link>
 
         </div>

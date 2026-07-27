@@ -418,7 +418,7 @@ export default function SmartChatixPrincipalPage() {
             alignItems: 'center'
           }}>
             <div>
-              📧 contacto@smartchatix.com | 📞 +51 967 717 179
+              📧 admin@smartchatix.com | 📞 +51 967 717 179
             </div>
             <div style={{ display: 'flex', gap: spacing.sm }}>
               <span>🌐 ES</span>
@@ -440,19 +440,30 @@ export default function SmartChatixPrincipalPage() {
           {/* Logo */}
           <Link href="/" style={{
             display: 'flex',
-            alignItems: 'center',
-            gap: spacing.sm,
+            flexDirection: 'column',
+            gap: '0.1rem',
             textDecoration: 'none'
           }}>
             <img
-              src="/images/logo_samartchatix.png"
+              src="/images/smartchatix_logov3.png"
               alt="SMARTCHATIX"
               style={{
-                height: '65px',
+                height: '43px',
                 width: 'auto',
                 cursor: 'pointer'
               }}
             />
+            <div style={{
+              fontSize: '9px',
+              fontWeight: '600',
+              letterSpacing: '0.15em',
+              color: '#64748b',
+              textAlign: 'center',
+              textTransform: 'uppercase',
+              marginTop: '-0.25rem'
+            }}>
+              Interactúa <span style={{ margin: '0 0.35rem', color: '#8b5cf6' }}>•</span> Automatiza <span style={{ margin: '0 0.35rem', color: '#8b5cf6' }}>•</span> Evoluciona
+            </div>
           </Link>
 
           {/* Navigation Menu */}
@@ -769,11 +780,11 @@ export default function SmartChatixPrincipalPage() {
           flexDirection: 'column',
           alignItems: 'center',
           justifyContent: 'center',
+          textAlign: 'center',
           position: 'relative',
-          zIndex: 10,
-          textAlign: 'center'
+          zIndex: 10
         }}>
-          {/* Content - Slide 1 */}
+          {/* Content Centered */}
           <div style={{
             animation: 'fadeIn 1s ease-in-out',
             maxWidth: '900px'
@@ -787,10 +798,8 @@ export default function SmartChatixPrincipalPage() {
                 lineHeight: '1.1'
               }}>
                 La IA  <span style={{color: colors.accent}}>no reemplazará tu trabajo</span>
-              
-
               <br />
-                Multiplicará tu capacidad<span style={{color: colors.accent}}></span>
+                Multiplicará tu capacidad
               </h1>
 
               <p className="mobile-text-base" style={{
@@ -806,8 +815,8 @@ export default function SmartChatixPrincipalPage() {
             {/* CTA */}
             <div style={{
               display: 'flex',
-              justifyContent: 'center',
-              gap: spacing.md
+              gap: spacing.md,
+              justifyContent: 'center'
             }}>
               <a href="#otros-programas" style={{ textDecoration: 'none' }}>
                 <button className="mobile-w-full mobile-text-base hypnotic-button" style={{
@@ -1248,16 +1257,27 @@ export default function SmartChatixPrincipalPage() {
             }}
             onClick={(e) => e.stopPropagation()}
           >
-            <div style={{ marginBottom: spacing.lg, textAlign: 'center' }}>
+            <div style={{ marginBottom: spacing.lg, textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.1rem' }}>
               <img
-                src="/images/logo_samartchatix.png"
+                src="/images/smartchatix_logov3.png"
                 alt="SMARTCHATIX"
                 style={{
-                  height: '60px',
+                  height: '43px',
                   width: 'auto',
                   objectFit: 'contain'
                 }}
               />
+              <div style={{
+                fontSize: '9px',
+                fontWeight: '600',
+                letterSpacing: '0.15em',
+                color: '#64748b',
+                textAlign: 'center',
+                textTransform: 'uppercase',
+                marginTop: '-0.25rem'
+              }}>
+                Interactúa <span style={{ margin: '0 0.35rem', color: '#8b5cf6' }}>•</span> Automatiza <span style={{ margin: '0 0.35rem', color: '#8b5cf6' }}>•</span> Evoluciona
+              </div>
             </div>
 
             <nav style={{ display: 'flex', flexDirection: 'column', gap: spacing.sm }}>
@@ -1408,7 +1428,7 @@ export default function SmartChatixPrincipalPage() {
               color: colors.gray[600],
               textAlign: 'center'
             }}>
-              <div style={{ marginBottom: spacing.xs }}>📧 contacto@smartchatix.com</div>
+              <div style={{ marginBottom: spacing.xs }}>📧 admin@smartchatix.com</div>
               <div>📞 +51 967 717 179</div>
             </div>
           </div>

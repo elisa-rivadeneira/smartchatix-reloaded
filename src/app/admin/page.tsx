@@ -557,7 +557,7 @@ export default function AdminPanel() {
                 </div>
 
                 {/* Line Chart */}
-                <div style={{ position: 'relative', height: '260px', padding: '1rem 0.5rem' }}>
+                <div style={{ position: 'relative', height: '338px', padding: '1rem 0.5rem' }}>
                   {/* Legend */}
                   <div style={{
                     display: 'flex',
@@ -585,9 +585,9 @@ export default function AdminPanel() {
                     </div>
                   </div>
 
-                  <div style={{ display: 'flex', gap: '0.5rem' }}>
+                  <div style={{ display: 'flex', gap: '0' }}>
                     {/* Eje Y izquierdo (Estudiantes) */}
-                    <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', paddingTop: '0.5rem', paddingBottom: '1.5rem' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', paddingTop: '0.5rem', paddingBottom: '1.5rem', paddingRight: '0.25rem' }}>
                       {[200, 150, 100, 50, 0].map((val, idx) => (
                         <div key={idx} style={{ fontSize: '11px', color: '#3b82f6', fontWeight: '500', textAlign: 'right', width: '30px' }}>
                           {val}
@@ -596,22 +596,23 @@ export default function AdminPanel() {
                     </div>
 
                     {/* SVG Chart */}
-                    <div style={{ flex: 1 }}>
-                      <svg width="100%" height="180" viewBox="0 0 720 160" preserveAspectRatio="xMidYMid meet">
+                    <div style={{ flex: 1, position: 'relative' }}>
+                      <svg width="100%" height="200" viewBox="0 0 700 180" preserveAspectRatio="none" style={{ display: 'block' }}>
                     {/* Grid lines */}
                     {[0, 1, 2, 3, 4].map((i) => (
                       <line
                         key={i}
-                        x1="10"
+                        x1="0"
                         y1={i * 40}
-                        x2="710"
+                        x2="700"
                         y2={i * 40}
                         stroke="#f3f4f6"
                         strokeWidth="1"
+                        vectorEffect="non-scaling-stroke"
                       />
                     ))}
 
-                    {/* Area bajo línea azul (Estudiantes) - Quincenal Ene-Ago */}
+                    {/* Area bajo línea azul (Estudiantes) - Quincenal Ene-Jul */}
                     <defs>
                       <linearGradient id="blueGradient" x1="0%" y1="0%" x2="0%" y2="100%">
                         <stop offset="0%" style={{ stopColor: '#3b82f6', stopOpacity: 0.15 }} />
@@ -619,46 +620,50 @@ export default function AdminPanel() {
                       </linearGradient>
                     </defs>
                     <path
-                      d="M 10,100 L 60,95 L 117,92 L 167,88 L 224,90 L 274,85 L 331,80 L 381,78 L 438,75 L 488,73 L 545,70 L 595,68 L 652,65 L 702,63 L 710,160 L 10,160 Z"
+                      d="M 0,120 L 50,110 L 100,115 L 150,100 L 200,95 L 250,105 L 300,90 L 350,85 L 400,95 L 450,80 L 500,75 L 550,85 L 600,70 L 650,75 L 700,60 L 700,160 L 0,160 Z"
                       fill="url(#blueGradient)"
                     />
 
                     {/* Línea Azul (Estudiantes inscritos) */}
                     <path
-                      d="M 10,100 L 60,95 L 117,92 L 167,88 L 224,90 L 274,85 L 331,80 L 381,78 L 438,75 L 488,73 L 545,70 L 595,68 L 652,65 L 702,63"
+                      d="M 0,120 L 50,110 L 100,115 L 150,100 L 200,95 L 250,105 L 300,90 L 350,85 L 400,95 L 450,80 L 500,75 L 550,85 L 600,70 L 650,75 L 700,60"
                       fill="none"
                       stroke="#3b82f6"
                       strokeWidth="2.5"
                       strokeLinecap="round"
                       strokeLinejoin="round"
+                      vectorEffect="non-scaling-stroke"
                     />
 
-                    {/* Puntos línea azul - Quincenal (2 por mes, 7 meses = 14 puntos) */}
+                    {/* Puntos línea azul - Quincenal (2 por mes, 7 meses = 15 puntos) */}
                     {[
-                      { x: 10, y: 100 },   // Ene 1
-                      { x: 60, y: 95 },    // Ene 15
-                      { x: 117, y: 92 },   // Feb 1
-                      { x: 167, y: 88 },   // Feb 15
-                      { x: 224, y: 90 },   // Mar 1
-                      { x: 274, y: 85 },   // Mar 15
-                      { x: 331, y: 80 },   // Abr 1
-                      { x: 381, y: 78 },   // Abr 15
-                      { x: 438, y: 75 },   // May 1
-                      { x: 488, y: 73 },   // May 15
-                      { x: 545, y: 70 },   // Jun 1
-                      { x: 595, y: 68 },   // Jun 15
-                      { x: 652, y: 65 },   // Jul 1
-                      { x: 702, y: 63 }    // Jul 15
+                      { x: 0, y: 120 },    // Ene 1
+                      { x: 50, y: 110 },   // Ene 15 - sube
+                      { x: 100, y: 115 },  // Feb 1 - baja leve
+                      { x: 150, y: 100 },  // Feb 15 - sube fuerte
+                      { x: 200, y: 95 },   // Mar 1 - sube
+                      { x: 250, y: 105 },  // Mar 15 - baja
+                      { x: 300, y: 90 },   // Abr 1 - sube fuerte
+                      { x: 350, y: 85 },   // Abr 15 - sube
+                      { x: 400, y: 95 },   // May 1 - baja
+                      { x: 450, y: 80 },   // May 15 - sube fuerte
+                      { x: 500, y: 75 },   // Jun 1 - sube
+                      { x: 550, y: 85 },   // Jun 15 - baja
+                      { x: 600, y: 70 },   // Jul 1 - sube fuerte
+                      { x: 650, y: 75 },   // Jul 15 - baja leve
+                      { x: 700, y: 60 }    // Jul 31 - sube fuerte (tendencia positiva)
                     ].map((point, idx) => (
-                      <circle
-                        key={`blue-${idx}`}
-                        cx={point.x}
-                        cy={point.y}
-                        r="3.5"
-                        fill="#fff"
-                        stroke="#3b82f6"
-                        strokeWidth="2.5"
-                      />
+                      <g key={`blue-${idx}`}>
+                        <circle
+                          cx={point.x}
+                          cy={point.y}
+                          r="2"
+                          fill="#fff"
+                          stroke="#3b82f6"
+                          strokeWidth="1.5"
+                          vectorEffect="non-scaling-stroke"
+                        />
+                      </g>
                     ))}
 
                     {/* Area bajo línea morada (Cursos completados) */}
@@ -669,46 +674,50 @@ export default function AdminPanel() {
                       </linearGradient>
                     </defs>
                     <path
-                      d="M 10,125 L 60,122 L 117,120 L 167,118 L 224,120 L 274,115 L 331,112 L 381,110 L 438,108 L 488,105 L 545,103 L 595,100 L 652,98 L 702,95 L 710,160 L 10,160 Z"
+                      d="M 0,135 L 50,140 L 100,130 L 150,135 L 200,125 L 250,130 L 300,120 L 350,125 L 400,115 L 450,120 L 500,110 L 550,108 L 600,105 L 650,100 L 700,95 L 700,160 L 0,160 Z"
                       fill="url(#purpleGradient)"
                     />
 
                     {/* Línea Morada (Cursos completados) */}
                     <path
-                      d="M 10,125 L 60,122 L 117,120 L 167,118 L 224,120 L 274,115 L 331,112 L 381,110 L 438,108 L 488,105 L 545,103 L 595,100 L 652,98 L 702,95"
+                      d="M 0,135 L 50,140 L 100,130 L 150,135 L 200,125 L 250,130 L 300,120 L 350,125 L 400,115 L 450,120 L 500,110 L 550,108 L 600,105 L 650,100 L 700,95"
                       fill="none"
                       stroke="#8b5cf6"
                       strokeWidth="2.5"
                       strokeLinecap="round"
                       strokeLinejoin="round"
+                      vectorEffect="non-scaling-stroke"
                     />
 
                     {/* Puntos línea morada - Quincenal */}
                     {[
-                      { x: 10, y: 125 },   // Ene 1
-                      { x: 60, y: 122 },   // Ene 15
-                      { x: 117, y: 120 },  // Feb 1
-                      { x: 167, y: 118 },  // Feb 15
-                      { x: 224, y: 120 },  // Mar 1
-                      { x: 274, y: 115 },  // Mar 15
-                      { x: 331, y: 112 },  // Abr 1
-                      { x: 381, y: 110 },  // Abr 15
-                      { x: 438, y: 108 },  // May 1
-                      { x: 488, y: 105 },  // May 15
-                      { x: 545, y: 103 },  // Jun 1
-                      { x: 595, y: 100 },  // Jun 15
-                      { x: 652, y: 98 },   // Jul 1
-                      { x: 702, y: 95 }    // Jul 15
+                      { x: 0, y: 135 },    // Ene 1
+                      { x: 50, y: 140 },   // Ene 15 - baja
+                      { x: 100, y: 130 },  // Feb 1 - sube
+                      { x: 150, y: 135 },  // Feb 15 - baja
+                      { x: 200, y: 125 },  // Mar 1 - sube
+                      { x: 250, y: 130 },  // Mar 15 - baja
+                      { x: 300, y: 120 },  // Abr 1 - sube
+                      { x: 350, y: 125 },  // Abr 15 - baja
+                      { x: 400, y: 115 },  // May 1 - sube
+                      { x: 450, y: 120 },  // May 15 - baja
+                      { x: 500, y: 110 },  // Jun 1 - sube
+                      { x: 550, y: 108 },  // Jun 15 - sube leve
+                      { x: 600, y: 105 },  // Jul 1 - sube
+                      { x: 650, y: 100 },  // Jul 15 - sube
+                      { x: 700, y: 95 }    // Jul 31 - sube (tendencia positiva más suave)
                     ].map((point, idx) => (
-                      <circle
-                        key={`purple-${idx}`}
-                        cx={point.x}
-                        cy={point.y}
-                        r="3.5"
-                        fill="#fff"
-                        stroke="#8b5cf6"
-                        strokeWidth="2.5"
-                      />
+                      <g key={`purple-${idx}`}>
+                        <circle
+                          cx={point.x}
+                          cy={point.y}
+                          r="2"
+                          fill="#fff"
+                          stroke="#8b5cf6"
+                          strokeWidth="1.5"
+                          vectorEffect="non-scaling-stroke"
+                        />
+                      </g>
                     ))}
                       </svg>
 

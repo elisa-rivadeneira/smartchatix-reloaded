@@ -49,9 +49,9 @@ export default function PoliticaPrivacidadPage() {
           justifyContent: 'space-between',
           alignItems: 'center'
         }}>
-          <Link href="/" style={{ textDecoration: 'none' }}>
+          <Link href="/" style={{ textDecoration: 'none', display: 'flex', flexDirection: 'column', gap: '0.1rem' }}>
             <img
-              src="/images/logo_samartchatix.png"
+              src="/images/smartchatix_logov3.png"
               alt="SmartChatix"
               style={{
                 height: '60px',
@@ -59,6 +59,17 @@ export default function PoliticaPrivacidadPage() {
                 objectFit: 'contain'
               }}
             />
+            <div style={{
+              fontSize: '9px',
+              fontWeight: '600',
+              letterSpacing: '0.15em',
+              color: '#64748b',
+              textAlign: 'center',
+              textTransform: 'uppercase',
+              marginTop: '-0.25rem'
+            }}>
+              Interactúa <span style={{ margin: '0 0.35rem', color: '#8b5cf6' }}>•</span> Automatiza <span style={{ margin: '0 0.35rem', color: '#8b5cf6' }}>•</span> Evoluciona
+            </div>
           </Link>
 
           <Link href="/" style={{

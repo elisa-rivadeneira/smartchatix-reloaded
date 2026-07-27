@@ -1,0 +1,13 @@
+<svg width="80" height="80" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <path d="M15 25C15 20.5817 18.5817 17 23 17H57C61.4183 17 65 20.5817 65 25V45C65 49.4183 61.4183 53 57 53H35L20 63V53C17.2386 53 15 50.7614 15 48V25Z" stroke="url(#chat-gradient)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M30 32H50M30 42H45" stroke="url(#chat-gradient)" stroke-width="3" stroke-linecap="round"/>
+  <circle cx="58" cy="22" r="8" fill="url(#chat-gradient)">
+    <animate attributeName="opacity" values="0.5;1;0.5" dur="2s" repeatCount="indefinite"/>
+  </circle>
+  <defs>
+    <linearGradient id="chat-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#6366f1"/>
+      <stop offset="100%" style="stop-color:#8b5cf6"/>
+    </linearGradient>
+  </defs>
+</svg>

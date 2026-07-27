@@ -4,6 +4,9 @@ import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import Footer from '@/components/Footer';
+import Header from '@/components/layout/Header';
+import StepsSection from '@/components/StepsSection';
+import { Sparkles, BookOpen, Users, ChartColumnIncreasing, BadgeCheck, Workflow } from 'lucide-react';
 
 export default function AulasVirtualesPage() {
   const [showModal, setShowModal] = React.useState(false);
@@ -37,167 +40,90 @@ export default function AulasVirtualesPage() {
         }
       `}</style>
 
-      {/* Header */}
-      <header style={{
-        position: 'sticky',
-        top: 0,
-        backgroundColor: 'rgba(255, 255, 255, 0.98)',
-        backdropFilter: 'blur(10px)',
-        borderBottom: '1px solid #e5e7eb',
-        zIndex: 1000,
-        padding: '1rem 3rem'
-      }}>
-        <div style={{
-          maxWidth: '1400px',
-          margin: '0 auto',
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center'
-        }}>
-          <Link href="/">
-            <Image
-              src="/images/logo_smartchatix_horiz.png"
-              alt="SmartChatix"
-              width={160}
-              height={50}
-              style={{ cursor: 'pointer' }}
-            />
-          </Link>
-
-          <nav className="mobile-hidden" style={{ display: 'flex', gap: '2rem', alignItems: 'center' }}>
-            <Link href="/" style={{
-              color: '#6b7280',
-              textDecoration: 'none',
-              fontSize: '14px',
-              fontWeight: '500',
-              transition: 'color 0.2s'
-            }}
-            onMouseEnter={(e) => e.currentTarget.style.color = '#8b5cf6'}
-            onMouseLeave={(e) => e.currentTarget.style.color = '#6b7280'}
-            >
-              Funciones
-            </Link>
-            <Link href="/" style={{
-              color: '#6b7280',
-              textDecoration: 'none',
-              fontSize: '14px',
-              fontWeight: '500',
-              transition: 'color 0.2s'
-            }}
-            onMouseEnter={(e) => e.currentTarget.style.color = '#8b5cf6'}
-            onMouseLeave={(e) => e.currentTarget.style.color = '#6b7280'}
-            >
-              Para empresas
-            </Link>
-            <Link href="/" style={{
-              color: '#6b7280',
-              textDecoration: 'none',
-              fontSize: '14px',
-              fontWeight: '500',
-              transition: 'color 0.2s'
-            }}
-            onMouseEnter={(e) => e.currentTarget.style.color = '#8b5cf6'}
-            onMouseLeave={(e) => e.currentTarget.style.color = '#6b7280'}
-            >
-              Para creadores
-            </Link>
-            <Link href="/" style={{
-              color: '#6b7280',
-              textDecoration: 'none',
-              fontSize: '14px',
-              fontWeight: '500',
-              transition: 'color 0.2s'
-            }}
-            onMouseEnter={(e) => e.currentTarget.style.color = '#8b5cf6'}
-            onMouseLeave={(e) => e.currentTarget.style.color = '#6b7280'}
-            >
-              Casos de uso
-            </Link>
-            <Link href="/" style={{
-              color: '#6b7280',
-              textDecoration: 'none',
-              fontSize: '14px',
-              fontWeight: '500',
-              transition: 'color 0.2s'
-            }}
-            onMouseEnter={(e) => e.currentTarget.style.color = '#8b5cf6'}
-            onMouseLeave={(e) => e.currentTarget.style.color = '#6b7280'}
-            >
-              Precios
-            </Link>
-            <Link href="/" style={{
-              color: '#6b7280',
-              textDecoration: 'none',
-              fontSize: '14px',
-              fontWeight: '500',
-              transition: 'color 0.2s'
-            }}
-            onMouseEnter={(e) => e.currentTarget.style.color = '#8b5cf6'}
-            onMouseLeave={(e) => e.currentTarget.style.color = '#6b7280'}
-            >
-              Recursos
-            </Link>
-            <Link href="/login" style={{
-              color: '#6b7280',
-              textDecoration: 'none',
-              fontSize: '14px',
-              fontWeight: '500',
-              transition: 'color 0.2s'
-            }}
-            onMouseEnter={(e) => e.currentTarget.style.color = '#8b5cf6'}
-            onMouseLeave={(e) => e.currentTarget.style.color = '#6b7280'}
-            >
-              Iniciar sesión
-            </Link>
-            <button
-              onClick={() => setShowModal(true)}
-              style={{
-                background: 'linear-gradient(135deg, #8b5cf6 0%, #d946ef 100%)',
-                color: '#fff',
-                border: 'none',
-                padding: '10px 24px',
-                borderRadius: '8px',
-                fontSize: '14px',
-                fontWeight: '600',
-                cursor: 'pointer',
-                transition: 'all 0.2s',
-                boxShadow: '0 4px 12px rgba(139, 92, 246, 0.3)'
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.transform = 'translateY(-2px)';
-                e.currentTarget.style.boxShadow = '0 6px 20px rgba(139, 92, 246, 0.4)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.transform = 'translateY(0)';
-                e.currentTarget.style.boxShadow = '0 4px 12px rgba(139, 92, 246, 0.3)';
-              }}
-            >
-              Solicitar demostración
-            </button>
-          </nav>
-        </div>
-      </header>
+      <Header />
 
       {/* Hero Section */}
       <section style={{
-        padding: '6rem 3rem 4rem',
+        paddingTop: '4rem',
+        paddingBottom: '4rem',
+        paddingLeft: '3rem',
+        paddingRight: '3rem',
         background: '#0a0e27',
         backgroundImage: 'url(/images/background_hero.png)',
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         position: 'relative',
-        overflow: 'hidden'
+        overflow: 'hidden',
+        minHeight: '90vh'
       }} className="fade-in-up">
+        {/* Laptop Image - Background Layer */}
+        <div style={{
+          position: 'absolute',
+          right: '5%',
+          top: '50%',
+          transform: 'translateY(-50%)',
+          width: '60%',
+          maxWidth: '960px',
+          zIndex: 1,
+          pointerEvents: 'none'
+        }}>
+          {/* Glow morado detrás */}
+          <div style={{
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            width: '80%',
+            height: '60%',
+            background: 'radial-gradient(ellipse, rgba(139, 92, 246, 0.15) 0%, transparent 70%)',
+            filter: 'blur(60px)',
+            zIndex: -1
+          }}></div>
+
+          {/* Luz azul borde izquierdo */}
+          <div style={{
+            position: 'absolute',
+            top: '30%',
+            left: '10%',
+            width: '40%',
+            height: '40%',
+            background: 'radial-gradient(ellipse, rgba(99, 102, 241, 0.2) 0%, transparent 60%)',
+            filter: 'blur(40px)',
+            zIndex: -1
+          }}></div>
+
+          <Image
+            src="/images/laptop.png"
+            alt="SmartChatix Platform"
+            width={1400}
+            height={1050}
+            style={{
+              width: '100%',
+              height: 'auto',
+              filter: 'drop-shadow(0 50px 120px rgba(0, 0, 0, 0.5)) drop-shadow(0 20px 40px rgba(0, 0, 0, 0.3))'
+            }}
+          />
+
+          {/* Sombra suave debajo */}
+          <div style={{
+            position: 'absolute',
+            bottom: '-10%',
+            left: '10%',
+            width: '80%',
+            height: '20%',
+            background: 'radial-gradient(ellipse, rgba(0, 0, 0, 0.3) 0%, transparent 70%)',
+            filter: 'blur(30px)'
+          }}></div>
+        </div>
+
         <div style={{
           maxWidth: '1400px',
           margin: '0 auto',
-          display: 'grid',
-          gridTemplateColumns: '1fr 1fr',
-          gap: '4rem',
-          alignItems: 'center'
+          position: 'relative',
+          zIndex: 2
         }}>
-          {/* Left Column */}
-          <div>
+          {/* Left Column - Content */}
+          <div style={{ maxWidth: '600px' }}>
             <div style={{
               display: 'inline-block',
               background: 'transparent',
@@ -345,124 +271,6 @@ export default function AulasVirtualesPage() {
               ))}
             </div>
           </div>
-
-          {/* Right Column - Mockup */}
-          <div style={{
-            position: 'relative'
-          }}>
-            <div style={{
-              background: 'rgba(255, 255, 255, 0.05)',
-              borderRadius: '20px',
-              border: '1px solid rgba(255, 255, 255, 0.1)',
-              padding: '2rem',
-              backdropFilter: 'blur(20px)',
-              boxShadow: '0 20px 60px rgba(0, 0, 0, 0.3)'
-            }}>
-              {/* Simplified Mockup */}
-              <div style={{
-                background: '#1e293b',
-                borderRadius: '12px',
-                padding: '1.5rem',
-                marginBottom: '1rem'
-              }}>
-                <div style={{
-                  color: '#8b5cf6',
-                  fontSize: '14px',
-                  fontWeight: '600',
-                  marginBottom: '1rem',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '0.5rem'
-                }}>
-                  <span style={{
-                    width: '32px',
-                    height: '32px',
-                    background: 'linear-gradient(135deg, #8b5cf6 0%, #d946ef 100%)',
-                    borderRadius: '8px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    fontSize: '18px'
-                  }}>✨</span>
-                  Asistente de Diseño de Cursos IA
-                </div>
-                <div style={{
-                  color: '#cbd5e1',
-                  fontSize: '13px',
-                  lineHeight: '1.6',
-                  marginBottom: '1rem'
-                }}>
-                  Conversa con la IA para estructurar tu curso
-                </div>
-              </div>
-
-              {/* Chat messages */}
-              <div style={{ marginBottom: '1rem' }}>
-                <div style={{
-                  background: '#6366f1',
-                  color: '#fff',
-                  padding: '1rem',
-                  borderRadius: '12px',
-                  fontSize: '13px',
-                  lineHeight: '1.6',
-                  marginBottom: '0.8rem'
-                }}>
-                  ¿Cuánto tiempo de curso tienes planificado?
-                </div>
-
-                <div style={{
-                  background: '#334155',
-                  color: '#e2e8f0',
-                  padding: '1rem',
-                  borderRadius: '12px',
-                  fontSize: '13px',
-                  lineHeight: '1.6',
-                  marginLeft: '2rem'
-                }}>
-                  30 horas
-                </div>
-              </div>
-
-              {/* Structure Preview */}
-              <div style={{
-                background: '#f0fdf4',
-                borderRadius: '12px',
-                padding: '1.5rem',
-                border: '2px solid #86efac'
-              }}>
-                <div style={{
-                  color: '#059669',
-                  fontSize: '13px',
-                  fontWeight: '600',
-                  marginBottom: '1rem'
-                }}>
-                  ✓ Estructura propuesta
-                </div>
-                <div style={{ fontSize: '12px', color: '#047857', lineHeight: '1.8' }}>
-                  <div>📖 <strong>Módulo 1:</strong> Introducción a la IA</div>
-                  <div style={{ paddingLeft: '1.5rem', marginTop: '0.5rem' }}>
-                    • Fundamentos (30 min)<br/>
-                    • Aplicaciones prácticas (30 min)
-                  </div>
-                </div>
-              </div>
-
-              <button style={{
-                width: '100%',
-                background: '#8b5cf6',
-                color: '#fff',
-                border: 'none',
-                padding: '14px',
-                borderRadius: '10px',
-                fontSize: '14px',
-                fontWeight: '600',
-                cursor: 'pointer',
-                marginTop: '1rem'
-              }}>
-                ✓ Crear curso con esta estructura
-              </button>
-            </div>
-          </div>
         </div>
 
         {/* Logos */}
@@ -483,509 +291,604 @@ export default function AulasVirtualesPage() {
         </div>
       </section>
 
-      {/* Así funciona SmartChatix */}
+      {/* Steps Section */}
+      <StepsSection />
+
+      {/* Se adapta a tu organización */}
       <section style={{
-        padding: '6rem 3rem',
-        background: '#ffffff'
+        padding: '0rem 3rem 6rem',
+        background: '#fafafa'
       }}>
-        <div style={{ maxWidth: '1400px', margin: '0 auto' }}>
-          <div style={{ textAlign: 'center', marginBottom: '4rem' }}>
+        <div style={{
+          maxWidth: '1280px',
+          margin: '0 auto'
+        }}>
+          {/* Header */}
+          <div style={{
+            textAlign: 'center',
+            marginBottom: '6rem'
+          }}>
             <h2 style={{
-              fontSize: '2.5rem',
-              fontWeight: '700',
+              fontSize: '48px',
+              fontWeight: '400',
               color: '#0a0e27',
-              marginBottom: '1rem'
+              marginBottom: '2rem',
+              letterSpacing: '-0.02em',
+              lineHeight: '1.2'
             }}>
-              Así funciona <span style={{
-                background: 'linear-gradient(135deg, #8b5cf6 0%, #d946ef 100%)',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-                backgroundClip: 'text'
-              }}>SmartChatix</span>
+              Se adapta a{' '}
+              <span style={{
+                color: '#b209e7',
+                fontWeight: '500'
+              }}>
+                tu organización
+              </span>
             </h2>
             <p style={{
-              fontSize: '1.125rem',
+              fontSize: '17px',
               color: '#64748b',
+              lineHeight: '1.8',
               maxWidth: '600px',
-              margin: '0 auto'
+              margin: '0 auto',
+              fontWeight: '400'
             }}>
-              Un flujo simple para crear experiencias de aprendizaje increíbles
+              No todas las organizaciones enseñan de la misma manera.<br/>
+              SmartChatix Academy se adapta a tus necesidades y procesos.
             </p>
           </div>
 
+          {/* Cards */}
           <div style={{
             display: 'grid',
             gridTemplateColumns: 'repeat(3, 1fr)',
-            gap: '2.5rem'
+            gap: '3rem',
+            marginBottom: '5rem'
           }}>
             {[
               {
-                icon: '💡',
-                title: '1. Diseña tu curso',
-                desc: 'La IA te ayuda a estructurar módulos, lecciones y objetivos en minutos.'
+                iconSrc: '/icons/org-empresas.svg',
+                iconBg: '#3b7fee',
+                title: 'Empresas',
+                titleColor: '#3b7fee',
+                description: 'Capacita a tus colaboradores, comparte conocimiento y mide resultados de aprendizaje.',
+                bullets: [
+                  'Formación interna y onboarding',
+                  'Reportes y seguimiento en tiempo real',
+                  'Certificados y cumplimiento'
+                ],
+                link: '#'
               },
               {
-                icon: '▶️',
-                title: '2. Agrega contenido',
-                desc: 'Sube videos, documentos, textos, audios y más.'
+                iconSrc: '/icons/org-academias.svg',
+                iconBg: '#d209bc',
+                title: 'Academias y consultoras',
+                titleColor: '#d209bc',
+                description: 'Publica, vende y administra cursos online bajo tu propia marca.',
+                bullets: [
+                  'Ciento de compras y pagos en línea',
+                  'Gestión completa de estudiantes',
+                  'Marketing y promociones integradas'
+                ],
+                link: '#'
               },
               {
-                icon: '📝',
-                title: '3. Evalúa y asigna tareas',
-                desc: 'Crea cuestionarios, tareas y rúbricas de evaluación.'
-              },
-              {
-                icon: '👥',
-                title: '4. Invita estudiantes',
-                desc: 'Inscribe colaboradores o alumnos de tu curso.'
-              },
-              {
-                icon: '📊',
-                title: '5. Haz seguimiento',
-                desc: 'Monitorea el progreso con reportes en tiempo real.'
-              },
-              {
-                icon: '🎓',
-                title: '6. Certifica',
-                desc: 'Emite certificados automáticos al completar.'
+                iconSrc: '/icons/org-instituciones.svg',
+                iconBg: '#f87107',
+                title: 'Instituciones educativas',
+                titleColor: '#f87107',
+                description: 'Gestiona programas académicos y comunidades de aprendizaje.',
+                bullets: [
+                  'Múltiples roles y permisos',
+                  'Rutas de aprendizaje y programas',
+                  'Integraciones con tus sistemas'
+                ],
+                link: '#'
               }
-            ].map((item, idx) => (
-              <div key={idx} style={{
-                textAlign: 'center',
-                padding: '2rem 1.5rem'
-              }}>
+            ].map((card, idx) => (
+              <div
+                key={idx}
+                style={{
+                  transition: 'all 0.3s ease',
+                  border: '1px solid #e5e7eb',
+                  borderRadius: '16px',
+                  padding: '2.5rem',
+                  background: '#ffffff'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = 'translateY(-4px)';
+                  e.currentTarget.style.boxShadow = '0 4px 20px rgba(0, 0, 0, 0.08)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = 'translateY(0)';
+                  e.currentTarget.style.boxShadow = 'none';
+                }}
+              >
+                {/* Header: Icon + Title + Description */}
                 <div style={{
-                  fontSize: '3rem',
-                  marginBottom: '1rem'
-                }}>{item.icon}</div>
-                <h3 style={{
-                  fontSize: '1.125rem',
-                  fontWeight: '700',
-                  color: '#0a0e27',
-                  marginBottom: '0.75rem'
-                }}>{item.title}</h3>
-                <p style={{
-                  fontSize: '0.875rem',
-                  color: '#64748b',
-                  lineHeight: '1.6'
-                }}>{item.desc}</p>
+                  display: 'flex',
+                  gap: '1.25rem',
+                  marginBottom: '2rem',
+                  alignItems: 'flex-start'
+                }}>
+                  {/* Icon */}
+                  <div style={{
+                    width: '72px',
+                    height: '72px',
+                    borderRadius: '50%',
+                    background: card.iconBg,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    flexShrink: 0
+                  }}>
+                    <Image
+                      src={card.iconSrc}
+                      alt={card.title}
+                      width={32}
+                      height={32}
+                      style={{ width: '32px', height: '32px' }}
+                    />
+                  </div>
+
+                  {/* Title + Description */}
+                  <div style={{ flex: 1 }}>
+                    <h3 style={{
+                      fontSize: '22px',
+                      fontWeight: '600',
+                      color: card.titleColor,
+                      marginBottom: '0.75rem',
+                      letterSpacing: '-0.01em',
+                      marginTop: 0
+                    }}>
+                      {card.title}
+                    </h3>
+
+                    <p style={{
+                      fontSize: '16px',
+                      color: '#64748b',
+                      lineHeight: '1.7',
+                      marginBottom: 0,
+                      fontWeight: '400'
+                    }}>
+                      {card.description}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Bullets */}
+                <ul style={{
+                  listStyle: 'none',
+                  padding: 0,
+                  margin: '0 0 2rem 0'
+                }}>
+                  {card.bullets.map((bullet, bulletIdx) => (
+                    <li key={bulletIdx} style={{
+                      display: 'flex',
+                      alignItems: 'flex-start',
+                      gap: '0.75rem',
+                      marginBottom: '1rem',
+                      fontSize: '16px',
+                      color: '#475569',
+                      lineHeight: '1.6'
+                    }}>
+                      <span style={{
+                        width: '20px',
+                        height: '20px',
+                        borderRadius: '50%',
+                        background: card.iconBg,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        fontSize: '11px',
+                        color: '#fff',
+                        flexShrink: 0,
+                        marginTop: '2px',
+                        fontWeight: '600'
+                      }}>✓</span>
+                      <span>{bullet}</span>
+                    </li>
+                  ))}
+                </ul>
+
+                {/* CTA */}
+                <a
+                  href={card.link}
+                  style={{
+                    fontSize: '16px',
+                    color: card.titleColor,
+                    textDecoration: 'none',
+                    fontWeight: '500',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '0.5rem',
+                    transition: 'gap 0.2s ease'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.gap = '0.75rem';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.gap = '0.5rem';
+                  }}
+                >
+                  Ver caso de uso →
+                </a>
               </div>
             ))}
           </div>
-        </div>
-      </section>
 
-      {/* Una plataforma, dos formas de enseñar */}
-      <section style={{
-        padding: '6rem 3rem',
-        background: '#f9fafb'
-      }}>
-        <div style={{ maxWidth: '1400px', margin: '0 auto' }}>
-          <div style={{ textAlign: 'center', marginBottom: '4rem' }}>
-            <h2 style={{
-              fontSize: '2.5rem',
-              fontWeight: '700',
-              color: '#0a0e27',
-              marginBottom: '1rem'
-            }}>
-              Una plataforma, dos formas de enseñar
-            </h2>
-          </div>
-
+          {/* Footer CTA */}
           <div style={{
-            display: 'grid',
-            gridTemplateColumns: '1fr 1fr',
-            gap: '2rem'
+            textAlign: 'center',
+            marginTop: '4rem'
           }}>
-            {/* Para Empresas */}
-            <div style={{
-              background: 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)',
-              borderRadius: '20px',
-              padding: '3rem',
-              color: '#fff',
-              position: 'relative',
-              overflow: 'hidden'
+            <p style={{
+              fontSize: '16px',
+              color: '#64748b',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '0.75rem',
+              margin: 0
             }}>
-              <div style={{
-                position: 'absolute',
-                top: '-50px',
-                right: '-50px',
-                width: '200px',
-                height: '200px',
-                background: 'rgba(255, 255, 255, 0.1)',
-                borderRadius: '50%',
-                filter: 'blur(40px)'
-              }}></div>
-
-              <div style={{
-                display: 'inline-block',
-                background: 'rgba(255, 255, 255, 0.2)',
-                borderRadius: '12px',
-                padding: '0.75rem 1.25rem',
-                fontSize: '14px',
-                fontWeight: '600',
-                marginBottom: '1.5rem'
-              }}>
-                🏢 PARA EMPRESAS
-              </div>
-
-              <h3 style={{
-                fontSize: '2rem',
-                fontWeight: '700',
-                marginBottom: '1rem',
-                lineHeight: '1.2'
-              }}>
-                Capacita a tu equipo<br/>y mide resultados
-              </h3>
-
-              <p style={{
-                fontSize: '1rem',
-                color: '#dbeafe',
-                marginBottom: '2rem',
-                lineHeight: '1.7'
-              }}>
-                Centraliza la capacitación de tu organización, asigna el compromiso y desarrollo del talento de tu equipo.
-              </p>
-
-              <div style={{ marginBottom: '2rem' }}>
-                {[
-                  'Cursos de inducción y entrenamiento',
-                  'Cumplimiento normativo',
-                  'Evaluaciones y reportes',
-                  'Certificados corporativos',
-                  'Roles y permisos personalizados'
-                ].map((item, idx) => (
-                  <div key={idx} style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '0.75rem',
-                    marginBottom: '0.75rem'
-                  }}>
-                    <div style={{
-                      width: '20px',
-                      height: '20px',
-                      background: '#10b981',
-                      borderRadius: '50%',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      fontSize: '12px'
-                    }}>✓</div>
-                    <span style={{ fontSize: '0.9rem' }}>{item}</span>
-                  </div>
-                ))}
-              </div>
-
-              <button style={{
-                background: '#fff',
-                color: '#1d4ed8',
-                border: 'none',
-                padding: '14px 28px',
-                borderRadius: '10px',
-                fontSize: '15px',
-                fontWeight: '600',
-                cursor: 'pointer',
-                boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)'
-              }}>
-                Conoce la solución para empresas
-              </button>
-            </div>
-
-            {/* Para Creadores */}
-            <div style={{
-              background: 'linear-gradient(135deg, #ec4899 0%, #8b5cf6 100%)',
-              borderRadius: '20px',
-              padding: '3rem',
-              color: '#fff',
-              position: 'relative',
-              overflow: 'hidden'
-            }}>
-              <div style={{
-                position: 'absolute',
-                top: '-50px',
-                right: '-50px',
-                width: '200px',
-                height: '200px',
-                background: 'rgba(255, 255, 255, 0.1)',
-                borderRadius: '50%',
-                filter: 'blur(40px)'
-              }}></div>
-
-              <div style={{
-                display: 'inline-block',
-                background: 'rgba(255, 255, 255, 0.2)',
-                borderRadius: '12px',
-                padding: '0.75rem 1.25rem',
-                fontSize: '14px',
-                fontWeight: '600',
-                marginBottom: '1.5rem'
-              }}>
-                👨‍🏫 PARA CREADORES
-              </div>
-
-              <h3 style={{
-                fontSize: '2rem',
-                fontWeight: '700',
-                marginBottom: '1rem',
-                lineHeight: '1.2'
-              }}>
-                Crea tu academia<br/>y vende cursos online
-              </h3>
-
-              <p style={{
-                fontSize: '1rem',
-                color: '#fce7f3',
-                marginBottom: '2rem',
-                lineHeight: '1.7'
-              }}>
-                Construye tu marca, publica tus cursos y haz crecer tu negocio de educación con contenido de técnica.
-              </p>
-
-              <div style={{ marginBottom: '2rem' }}>
-                {[
-                  'Tu propia academia online',
-                  'Página de ventas integrada',
-                  'Gestión de estudiantes',
-                  'Certificados personalizados',
-                  'Cobros y matrículas'
-                ].map((item, idx) => (
-                  <div key={idx} style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '0.75rem',
-                    marginBottom: '0.75rem'
-                  }}>
-                    <div style={{
-                      width: '20px',
-                      height: '20px',
-                      background: '#fbbf24',
-                      borderRadius: '50%',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      fontSize: '12px'
-                    }}>✓</div>
-                    <span style={{ fontSize: '0.9rem' }}>{item}</span>
-                  </div>
-                ))}
-              </div>
-
-              <button style={{
-                background: '#fff',
-                color: '#8b5cf6',
-                border: 'none',
-                padding: '14px 28px',
-                borderRadius: '10px',
-                fontSize: '15px',
-                fontWeight: '600',
-                cursor: 'pointer',
-                boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)'
-              }}>
-                Conoce la solución para creadores
-              </button>
-            </div>
+              <span style={{
+                fontSize: '20px',
+                display: 'flex',
+                alignItems: 'center'
+              }}>⚙️</span>
+              ¿Tienes un proceso específico? Lo adaptamos para ti.
+              <a
+                href="#"
+                style={{
+                  color: '#8b5cf6',
+                  textDecoration: 'none',
+                  fontWeight: '500',
+                  marginLeft: '0.25rem',
+                  transition: 'color 0.2s ease'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.color = '#d946ef';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.color = '#8b5cf6';
+                }}
+              >
+                Hablemos →
+              </a>
+            </p>
           </div>
         </div>
+
+        <style jsx>{`
+          @keyframes fadeUp {
+            from {
+              opacity: 0;
+              transform: translateY(30px);
+            }
+            to {
+              opacity: 1;
+              transform: translateY(0);
+            }
+          }
+
+          @media (max-width: 1024px) {
+            section > div > div:nth-child(2) {
+              grid-template-columns: repeat(2, 1fr) !important;
+            }
+            section > div > div:nth-child(2) > div:last-child {
+              grid-column: 1 / -1;
+              max-width: 50%;
+              margin: 0 auto;
+            }
+          }
+
+          @media (max-width: 768px) {
+            section > div > div:nth-child(2) {
+              grid-template-columns: 1fr !important;
+              gap: 3rem !important;
+            }
+            section > div > div:nth-child(2) > div:last-child {
+              max-width: 100%;
+            }
+          }
+        `}</style>
       </section>
 
-      {/* Todo lo que necesitas */}
+
+      {/* Todo lo que necesitas, en una sola plataforma */}
       <section style={{
-        padding: '6rem 3rem',
-        background: '#ffffff'
+        padding: '3.5rem 3rem 6rem',
+        background: '#fafafa'
       }}>
-        <div style={{ maxWidth: '1400px', margin: '0 auto' }}>
-          <div style={{ textAlign: 'center', marginBottom: '4rem' }}>
+        <div style={{
+          maxWidth: '1280px',
+          margin: '0 auto'
+        }}>
+          {/* Header */}
+          <div style={{
+            textAlign: 'center',
+            marginBottom: '6rem'
+          }}>
             <h2 style={{
-              fontSize: '2.5rem',
-              fontWeight: '700',
+              fontSize: '48px',
+              fontWeight: '400',
               color: '#0a0e27',
-              marginBottom: '1rem'
+              marginBottom: '0',
+              letterSpacing: '-0.02em',
+              lineHeight: '1.2'
             }}>
-              Todo lo que necesitas para enseñar sin límites
+              Una plataforma que centraliza todo el proceso de aprendizaje
             </h2>
           </div>
 
+          {/* Features Grid - 6 columns */}
           <div style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(3, 1fr)',
-            gap: '2rem'
+            gridTemplateColumns: 'repeat(6, 1fr)',
+            gap: '3.5rem'
           }}>
             {[
               {
-                icon: '🤖',
+                icon: Sparkles,
                 title: 'Asistente IA',
-                desc: 'Crea estructuras, contenidos, quizzes y más sin esfuerzo.'
+                desc: 'Crea cursos, lecciones, quizzes y materiales en segundos.'
               },
               {
-                icon: '📹',
-                title: 'Lecciones flexibles',
-                desc: 'Videos, textos, markdown, PDFs, quizzes, y más.'
+                icon: BookOpen,
+                title: 'Gestión de cursos',
+                desc: 'Organiza módulos, lecciones y recursos de forma simple y poderosa.'
               },
               {
-                icon: '❓',
-                title: 'Quizzes inteligentes',
-                desc: 'La IA programa respuestas apropiadas para cada tema.'
+                icon: Users,
+                title: 'Gestión de estudiantes',
+                desc: 'Matriculas, grupos, roles y comunicación en un solo lugar.'
               },
               {
-                icon: '✍️',
-                title: 'Tareas y asignaciones',
-                desc: 'Recibe entregas, califica y da feedback.'
-              },
-              {
-                icon: '📜',
-                title: 'Certificados automáticos',
-                desc: 'Personalizados con tu logo y código de verificación.'
-              },
-              {
-                icon: '📊',
+                icon: ChartColumnIncreasing,
                 title: 'Reportes y analíticas',
-                desc: 'Visualiza el progreso y desempeño en tiempo real.'
+                desc: 'Visualiza el progreso y toma decisiones basadas en datos reales.'
+              },
+              {
+                icon: BadgeCheck,
+                title: 'Certificados',
+                desc: 'Automáticos, personalizados y con verificación de autenticidad.'
+              },
+              {
+                icon: Workflow,
+                title: 'Integraciones',
+                desc: 'Conecta con tus herramientas favoritas y sistemas existentes.'
               }
-            ].map((item, idx) => (
-              <div key={idx} style={{
-                background: '#f9fafb',
-                borderRadius: '16px',
-                padding: '2rem',
-                border: '1px solid #e5e7eb',
-                textAlign: 'center'
-              }}>
-                <div style={{
-                  fontSize: '3rem',
-                  marginBottom: '1rem'
-                }}>{item.icon}</div>
-                <h3 style={{
-                  fontSize: '1.125rem',
-                  fontWeight: '700',
-                  color: '#0a0e27',
-                  marginBottom: '0.75rem'
-                }}>{item.title}</h3>
-                <p style={{
-                  fontSize: '0.875rem',
-                  color: '#64748b',
-                  lineHeight: '1.6'
-                }}>{item.desc}</p>
-              </div>
-            ))}
+            ].map((item, idx) => {
+              const IconComponent = item.icon;
+              return (
+                <div
+                  key={idx}
+                  style={{
+                    textAlign: 'center',
+                    transition: 'transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
+                  }}
+                  onMouseEnter={(e) => {
+                    const iconContainer = e.currentTarget.querySelector('.icon-container') as HTMLElement;
+                    if (iconContainer) {
+                      iconContainer.style.transform = 'translateY(-2px)';
+                      iconContainer.style.boxShadow = '0 8px 24px rgba(139, 92, 246, 0.15)';
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    const iconContainer = e.currentTarget.querySelector('.icon-container') as HTMLElement;
+                    if (iconContainer) {
+                      iconContainer.style.transform = 'translateY(0)';
+                      iconContainer.style.boxShadow = '0 4px 12px rgba(139, 92, 246, 0.08)';
+                    }
+                  }}
+                >
+                  {/* Icon Container */}
+                  <div
+                    className="icon-container"
+                    style={{
+                      width: '72px',
+                      height: '72px',
+                      margin: '0 auto 2rem',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      borderRadius: '50%',
+                      background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.08) 0%, rgba(217, 70, 239, 0.08) 100%)',
+                      boxShadow: '0 4px 12px rgba(139, 92, 246, 0.08)',
+                      transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
+                    }}
+                  >
+                    <IconComponent
+                      size={40}
+                      strokeWidth={2}
+                      style={{
+                        color: '#8b5cf6'
+                      }}
+                    />
+                  </div>
+
+                  {/* Title */}
+                  <h3 style={{
+                    fontSize: '16px',
+                    fontWeight: '600',
+                    color: '#0a0e27',
+                    marginBottom: '0.875rem',
+                    lineHeight: '1.3'
+                  }}>
+                    {item.title}
+                  </h3>
+
+                  {/* Description */}
+                  <p style={{
+                    fontSize: '14px',
+                    color: '#64748b',
+                    lineHeight: '1.6',
+                    margin: 0
+                  }}>
+                    {item.desc}
+                  </p>
+                </div>
+              );
+            })}
           </div>
         </div>
+
+        <style jsx>{`
+          @media (max-width: 1280px) {
+            section > div > div:nth-child(2) {
+              grid-template-columns: repeat(3, 1fr) !important;
+            }
+          }
+
+          @media (max-width: 768px) {
+            section > div > div:nth-child(2) {
+              grid-template-columns: repeat(2, 1fr) !important;
+              gap: 2rem !important;
+            }
+          }
+
+          @media (max-width: 480px) {
+            section > div > div:nth-child(2) {
+              grid-template-columns: 1fr !important;
+            }
+          }
+        `}</style>
       </section>
 
-      {/* ¿Por qué elegir SmartChatix? */}
-      <section style={{
-        padding: '6rem 3rem',
-        background: '#f9fafb'
-      }}>
-        <div style={{ maxWidth: '900px', margin: '0 auto', textAlign: 'center' }}>
-          <h2 style={{
-            fontSize: '2.5rem',
-            fontWeight: '700',
-            color: '#0a0e27',
-            marginBottom: '3rem'
-          }}>
-            ¿Por qué elegir SmartChatix?
-          </h2>
-
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(2, 1fr)',
-            gap: '1.5rem'
-          }}>
-            {[
-              { icon: '💎', title: 'Tú Cuentas, Tus Datos', desc: 'Mantienes control total en tu propia servidor e infraestructura.' },
-              { icon: '⚡', title: 'IA que sí Acompaña', desc: 'IA IA te ayuda en todo el proceso, no es solo alcanza.' },
-              { icon: '🎯', title: 'Implementación Rápida', desc: 'Agiliza los tiempos de configuración y actualización en cada paso del proceso.' },
-              { icon: '🛡️', title: 'Seguridad y Privacidad', desc: 'Cumple con las políticas internas de tu empresa y normativas.' },
-              { icon: '📈', title: 'Escalable', desc: 'Desde pequeños equipos hasta grandes organización.' },
-              { icon: '🤝', title: 'Soporte Humano', desc: 'Entrenamiento contigo antes, durante y después de la implementación.' }
-            ].map((item, idx) => (
-              <div key={idx} style={{
-                background: '#fff',
-                borderRadius: '12px',
-                padding: '2rem',
-                border: '1px solid #e5e7eb',
-                textAlign: 'left'
-              }}>
-                <div style={{ fontSize: '2rem', marginBottom: '1rem' }}>{item.icon}</div>
-                <h3 style={{
-                  fontSize: '1.125rem',
-                  fontWeight: '700',
-                  color: '#0a0e27',
-                  marginBottom: '0.5rem'
-                }}>{item.title}</h3>
-                <p style={{
-                  fontSize: '0.875rem',
-                  color: '#64748b',
-                  lineHeight: '1.6'
-                }}>{item.desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
 
       {/* CTA Final */}
       <section style={{
-        padding: '6rem 3rem',
-        background: 'linear-gradient(135deg, #1e1b4b 0%, #312e81 100%)',
-        color: '#fff',
-        textAlign: 'center'
+        padding: '4rem 3rem',
+        background: '#0a0e27',
+        backgroundImage: 'url(/images/background_hero.png)',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        position: 'relative',
+        overflow: 'hidden'
       }}>
-        <div style={{ maxWidth: '800px', margin: '0 auto' }}>
-          <h2 style={{
-            fontSize: '3rem',
-            fontWeight: '800',
-            lineHeight: '1.2',
-            marginBottom: '1.5rem'
-          }}>
-            ¿Listo para transformar<br/>la forma en que enseñas<br/>o capacitas?
-          </h2>
-          <p style={{
-            fontSize: '1.25rem',
-            color: '#cbd5e1',
-            marginBottom: '3rem',
-            lineHeight: '1.7'
-          }}>
-            Solicita una demostración personalizada y descubre<br/>
-            todo lo que SmartChatix puede hacer por ti.
-          </p>
+        <div style={{
+          maxWidth: '1280px',
+          margin: '0 auto',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          gap: '4rem'
+        }}>
+          {/* Text Content */}
+          <div style={{ flex: 1 }}>
+            <h2 style={{
+              fontSize: '36px',
+              fontWeight: '600',
+              lineHeight: '1.3',
+              color: '#ffffff',
+              marginBottom: '0.75rem',
+              letterSpacing: '-0.01em'
+            }}>
+              ¿Listo para transformar<br/>la forma en que enseñas?
+            </h2>
+            <p style={{
+              fontSize: '17px',
+              color: '#cbd5e1',
+              lineHeight: '1.6',
+              margin: 0
+            }}>
+              Solicita una demostración personalizada y descubre<br/>
+              todo lo que SmartChatix Academy puede hacer por ti.
+            </p>
+          </div>
 
-          <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
+          {/* Divisor sutil */}
+          <div style={{
+            width: '1px',
+            height: '60px',
+            background: 'linear-gradient(180deg, transparent 0%, rgba(255, 255, 255, 0.1) 50%, transparent 100%)',
+            flexShrink: 0
+          }}></div>
+
+          {/* Button Container */}
+          <div style={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'flex-end',
+            gap: '0.75rem'
+          }}>
             <button
               onClick={() => setShowModal(true)}
               style={{
                 background: 'linear-gradient(135deg, #8b5cf6 0%, #d946ef 100%)',
                 color: '#fff',
                 border: 'none',
-                padding: '18px 36px',
+                padding: '18px 38px',
                 borderRadius: '12px',
-                fontSize: '17px',
-                fontWeight: '700',
+                fontSize: '16px',
+                fontWeight: '600',
                 cursor: 'pointer',
-                transition: 'all 0.2s',
-                boxShadow: '0 8px 24px rgba(139, 92, 246, 0.4)'
+                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                boxShadow: '0 0 0 0 rgba(139, 92, 246, 0), 0 8px 24px rgba(139, 92, 246, 0.35)',
+                whiteSpace: 'nowrap',
+                position: 'relative'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = 'translateY(-2px)';
+                e.currentTarget.style.boxShadow = '0 0 32px 8px rgba(139, 92, 246, 0.25), 0 12px 32px rgba(139, 92, 246, 0.45)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = 'translateY(0)';
+                e.currentTarget.style.boxShadow = '0 0 0 0 rgba(139, 92, 246, 0), 0 8px 24px rgba(139, 92, 246, 0.35)';
               }}
             >
-              📅 Solicitar demostración
+              Solicitar demostración
             </button>
 
-            <button
-              style={{
-                background: 'rgba(255, 255, 255, 0.1)',
-                color: '#fff',
-                border: '1px solid rgba(255, 255, 255, 0.3)',
-                padding: '18px 36px',
-                borderRadius: '12px',
-                fontSize: '17px',
-                fontWeight: '700',
-                cursor: 'pointer',
-                transition: 'all 0.2s',
-                backdropFilter: 'blur(10px)'
-              }}
-            >
-              💬 Hablar con un especialista
-            </button>
+            {/* Microcopy de confianza */}
+            <span style={{
+              fontSize: '13px',
+              color: 'rgba(203, 213, 225, 0.7)',
+              fontWeight: '400',
+              letterSpacing: '0.01em'
+            }}>
+              ✓ Respuesta en menos de 15 minutos
+            </span>
           </div>
         </div>
+
+        <style jsx>{`
+          @keyframes fadeUp {
+            from {
+              opacity: 0;
+              transform: translateY(20px);
+            }
+            to {
+              opacity: 1;
+              transform: translateY(0);
+            }
+          }
+
+          @media (max-width: 768px) {
+            section > div {
+              flex-direction: column !important;
+              text-align: center !important;
+              gap: 2.5rem !important;
+            }
+            section > div > div:first-child {
+              text-align: center !important;
+            }
+            section > div > div:nth-child(2) {
+              display: none !important;
+            }
+            section > div > div:last-child {
+              align-items: center !important;
+              width: 100%;
+            }
+            section > div > div:last-child button {
+              width: 90% !important;
+            }
+            section h2 br {
+              display: none;
+            }
+            section p br {
+              display: none;
+            }
+          }
+        `}</style>
       </section>
 
       <Footer />

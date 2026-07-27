@@ -412,7 +412,7 @@ export default function SmartChatixPrincipalPage() {
             alignItems: 'center'
           }}>
             <div>
-              📧 contacto@smartchatix.com | 📞 +51 967 717 179
+              📧 admin@smartchatix.com | 📞 +51 967 717 179
             </div>
             <div style={{ display: 'flex', gap: spacing.sm }}>
               <span>🌐 ES</span>
@@ -1381,7 +1381,7 @@ export default function SmartChatixPrincipalPage() {
               color: colors.gray[600],
               textAlign: 'center'
             }}>
-              <div style={{ marginBottom: spacing.xs }}>📧 contacto@smartchatix.com</div>
+              <div style={{ marginBottom: spacing.xs }}>📧 admin@smartchatix.com</div>
               <div>📞 +51 967 717 179</div>
             </div>
           </div>

@@ -1,0 +1,12 @@
+<svg width="80" height="80" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <circle cx="32" cy="28" r="10" stroke="url(#users-gradient)" stroke-width="3"/>
+  <path d="M18 55C18 48.3726 23.3726 43 30 43H34C40.6274 43 46 48.3726 46 55V58H18V55Z" stroke="url(#users-gradient)" stroke-width="3" stroke-linecap="round"/>
+  <circle cx="52" cy="32" r="8" stroke="url(#users-gradient)" stroke-width="2.5"/>
+  <path d="M62 56C62 51.0294 57.9706 47 53 47H51C49.8954 47 48.8452 47.2292 47.8906 47.6406" stroke="url(#users-gradient)" stroke-width="2.5" stroke-linecap="round"/>
+  <defs>
+    <linearGradient id="users-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#3b82f6"/>
+      <stop offset="100%" style="stop-color:#8b5cf6"/>
+    </linearGradient>
+  </defs>
+</svg>

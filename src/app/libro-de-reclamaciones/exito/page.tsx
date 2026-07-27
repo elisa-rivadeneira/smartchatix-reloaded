@@ -85,7 +85,7 @@ function ClaimSuccessContent() {
               justifyContent: 'space-between',
               alignItems: 'center'
             }}>
-              <div>📧 contacto@smartchatix.com | 📞 +51 967 717 179</div>
+              <div>📧 admin@smartchatix.com | 📞 +51 967 717 179</div>
               <div style={{ display: 'flex', gap: spacing.sm }}>
                 <span>🌐 ES</span>
                 <span>|</span>
@@ -160,7 +160,7 @@ function ClaimSuccessContent() {
               justifyContent: 'space-between',
               alignItems: 'center'
             }}>
-              <div>📧 contacto@smartchatix.com | 📞 +51 967 717 179</div>
+              <div>📧 admin@smartchatix.com | 📞 +51 967 717 179</div>
               <div style={{ display: 'flex', gap: spacing.sm }}>
                 <span>🌐 ES</span>
                 <span>|</span>
@@ -246,7 +246,7 @@ function ClaimSuccessContent() {
             justifyContent: 'space-between',
             alignItems: 'center'
           }}>
-            <div>📧 contacto@smartchatix.com | 📞 +51 967 717 179</div>
+            <div>📧 admin@smartchatix.com | 📞 +51 967 717 179</div>
             <div style={{ display: 'flex', gap: spacing.sm }}>
               <span>🌐 ES</span>
               <span>|</span>

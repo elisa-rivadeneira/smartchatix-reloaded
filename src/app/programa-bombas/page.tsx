@@ -1751,7 +1751,7 @@ export default function ProgramaBombasPage() {
               color: colors.gray[600],
               textAlign: 'center'
             }}>
-              <div style={{ marginBottom: spacing.xs }}>📧 contacto@smartchatix.com</div>
+              <div style={{ marginBottom: spacing.xs }}>📧 admin@smartchatix.com</div>
               <div>📞 +51 967 717 179</div>
             </div>
           </div>
