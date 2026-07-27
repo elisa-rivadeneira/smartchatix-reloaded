@@ -585,7 +585,7 @@ export default function AdminPanel() {
                     </div>
                   </div>
 
-                  <svg width="100%" height="180" viewBox="0 0 700 160" preserveAspectRatio="none">
+                  <svg width="100%" height="180" viewBox="0 0 700 160" preserveAspectRatio="xMidYMid meet">
                     {/* Grid lines */}
                     {[0, 1, 2, 3, 4].map((i) => (
                       <line
