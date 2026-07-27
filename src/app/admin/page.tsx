@@ -597,14 +597,14 @@ export default function AdminPanel() {
 
                     {/* SVG Chart */}
                     <div style={{ flex: 1 }}>
-                      <svg width="100%" height="180" viewBox="0 0 800 160" preserveAspectRatio="xMidYMid meet">
+                      <svg width="100%" height="180" viewBox="0 0 720 160" preserveAspectRatio="xMidYMid meet">
                     {/* Grid lines */}
                     {[0, 1, 2, 3, 4].map((i) => (
                       <line
                         key={i}
-                        x1="50"
+                        x1="10"
                         y1={i * 40}
-                        x2="800"
+                        x2="710"
                         y2={i * 40}
                         stroke="#f3f4f6"
                         strokeWidth="1"
@@ -619,13 +619,13 @@ export default function AdminPanel() {
                       </linearGradient>
                     </defs>
                     <path
-                      d="M 50,100 L 95,95 L 145,92 L 190,88 L 240,90 L 285,85 L 335,80 L 380,78 L 430,75 L 475,73 L 525,70 L 570,68 L 620,65 L 665,63 L 715,60 L 760,55 L 800,160 L 50,160 Z"
+                      d="M 10,100 L 60,95 L 117,92 L 167,88 L 224,90 L 274,85 L 331,80 L 381,78 L 438,75 L 488,73 L 545,70 L 595,68 L 652,65 L 702,63 L 710,160 L 10,160 Z"
                       fill="url(#blueGradient)"
                     />
 
                     {/* Línea Azul (Estudiantes inscritos) */}
                     <path
-                      d="M 50,100 L 95,95 L 145,92 L 190,88 L 240,90 L 285,85 L 335,80 L 380,78 L 430,75 L 475,73 L 525,70 L 570,68 L 620,65 L 665,63 L 715,60 L 760,55"
+                      d="M 10,100 L 60,95 L 117,92 L 167,88 L 224,90 L 274,85 L 331,80 L 381,78 L 438,75 L 488,73 L 545,70 L 595,68 L 652,65 L 702,63"
                       fill="none"
                       stroke="#3b82f6"
                       strokeWidth="2.5"
@@ -633,24 +633,22 @@ export default function AdminPanel() {
                       strokeLinejoin="round"
                     />
 
-                    {/* Puntos línea azul - Quincenal (2 por mes, 8 meses = 16 puntos) */}
+                    {/* Puntos línea azul - Quincenal (2 por mes, 7 meses = 14 puntos) */}
                     {[
-                      { x: 50, y: 100 },   // Ene 1
-                      { x: 95, y: 95 },    // Ene 15
-                      { x: 145, y: 92 },   // Feb 1
-                      { x: 190, y: 88 },   // Feb 15
-                      { x: 240, y: 90 },   // Mar 1
-                      { x: 285, y: 85 },   // Mar 15
-                      { x: 335, y: 80 },   // Abr 1
-                      { x: 380, y: 78 },   // Abr 15
-                      { x: 430, y: 75 },   // May 1
-                      { x: 475, y: 73 },   // May 15
-                      { x: 525, y: 70 },   // Jun 1
-                      { x: 570, y: 68 },   // Jun 15
-                      { x: 620, y: 65 },   // Jul 1
-                      { x: 665, y: 63 },   // Jul 15
-                      { x: 715, y: 60 },   // Ago 1
-                      { x: 760, y: 55 }    // Ago 15
+                      { x: 10, y: 100 },   // Ene 1
+                      { x: 60, y: 95 },    // Ene 15
+                      { x: 117, y: 92 },   // Feb 1
+                      { x: 167, y: 88 },   // Feb 15
+                      { x: 224, y: 90 },   // Mar 1
+                      { x: 274, y: 85 },   // Mar 15
+                      { x: 331, y: 80 },   // Abr 1
+                      { x: 381, y: 78 },   // Abr 15
+                      { x: 438, y: 75 },   // May 1
+                      { x: 488, y: 73 },   // May 15
+                      { x: 545, y: 70 },   // Jun 1
+                      { x: 595, y: 68 },   // Jun 15
+                      { x: 652, y: 65 },   // Jul 1
+                      { x: 702, y: 63 }    // Jul 15
                     ].map((point, idx) => (
                       <circle
                         key={`blue-${idx}`}
@@ -671,13 +669,13 @@ export default function AdminPanel() {
                       </linearGradient>
                     </defs>
                     <path
-                      d="M 50,125 L 95,122 L 145,120 L 190,118 L 240,120 L 285,115 L 335,112 L 380,110 L 430,108 L 475,105 L 525,103 L 570,100 L 620,98 L 665,95 L 715,92 L 760,88 L 800,160 L 50,160 Z"
+                      d="M 10,125 L 60,122 L 117,120 L 167,118 L 224,120 L 274,115 L 331,112 L 381,110 L 438,108 L 488,105 L 545,103 L 595,100 L 652,98 L 702,95 L 710,160 L 10,160 Z"
                       fill="url(#purpleGradient)"
                     />
 
                     {/* Línea Morada (Cursos completados) */}
                     <path
-                      d="M 50,125 L 95,122 L 145,120 L 190,118 L 240,120 L 285,115 L 335,112 L 380,110 L 430,108 L 475,105 L 525,103 L 570,100 L 620,98 L 665,95 L 715,92 L 760,88"
+                      d="M 10,125 L 60,122 L 117,120 L 167,118 L 224,120 L 274,115 L 331,112 L 381,110 L 438,108 L 488,105 L 545,103 L 595,100 L 652,98 L 702,95"
                       fill="none"
                       stroke="#8b5cf6"
                       strokeWidth="2.5"
@@ -687,22 +685,20 @@ export default function AdminPanel() {
 
                     {/* Puntos línea morada - Quincenal */}
                     {[
-                      { x: 50, y: 125 },   // Ene 1
-                      { x: 95, y: 122 },   // Ene 15
-                      { x: 145, y: 120 },  // Feb 1
-                      { x: 190, y: 118 },  // Feb 15
-                      { x: 240, y: 120 },  // Mar 1
-                      { x: 285, y: 115 },  // Mar 15
-                      { x: 335, y: 112 },  // Abr 1
-                      { x: 380, y: 110 },  // Abr 15
-                      { x: 430, y: 108 },  // May 1
-                      { x: 475, y: 105 },  // May 15
-                      { x: 525, y: 103 },  // Jun 1
-                      { x: 570, y: 100 },  // Jun 15
-                      { x: 620, y: 98 },   // Jul 1
-                      { x: 665, y: 95 },   // Jul 15
-                      { x: 715, y: 92 },   // Ago 1
-                      { x: 760, y: 88 }    // Ago 15
+                      { x: 10, y: 125 },   // Ene 1
+                      { x: 60, y: 122 },   // Ene 15
+                      { x: 117, y: 120 },  // Feb 1
+                      { x: 167, y: 118 },  // Feb 15
+                      { x: 224, y: 120 },  // Mar 1
+                      { x: 274, y: 115 },  // Mar 15
+                      { x: 331, y: 112 },  // Abr 1
+                      { x: 381, y: 110 },  // Abr 15
+                      { x: 438, y: 108 },  // May 1
+                      { x: 488, y: 105 },  // May 15
+                      { x: 545, y: 103 },  // Jun 1
+                      { x: 595, y: 100 },  // Jun 15
+                      { x: 652, y: 98 },   // Jul 1
+                      { x: 702, y: 95 }    // Jul 15
                     ].map((point, idx) => (
                       <circle
                         key={`purple-${idx}`}
@@ -719,10 +715,10 @@ export default function AdminPanel() {
                       {/* Labels de meses - Alineados al centro de cada mes */}
                       <div style={{
                         display: 'grid',
-                        gridTemplateColumns: 'repeat(8, 1fr)',
+                        gridTemplateColumns: 'repeat(7, 1fr)',
                         marginTop: '0.5rem'
                       }}>
-                        {['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago'].map((month, idx) => (
+                        {['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul'].map((month, idx) => (
                           <div key={idx} style={{
                             fontSize: '11px',
                             color: '#9ca3af',
