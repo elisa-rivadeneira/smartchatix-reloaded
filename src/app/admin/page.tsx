@@ -173,39 +173,37 @@ export default function AdminPanel() {
       }}>
         {/* Logo */}
         <div style={{
-          padding: '1.5rem',
+          padding: sidebarCollapsed ? '1.5rem 0' : '1.5rem',
           borderBottom: '1px solid #e5e7eb',
           display: 'flex',
           alignItems: 'center',
-          justifyContent: sidebarCollapsed ? 'center' : 'space-between'
+          justifyContent: 'center'
         }}>
-          {!sidebarCollapsed && (
+          {!sidebarCollapsed ? (
             <Link href="/">
               <Image
                 src="/images/logo_smartchatix_horiz.png"
                 alt="SmartChatix"
-                width={140}
-                height={42}
+                width={180}
+                height={54}
                 style={{ cursor: 'pointer' }}
               />
             </Link>
+          ) : (
+            <Link href="/">
+              <div style={{
+                fontSize: '24px',
+                fontWeight: '700',
+                background: 'linear-gradient(135deg, #8b5cf6 0%, #d946ef 100%)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                backgroundClip: 'text',
+                cursor: 'pointer'
+              }}>
+                S
+              </div>
+            </Link>
           )}
-          <button
-            onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
-            style={{
-              background: 'transparent',
-              border: 'none',
-              cursor: 'pointer',
-              fontSize: '20px',
-              padding: '0.5rem',
-              borderRadius: '6px',
-              transition: 'background 0.2s'
-            }}
-            onMouseEnter={(e) => e.currentTarget.style.background = '#f3f4f6'}
-            onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
-          >
-            {sidebarCollapsed ? '→' : '←'}
-          </button>
         </div>
 
         {/* Menu Items */}
@@ -381,19 +379,47 @@ export default function AdminPanel() {
           justifyContent: 'space-between',
           alignItems: 'center'
         }}>
-          <div>
-            <h1 style={{ fontSize: '1.875rem', fontWeight: '700', color: '#111827', marginBottom: '0.25rem' }}>
-              {activeTab === 'dashboard' ? 'Dashboard' :
-               activeTab === 'users' ? 'Usuarios' :
-               activeTab === 'courses' ? 'Cursos' :
-               activeTab === 'enrollments' ? 'Inscripciones' :
-               activeTab === 'instructors' ? 'Instructores' :
-               activeTab === 'reports' ? 'Reportes' :
-               'Configuración'}
-            </h1>
-            <p style={{ fontSize: '14px', color: '#6b7280' }}>
-              Bienvenido de nuevo, {currentUser?.name}
-            </p>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+            <button
+              onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
+              style={{
+                background: '#f9fafb',
+                border: '1px solid #e5e7eb',
+                cursor: 'pointer',
+                fontSize: '20px',
+                width: '40px',
+                height: '40px',
+                borderRadius: '8px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                transition: 'all 0.2s'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = '#f3f4f6';
+                e.currentTarget.style.borderColor = '#d1d5db';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = '#f9fafb';
+                e.currentTarget.style.borderColor = '#e5e7eb';
+              }}
+            >
+              {sidebarCollapsed ? '→' : '←'}
+            </button>
+            <div>
+              <h1 style={{ fontSize: '1.875rem', fontWeight: '700', color: '#111827', marginBottom: '0.25rem' }}>
+                {activeTab === 'dashboard' ? 'Dashboard' :
+                 activeTab === 'users' ? 'Usuarios' :
+                 activeTab === 'courses' ? 'Cursos' :
+                 activeTab === 'enrollments' ? 'Inscripciones' :
+                 activeTab === 'instructors' ? 'Instructores' :
+                 activeTab === 'reports' ? 'Reportes' :
+                 'Configuración'}
+              </h1>
+              <p style={{ fontSize: '14px', color: '#6b7280' }}>
+                Bienvenido de nuevo, {currentUser?.name}
+              </p>
+            </div>
           </div>
           <div style={{ display: 'flex', gap: '0.75rem' }}>
             <button style={{
