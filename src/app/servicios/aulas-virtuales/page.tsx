@@ -205,9 +205,9 @@ export default function AulasVirtualesPage() {
               marginBottom: '1.5rem'
             }}>
               <span style={{
-                fontSize: '11px',
+                fontSize: '15px',
                 fontWeight: '700',
-                color: '#94a3b8',
+                color: '#ffffff',
                 textTransform: 'uppercase',
                 letterSpacing: '0.1em'
               }}>PLATAFORMA PARA CAPACITACIÓN Y EDUCACIÓN</span>
@@ -221,12 +221,12 @@ export default function AulasVirtualesPage() {
               color: '#ffffff',
               letterSpacing: '-0.02em'
             }}>
-              Crea cursos increíbles<br/>con <span style={{
+              Crea mejores cursos <br/>con <span style={{
                 background: 'linear-gradient(90deg, #6366f1 0%, #e91e63 100%)',
                 WebkitBackgroundClip: 'text',
                 WebkitTextFillColor: 'transparent',
                 backgroundClip: 'text'
-              }}>IA en minutos</span>
+              }}>Tu asistente IA</span>
             </h1>
 
             <p style={{
@@ -477,7 +477,7 @@ export default function AulasVirtualesPage() {
             marginBottom: '2rem',
             fontWeight: '500'
           }}>
-            Más de 1,000 creadores y empresas ya confían en SmartChatix
+            Diseñada para la nueva generación de capacitación impulsada por IA.
           </p>
           {/* Aquí irían los logos */}
         </div>

@@ -4,7 +4,6 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
-import Breadcrumb from '@/components/Breadcrumb';
 
 interface User {
   id: number;
@@ -40,29 +39,8 @@ export default function AdminPanel() {
     totalEnrollments: 0,
     activeStudents: 0
   });
-  const [editingCourse, setEditingCourse] = useState<Course | null>(null);
-  const [instructors, setInstructors] = useState<User[]>([]);
-  const [students, setStudents] = useState<User[]>([]);
-  const [saving, setSaving] = useState(false);
-  const [showNewCourseModal, setShowNewCourseModal] = useState(false);
-  const [newCourse, setNewCourse] = useState({
-    title: '',
-    slug: '',
-    description: '',
-    price_vivo: 0,
-    price_grabado: 0,
-    instructor_id: null as number | null
-  });
-  const [enrolledStudents, setEnrolledStudents] = useState<number[]>([]);
-  const [loadingEnrollments, setLoadingEnrollments] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
-  const [editingUser, setEditingUser] = useState<User | null>(null);
-  const [userCourses, setUserCourses] = useState<number[]>([]);
-  const [loadingUserCourses, setLoadingUserCourses] = useState(false);
-  const [deleting, setDeleting] = useState(false);
-  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-  const [settings, setSettings] = useState<Record<string, any>>({});
-  const [loadingSettings, setLoadingSettings] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
   useEffect(() => {
     checkAuth();
@@ -97,14 +75,7 @@ export default function AdminPanel() {
 
       if (usersRes.ok) {
         const usersData = await usersRes.json();
-        const allUsers = usersData.users || [];
-        const studentsList = allUsers.filter((u: User) => u.role === 'student');
-        console.log('Total users:', allUsers.length);
-        console.log('Students found:', studentsList.length);
-        console.log('Students:', studentsList);
-        setUsers(allUsers);
-        setInstructors(allUsers.filter((u: User) => u.role === 'instructor' || u.role === 'admin') || []);
-        setStudents(studentsList);
+        setUsers(usersData.users || []);
       }
 
       if (coursesRes.ok) {
@@ -128,1647 +99,603 @@ export default function AdminPanel() {
     router.push('/');
   };
 
-  const loadSettings = async () => {
-    setLoadingSettings(true);
-    try {
-      const res = await fetch('/api/admin/settings');
-      if (res.ok) {
-        const data = await res.json();
-        setSettings(data.settings || {});
-      }
-    } catch (error) {
-      console.error('Error loading settings:', error);
-    } finally {
-      setLoadingSettings(false);
-    }
-  };
-
-  const updateSetting = async (key: string, value: any) => {
-    try {
-      const res = await fetch('/api/admin/settings', {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ setting_key: key, setting_value: value })
-      });
-      if (res.ok) {
-        setSettings({ ...settings, [key]: value });
-      }
-    } catch (error) {
-      console.error('Error updating setting:', error);
-    }
-  };
-
-  const handleEditCourse = async (course: Course) => {
-    setEditingCourse(course);
-    setLoadingEnrollments(true);
-    try {
-      const response = await fetch(`/api/admin/courses/${course.id}/enrollments`);
-      if (response.ok) {
-        const data = await response.json();
-        setEnrolledStudents(data.enrollments?.map((e: any) => e.user_id) || []);
-      }
-    } catch (error) {
-      console.error('Error loading enrollments:', error);
-    } finally {
-      setLoadingEnrollments(false);
-    }
-  };
-
-  const handleSaveCourse = async () => {
-    if (!editingCourse) return;
-
-    setSaving(true);
-    try {
-      const updateResponse = await fetch(`/api/admin/courses/${editingCourse.id}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          instructor_id: editingCourse.instructor_id
-        })
-      });
-
-      if (!updateResponse.ok) {
-        alert('Error al actualizar el curso');
-        setSaving(false);
-        return;
-      }
-
-      const enrollResponse = await fetch(`/api/admin/courses/${editingCourse.id}/enrollments`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          student_ids: enrolledStudents
-        })
-      });
-
-      if (enrollResponse.ok) {
-        await loadData();
-        setEditingCourse(null);
-        setEnrolledStudents([]);
-      } else {
-        alert('Error al actualizar estudiantes');
-      }
-    } catch (error) {
-      console.error('Error updating course:', error);
-      alert('Error al actualizar el curso');
-    } finally {
-      setSaving(false);
-    }
-  };
-
-  const toggleStudentEnrollment = (studentId: number) => {
-    setEnrolledStudents(prev => {
-      if (prev.includes(studentId)) {
-        return prev.filter(id => id !== studentId);
-      } else {
-        return [...prev, studentId];
-      }
-    });
-  };
-
-  const handleCreateCourse = async () => {
-    if (!newCourse.title.trim() || !newCourse.slug.trim()) {
-      alert('Título y slug son obligatorios');
-      return;
-    }
-
-    setSaving(true);
-    try {
-      const response = await fetch('/api/admin/courses', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(newCourse)
-      });
-
-      if (response.ok) {
-        await loadData();
-        setShowNewCourseModal(false);
-        setNewCourse({
-          title: '',
-          slug: '',
-          description: '',
-          price_vivo: 0,
-          price_grabado: 0,
-          instructor_id: null
-        });
-      } else {
-        const data = await response.json();
-        alert(data.message || 'Error al crear el curso');
-      }
-    } catch (error) {
-      console.error('Error creating course:', error);
-      alert('Error al crear el curso');
-    } finally {
-      setSaving(false);
-    }
-  };
-
-  const handleEditUser = async (user: User) => {
-    setEditingUser(user);
-    setLoadingUserCourses(true);
-    try {
-      const response = await fetch(`/api/admin/users/${user.id}/enrollments`);
-      if (response.ok) {
-        const data = await response.json();
-        setUserCourses(data.enrollments?.map((e: any) => e.course_id) || []);
-      }
-    } catch (error) {
-      console.error('Error loading user enrollments:', error);
-    } finally {
-      setLoadingUserCourses(false);
-    }
-  };
-
-  const handleSaveUser = async () => {
-    if (!editingUser) return;
-
-    setSaving(true);
-    try {
-      const updateResponse = await fetch(`/api/admin/users/${editingUser.id}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name: editingUser.name,
-          email: editingUser.email
-        })
-      });
-
-      if (!updateResponse.ok) {
-        alert('Error al actualizar el usuario');
-        setSaving(false);
-        return;
-      }
-
-      const enrollResponse = await fetch(`/api/admin/users/${editingUser.id}/enrollments`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          course_ids: userCourses
-        })
-      });
-
-      if (enrollResponse.ok) {
-        await loadData();
-        setEditingUser(null);
-        setUserCourses([]);
-      } else {
-        alert('Error al actualizar cursos');
-      }
-    } catch (error) {
-      console.error('Error updating user:', error);
-      alert('Error al actualizar el usuario');
-    } finally {
-      setSaving(false);
-    }
-  };
-
-  const toggleUserCourse = (courseId: number) => {
-    setUserCourses(prev => {
-      if (prev.includes(courseId)) {
-        return prev.filter(id => id !== courseId);
-      } else {
-        return [...prev, courseId];
-      }
-    });
-  };
-
-  const handleDeleteUser = async () => {
-    if (!editingUser) return;
-
-    setDeleting(true);
-    try {
-      const response = await fetch(`/api/admin/users/${editingUser.id}`, {
-        method: 'DELETE'
-      });
-
-      if (response.ok) {
-        await loadData();
-        setEditingUser(null);
-        setUserCourses([]);
-        setShowDeleteConfirm(false);
-      } else {
-        const data = await response.json();
-        alert(data.message || 'Error al eliminar el usuario');
-      }
-    } catch (error) {
-      console.error('Error deleting user:', error);
-      alert('Error al eliminar el usuario');
-    } finally {
-      setDeleting(false);
-    }
-  };
-
   if (loading) {
     return (
       <div style={{
-        minHeight: '100vh',
+        height: '100vh',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
         background: '#f9fafb'
       }}>
-        <div style={{
-          width: '48px',
-          height: '48px',
-          border: '4px solid #e5e7eb',
-          borderTopColor: '#667eea',
-          borderRadius: '50%',
-          animation: 'spin 1s linear infinite'
-        }} />
-        <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+        <div style={{ textAlign: 'center' }}>
+          <div style={{
+            width: '48px',
+            height: '48px',
+            border: '4px solid #e5e7eb',
+            borderTopColor: '#8b5cf6',
+            borderRadius: '50%',
+            animation: 'spin 1s linear infinite',
+            margin: '0 auto 1rem'
+          }}></div>
+          <p style={{ color: '#6b7280', fontSize: '14px' }}>Cargando panel de administración...</p>
+        </div>
       </div>
     );
   }
 
-  return (
-    <div style={{ minHeight: '100vh', background: '#f9fafb' }}>
-      <header style={{
-        position: 'sticky',
-        top: 0,
-        height: '72px',
-        background: '#1c1d1f',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        padding: '0 32px',
-        zIndex: 100,
-        boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
-      }}>
-        <Link href="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center' }}>
-          <Image
-            src="/images/logo_smartchatix_horiz.png"
-            alt="SmartChatix"
-            width={180}
-            height={52}
-            style={{ objectFit: 'contain' }}
-          />
-        </Link>
+  const menuItems = [
+    { id: 'dashboard', icon: '📊', label: 'Dashboard', badge: null },
+    { id: 'users', icon: '👥', label: 'Usuarios', badge: users.length },
+    { id: 'courses', icon: '📚', label: 'Cursos', badge: courses.length },
+    { id: 'enrollments', icon: '✅', label: 'Inscripciones', badge: stats.totalEnrollments },
+    { id: 'instructors', icon: '👨‍🏫', label: 'Instructores', badge: null },
+    { id: 'reports', icon: '📈', label: 'Reportes', badge: null },
+    { id: 'settings', icon: '⚙️', label: 'Configuración', badge: null }
+  ];
 
-        <div style={{ position: 'relative' }}>
+  const recentActivity = [
+    { type: 'enrollment', user: 'María García', course: 'Introducción a Python', time: '2 min', icon: '✅', color: '#10b981' },
+    { type: 'completion', user: 'Juan Pérez', course: 'React Avanzado', time: '15 min', icon: '🎓', color: '#3b82f6' },
+    { type: 'new_user', user: 'Ana Rodríguez', course: 'Registro nuevo', time: '1 hora', icon: '👤', color: '#8b5cf6' },
+    { type: 'enrollment', user: 'Carlos López', course: 'Data Science', time: '2 horas', icon: '✅', color: '#10b981' }
+  ];
+
+  const topCourses = courses.slice(0, 5).map((course, idx) => ({
+    title: course.title,
+    students: Math.floor(Math.random() * 150) + 50,
+    completion: Math.floor(Math.random() * 40) + 60
+  }));
+
+  return (
+    <div style={{
+      display: 'flex',
+      height: '100vh',
+      background: '#f9fafb',
+      fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif'
+    }}>
+      <style>{`
+        @keyframes spin {
+          to { transform: rotate(360deg); }
+        }
+      `}</style>
+
+      {/* Sidebar */}
+      <aside style={{
+        width: sidebarCollapsed ? '80px' : '280px',
+        background: '#ffffff',
+        borderRight: '1px solid #e5e7eb',
+        display: 'flex',
+        flexDirection: 'column',
+        transition: 'width 0.3s ease',
+        position: 'relative',
+        zIndex: 100
+      }}>
+        {/* Logo */}
+        <div style={{
+          padding: '1.5rem',
+          borderBottom: '1px solid #e5e7eb',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: sidebarCollapsed ? 'center' : 'space-between'
+        }}>
+          {!sidebarCollapsed && (
+            <Link href="/">
+              <Image
+                src="/images/logo_smartchatix_horiz.png"
+                alt="SmartChatix"
+                width={140}
+                height={42}
+                style={{ cursor: 'pointer' }}
+              />
+            </Link>
+          )}
+          <button
+            onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
+            style={{
+              background: 'transparent',
+              border: 'none',
+              cursor: 'pointer',
+              fontSize: '20px',
+              padding: '0.5rem',
+              borderRadius: '6px',
+              transition: 'background 0.2s'
+            }}
+            onMouseEnter={(e) => e.currentTarget.style.background = '#f3f4f6'}
+            onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
+          >
+            {sidebarCollapsed ? '→' : '←'}
+          </button>
+        </div>
+
+        {/* Menu Items */}
+        <nav style={{ flex: 1, padding: '1rem', overflowY: 'auto' }}>
+          {menuItems.map((item) => (
+            <button
+              key={item.id}
+              onClick={() => setActiveTab(item.id)}
+              style={{
+                width: '100%',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: sidebarCollapsed ? 'center' : 'space-between',
+                padding: sidebarCollapsed ? '1rem 0.5rem' : '0.875rem 1rem',
+                marginBottom: '0.25rem',
+                background: activeTab === item.id ? '#f3f4f6' : 'transparent',
+                border: 'none',
+                borderRadius: '8px',
+                cursor: 'pointer',
+                fontSize: '14px',
+                fontWeight: '500',
+                color: activeTab === item.id ? '#111827' : '#6b7280',
+                transition: 'all 0.2s',
+                textAlign: 'left'
+              }}
+              onMouseEnter={(e) => {
+                if (activeTab !== item.id) {
+                  e.currentTarget.style.background = '#f9fafb';
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (activeTab !== item.id) {
+                  e.currentTarget.style.background = 'transparent';
+                }
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                <span style={{ fontSize: '18px' }}>{item.icon}</span>
+                {!sidebarCollapsed && <span>{item.label}</span>}
+              </div>
+              {!sidebarCollapsed && item.badge !== null && (
+                <span style={{
+                  background: activeTab === item.id ? '#8b5cf6' : '#e5e7eb',
+                  color: activeTab === item.id ? '#fff' : '#6b7280',
+                  padding: '0.125rem 0.5rem',
+                  borderRadius: '12px',
+                  fontSize: '12px',
+                  fontWeight: '600'
+                }}>
+                  {item.badge}
+                </span>
+              )}
+            </button>
+          ))}
+        </nav>
+
+        {/* User Profile */}
+        <div style={{
+          padding: '1rem',
+          borderTop: '1px solid #e5e7eb',
+          position: 'relative'
+        }}>
           <button
             onClick={() => setUserMenuOpen(!userMenuOpen)}
             style={{
-              width: '40px',
-              height: '40px',
-              background: userMenuOpen ? 'rgba(255,255,255,0.15)' : 'rgba(255,255,255,0.08)',
+              width: '100%',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: sidebarCollapsed ? 'center' : 'flex-start',
+              gap: '0.75rem',
+              padding: '0.75rem',
+              background: 'transparent',
               border: 'none',
-              borderRadius: '50%',
-              color: 'white',
-              fontSize: '20px',
+              borderRadius: '8px',
               cursor: 'pointer',
+              transition: 'background 0.2s'
+            }}
+            onMouseEnter={(e) => e.currentTarget.style.background = '#f3f4f6'}
+            onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
+          >
+            <div style={{
+              width: '36px',
+              height: '36px',
+              borderRadius: '50%',
+              background: 'linear-gradient(135deg, #8b5cf6 0%, #d946ef 100%)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              transition: 'all 0.2s',
-              fontWeight: '600'
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.background = 'rgba(255,255,255,0.15)';
-            }}
-            onMouseLeave={(e) => {
-              if (!userMenuOpen) e.currentTarget.style.background = 'rgba(255,255,255,0.08)';
-            }}
-          >
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-              <circle cx="12" cy="7" r="4"></circle>
-            </svg>
+              color: '#fff',
+              fontSize: '16px',
+              fontWeight: '600',
+              flexShrink: 0
+            }}>
+              {currentUser?.name?.charAt(0).toUpperCase() || 'A'}
+            </div>
+            {!sidebarCollapsed && (
+              <div style={{ flex: 1, textAlign: 'left' }}>
+                <div style={{ fontSize: '14px', fontWeight: '600', color: '#111827' }}>
+                  {currentUser?.name || 'Admin'}
+                </div>
+                <div style={{ fontSize: '12px', color: '#6b7280' }}>Administrador</div>
+              </div>
+            )}
           </button>
+
           {userMenuOpen && (
             <div style={{
               position: 'absolute',
-              top: 'calc(100% + 12px)',
-              right: 0,
-              background: 'white',
-              borderRadius: '8px',
-              boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
+              bottom: '100%',
+              left: '1rem',
+              right: '1rem',
+              marginBottom: '0.5rem',
+              background: '#fff',
               border: '1px solid #e5e7eb',
-              minWidth: '220px',
-              zIndex: 1000,
+              borderRadius: '8px',
+              boxShadow: '0 10px 25px rgba(0, 0, 0, 0.1)',
               overflow: 'hidden'
             }}>
-              <div style={{
-                padding: '16px',
-                borderBottom: '1px solid #f3f4f6'
-              }}>
-                <div style={{
-                  fontSize: '14px',
-                  fontWeight: '600',
-                  color: '#1a202c',
-                  marginBottom: '4px'
-                }}>
-                  {currentUser?.name || 'Usuario'}
-                </div>
-                <div style={{
-                  fontSize: '12px',
-                  color: '#6b7280'
-                }}>
-                  {currentUser?.email}
-                </div>
-              </div>
-              <Link
-                href="/perfil"
-                onClick={() => setUserMenuOpen(false)}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '12px',
-                  padding: '12px 16px',
-                  textDecoration: 'none',
-                  color: '#374151',
-                  fontSize: '14px',
-                  fontWeight: '500',
-                  transition: 'background 0.2s',
-                  borderBottom: '1px solid #f3f4f6'
-                }}
-                onMouseEnter={(e) => e.currentTarget.style.background = '#f9fafb'}
-                onMouseLeave={(e) => e.currentTarget.style.background = 'white'}
-              >
-                <span style={{ fontSize: '16px' }}>👤</span>
-                Mi Perfil
-              </Link>
-              <Link
-                href="/aula-virtual"
-                onClick={() => setUserMenuOpen(false)}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '12px',
-                  padding: '12px 16px',
-                  textDecoration: 'none',
-                  color: '#374151',
-                  fontSize: '14px',
-                  fontWeight: '500',
-                  transition: 'background 0.2s',
-                  borderBottom: '1px solid #f3f4f6'
-                }}
-                onMouseEnter={(e) => e.currentTarget.style.background = '#f9fafb'}
-                onMouseLeave={(e) => e.currentTarget.style.background = 'white'}
-              >
-                <span style={{ fontSize: '16px' }}>📚</span>
-                Mis Cursos
-              </Link>
-              <Link
-                href="/"
-                onClick={() => setUserMenuOpen(false)}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '12px',
-                  padding: '12px 16px',
-                  textDecoration: 'none',
-                  color: '#374151',
-                  fontSize: '14px',
-                  fontWeight: '500',
-                  transition: 'background 0.2s',
-                  borderBottom: '1px solid #f3f4f6'
-                }}
-                onMouseEnter={(e) => e.currentTarget.style.background = '#f9fafb'}
-                onMouseLeave={(e) => e.currentTarget.style.background = 'white'}
-              >
-                <span style={{ fontSize: '16px' }}>🔍</span>
-                Catálogo
-              </Link>
-              <Link
-                href="/admin"
-                onClick={() => setUserMenuOpen(false)}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '12px',
-                  padding: '12px 16px',
-                  textDecoration: 'none',
-                  color: '#374151',
-                  fontSize: '14px',
-                  fontWeight: '500',
-                  transition: 'background 0.2s',
-                  borderBottom: '1px solid #f3f4f6'
-                }}
-                onMouseEnter={(e) => e.currentTarget.style.background = '#f9fafb'}
-                onMouseLeave={(e) => e.currentTarget.style.background = 'white'}
-              >
-                <span style={{ fontSize: '16px' }}>⚙️</span>
-                Panel Admin
-              </Link>
               <button
-                onClick={async () => {
-                  setUserMenuOpen(false);
-                  await fetch('/api/auth/logout', { method: 'POST' });
-                  router.push('/');
-                }}
+                onClick={() => router.push('/perfil')}
                 style={{
                   width: '100%',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '12px',
-                  padding: '12px 16px',
-                  background: 'white',
+                  padding: '0.75rem 1rem',
+                  background: 'transparent',
                   border: 'none',
                   textAlign: 'left',
-                  color: '#ef4444',
                   fontSize: '14px',
-                  fontWeight: '600',
+                  color: '#374151',
                   cursor: 'pointer',
-                  transition: 'background 0.2s'
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.5rem'
+                }}
+                onMouseEnter={(e) => e.currentTarget.style.background = '#f3f4f6'}
+                onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
+              >
+                <span>👤</span> Mi perfil
+              </button>
+              <button
+                onClick={handleLogout}
+                style={{
+                  width: '100%',
+                  padding: '0.75rem 1rem',
+                  background: 'transparent',
+                  border: 'none',
+                  borderTop: '1px solid #e5e7eb',
+                  textAlign: 'left',
+                  fontSize: '14px',
+                  color: '#dc2626',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.5rem'
                 }}
                 onMouseEnter={(e) => e.currentTarget.style.background = '#fef2f2'}
-                onMouseLeave={(e) => e.currentTarget.style.background = 'white'}
+                onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
               >
-                <span style={{ fontSize: '16px' }}>🚪</span>
-                Cerrar Sesión
+                <span>🚪</span> Cerrar sesión
               </button>
             </div>
           )}
         </div>
-      </header>
+      </aside>
 
-      <Breadcrumb
-        items={[
-          { label: 'Inicio', href: '/' },
-          { label: 'Panel Admin' }
-        ]}
-        grayBackground={true}
-      >
-        <div style={{ display: 'flex', gap: '32px' }}>
-          {['dashboard', 'usuarios', 'cursos', 'configuración'].map(tab => (
-            <button
-              key={tab}
-              onClick={() => {
-                setActiveTab(tab);
-                if (tab === 'configuración') loadSettings();
-              }}
-              style={{
-                padding: '16px 0',
-                background: 'none',
-                border: 'none',
-                borderBottom: activeTab === tab ? '2px solid #667eea' : '2px solid transparent',
-                color: activeTab === tab ? '#667eea' : '#6b7280',
-                fontSize: '15px',
-                fontWeight: activeTab === tab ? '600' : '500',
-                cursor: 'pointer',
-                textTransform: 'capitalize'
-              }}
-            >
-              {tab === 'dashboard' ? 'Dashboard' : tab.charAt(0).toUpperCase() + tab.slice(1)}
-            </button>
-          ))}
-        </div>
-      </Breadcrumb>
-
-      <main style={{ padding: '32px' }}>
-        {activeTab === 'dashboard' && (
+      {/* Main Content */}
+      <main style={{ flex: 1, overflow: 'auto', background: '#f9fafb' }}>
+        {/* Header */}
+        <header style={{
+          background: '#fff',
+          borderBottom: '1px solid #e5e7eb',
+          padding: '1.5rem 2rem',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center'
+        }}>
           <div>
+            <h1 style={{ fontSize: '1.875rem', fontWeight: '700', color: '#111827', marginBottom: '0.25rem' }}>
+              {activeTab === 'dashboard' ? 'Dashboard' :
+               activeTab === 'users' ? 'Usuarios' :
+               activeTab === 'courses' ? 'Cursos' :
+               activeTab === 'enrollments' ? 'Inscripciones' :
+               activeTab === 'instructors' ? 'Instructores' :
+               activeTab === 'reports' ? 'Reportes' :
+               'Configuración'}
+            </h1>
+            <p style={{ fontSize: '14px', color: '#6b7280' }}>
+              Bienvenido de nuevo, {currentUser?.name}
+            </p>
+          </div>
+          <div style={{ display: 'flex', gap: '0.75rem' }}>
+            <button style={{
+              padding: '0.625rem 1.25rem',
+              background: '#fff',
+              border: '1px solid #e5e7eb',
+              borderRadius: '8px',
+              fontSize: '14px',
+              fontWeight: '500',
+              color: '#374151',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.5rem'
+            }}>
+              <span>📥</span> Exportar
+            </button>
+            <button style={{
+              padding: '0.625rem 1.25rem',
+              background: 'linear-gradient(135deg, #8b5cf6 0%, #d946ef 100%)',
+              border: 'none',
+              borderRadius: '8px',
+              fontSize: '14px',
+              fontWeight: '600',
+              color: '#fff',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.5rem',
+              boxShadow: '0 4px 12px rgba(139, 92, 246, 0.3)'
+            }}>
+              <span>➕</span> Nuevo Curso
+            </button>
+          </div>
+        </header>
+
+        {/* Dashboard Content */}
+        {activeTab === 'dashboard' && (
+          <div style={{ padding: '2rem' }}>
+            {/* KPI Cards */}
             <div style={{
               display: 'grid',
-              gridTemplateColumns: 'repeat(4, 1fr)',
-              gap: '24px',
-              marginBottom: '32px'
+              gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
+              gap: '1.5rem',
+              marginBottom: '2rem'
             }}>
               {[
-                { label: 'Total Usuarios', value: stats.totalUsers, icon: '👥', color: '#667eea' },
-                { label: 'Cursos Activos', value: stats.totalCourses, icon: '📚', color: '#10b981' },
-                { label: 'Inscripciones', value: stats.totalEnrollments, icon: '✓', color: '#f59e0b' },
-                { label: 'Estudiantes Activos', value: stats.activeStudents, icon: '🎓', color: '#ef4444' }
-              ].map((stat, i) => (
-                <div key={i} style={{
-                  background: 'white',
+                {
+                  title: 'Total Usuarios',
+                  value: stats.totalUsers,
+                  change: '+12.5%',
+                  trend: 'up',
+                  icon: '👥',
+                  color: '#8b5cf6'
+                },
+                {
+                  title: 'Cursos Activos',
+                  value: stats.totalCourses,
+                  change: '+8.2%',
+                  trend: 'up',
+                  icon: '📚',
+                  color: '#3b82f6'
+                },
+                {
+                  title: 'Inscripciones',
+                  value: stats.totalEnrollments,
+                  change: '+23.1%',
+                  trend: 'up',
+                  icon: '✅',
+                  color: '#10b981'
+                },
+                {
+                  title: 'Tasa Finalización',
+                  value: '68%',
+                  change: '+5.4%',
+                  trend: 'up',
+                  icon: '🎯',
+                  color: '#f59e0b'
+                }
+              ].map((kpi, idx) => (
+                <div key={idx} style={{
+                  background: '#fff',
                   borderRadius: '12px',
-                  padding: '24px',
+                  padding: '1.5rem',
                   border: '1px solid #e5e7eb'
                 }}>
-                  <div style={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'flex-start',
-                    marginBottom: '12px'
-                  }}>
-                    <p style={{
-                      fontSize: '14px',
-                      color: '#6b7280',
-                      margin: 0,
-                      fontWeight: '500'
-                    }}>
-                      {stat.label}
-                    </p>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem' }}>
                     <div style={{
-                      width: '40px',
-                      height: '40px',
-                      background: `${stat.color}20`,
-                      borderRadius: '8px',
+                      width: '48px',
+                      height: '48px',
+                      borderRadius: '10px',
+                      background: `${kpi.color}15`,
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      fontSize: '20px'
+                      fontSize: '24px'
                     }}>
-                      {stat.icon}
+                      {kpi.icon}
+                    </div>
+                    <div style={{
+                      padding: '0.25rem 0.625rem',
+                      background: '#dcfce7',
+                      color: '#16a34a',
+                      borderRadius: '12px',
+                      fontSize: '12px',
+                      fontWeight: '600',
+                      height: 'fit-content'
+                    }}>
+                      {kpi.change}
                     </div>
                   </div>
-                  <p style={{
-                    fontSize: '32px',
-                    fontWeight: '700',
-                    color: '#1a202c',
-                    margin: 0
-                  }}>
-                    {stat.value}
-                  </p>
+                  <div style={{ fontSize: '14px', color: '#6b7280', marginBottom: '0.5rem' }}>
+                    {kpi.title}
+                  </div>
+                  <div style={{ fontSize: '2rem', fontWeight: '700', color: '#111827' }}>
+                    {kpi.value}
+                  </div>
                 </div>
               ))}
             </div>
-          </div>
-        )}
 
-        {activeTab === 'usuarios' && (
-          <div style={{
-            background: 'white',
-            borderRadius: '12px',
-            border: '1px solid #e5e7eb',
-            overflow: 'hidden'
-          }}>
-            <div style={{
-              padding: '20px 24px',
-              borderBottom: '1px solid #e5e7eb',
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center'
-            }}>
-              <h2 style={{
-                fontSize: '18px',
-                fontWeight: '600',
-                color: '#1a202c',
-                margin: 0
+            <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '1.5rem' }}>
+              {/* Chart */}
+              <div style={{
+                background: '#fff',
+                borderRadius: '12px',
+                padding: '1.5rem',
+                border: '1px solid #e5e7eb'
               }}>
-                Gestión de Usuarios
-              </h2>
-              <button style={{
-                padding: '10px 20px',
-                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                color: 'white',
-                border: 'none',
-                borderRadius: '8px',
-                fontSize: '14px',
-                fontWeight: '600',
-                cursor: 'pointer'
-              }}>
-                + Nuevo Usuario
-              </button>
-            </div>
-            <div style={{ overflowX: 'auto' }}>
-              <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-                <thead>
-                  <tr style={{ background: '#f9fafb' }}>
-                    {['ID', 'Nombre', 'Email', 'Rol', 'Estado', 'Fecha Registro', 'Acciones'].map(header => (
-                      <th key={header} style={{
-                        padding: '12px 24px',
-                        textAlign: 'left',
-                        fontSize: '12px',
-                        fontWeight: '600',
-                        color: '#6b7280',
-                        textTransform: 'uppercase',
-                        letterSpacing: '0.5px'
+                <div style={{ marginBottom: '1.5rem' }}>
+                  <h3 style={{ fontSize: '1.125rem', fontWeight: '700', color: '#111827', marginBottom: '0.25rem' }}>
+                    Progreso de Aprendizaje
+                  </h3>
+                  <p style={{ fontSize: '14px', color: '#6b7280' }}>Inscripciones en los últimos 6 meses</p>
+                </div>
+
+                {/* Simple Line Chart */}
+                <div style={{ position: 'relative', height: '200px', display: 'flex', alignItems: 'flex-end', gap: '1rem', padding: '1rem 0' }}>
+                  {[40, 65, 45, 80, 60, 95].map((height, idx) => (
+                    <div key={idx} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem' }}>
+                      <div style={{
+                        width: '100%',
+                        height: `${height}%`,
+                        background: `linear-gradient(180deg, #8b5cf6 0%, #d946ef 100%)`,
+                        borderRadius: '6px 6px 0 0',
+                        position: 'relative',
+                        transition: 'height 0.3s ease'
                       }}>
-                        {header}
-                      </th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {users.map(user => (
-                    <tr key={user.id} style={{ borderTop: '1px solid #e5e7eb' }}>
-                      <td style={{ padding: '16px 24px', fontSize: '14px', color: '#1a202c' }}>
-                        {user.id}
-                      </td>
-                      <td style={{ padding: '16px 24px', fontSize: '14px', color: '#1a202c', fontWeight: '500' }}>
-                        {user.name || '-'}
-                      </td>
-                      <td style={{ padding: '16px 24px', fontSize: '14px', color: '#6b7280' }}>
-                        {user.email}
-                      </td>
-                      <td style={{ padding: '16px 24px' }}>
-                        <span style={{
-                          padding: '4px 12px',
-                          borderRadius: '12px',
+                        <div style={{
+                          position: 'absolute',
+                          top: '-2rem',
+                          left: '50%',
+                          transform: 'translateX(-50%)',
                           fontSize: '12px',
                           fontWeight: '600',
-                          background: user.role === 'admin' ? '#fef3c7' : user.role === 'instructor' ? '#dbeafe' : '#e0e7ff',
-                          color: user.role === 'admin' ? '#92400e' : user.role === 'instructor' ? '#1e40af' : '#3730a3'
+                          color: '#8b5cf6'
                         }}>
-                          {user.role === 'admin' ? 'Admin' : user.role === 'instructor' ? 'Instructor' : 'Estudiante'}
-                        </span>
-                      </td>
-                      <td style={{ padding: '16px 24px' }}>
-                        <span style={{
-                          padding: '4px 12px',
-                          borderRadius: '12px',
-                          fontSize: '12px',
-                          fontWeight: '600',
-                          background: user.is_active ? '#d1fae5' : '#fee2e2',
-                          color: user.is_active ? '#065f46' : '#991b1b'
-                        }}>
-                          {user.is_active ? 'Activo' : 'Inactivo'}
-                        </span>
-                      </td>
-                      <td style={{ padding: '16px 24px', fontSize: '14px', color: '#6b7280' }}>
-                        {new Date(user.created_at).toLocaleDateString('es-ES')}
-                      </td>
-                      <td style={{ padding: '16px 24px' }}>
-                        <button
-                          onClick={() => handleEditUser(user)}
-                          style={{
-                            padding: '6px 12px',
-                            background: '#f3f4f6',
-                            border: '1px solid #e5e7eb',
-                            borderRadius: '6px',
-                            fontSize: '13px',
-                            cursor: 'pointer',
-                            marginRight: '8px'
-                          }}
-                        >
-                          Editar
-                        </button>
-                      </td>
-                    </tr>
+                          {Math.floor(height * 2)}
+                        </div>
+                      </div>
+                      <div style={{ fontSize: '12px', color: '#9ca3af', fontWeight: '500' }}>
+                        {['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun'][idx]}
+                      </div>
+                    </div>
                   ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        )}
+                </div>
+              </div>
 
-        {activeTab === 'cursos' && (
-          <div style={{
-            background: 'white',
-            borderRadius: '12px',
-            border: '1px solid #e5e7eb',
-            overflow: 'hidden'
-          }}>
-            <div style={{
-              padding: '20px 24px',
-              borderBottom: '1px solid #e5e7eb',
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center'
-            }}>
-              <h2 style={{
-                fontSize: '18px',
-                fontWeight: '600',
-                color: '#1a202c',
-                margin: 0
+              {/* Recent Activity */}
+              <div style={{
+                background: '#fff',
+                borderRadius: '12px',
+                padding: '1.5rem',
+                border: '1px solid #e5e7eb'
               }}>
-                Gestión de Cursos
-              </h2>
-              <button
-                onClick={() => setShowNewCourseModal(true)}
-                style={{
-                  padding: '10px 20px',
-                  background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '8px',
-                  fontSize: '14px',
-                  fontWeight: '600',
-                  cursor: 'pointer'
-                }}
-              >
-                + Nuevo Curso
-              </button>
-            </div>
-            <div style={{ overflowX: 'auto' }}>
-              <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-                <thead>
-                  <tr style={{ background: '#f9fafb' }}>
-                    {['ID', 'Título', 'Slug', 'Instructor', 'Precio Vivo', 'Precio Grabado', 'Estado', 'Acciones'].map(header => (
-                      <th key={header} style={{
-                        padding: '12px 24px',
-                        textAlign: 'left',
-                        fontSize: '12px',
-                        fontWeight: '600',
-                        color: '#6b7280',
-                        textTransform: 'uppercase',
-                        letterSpacing: '0.5px'
+                <h3 style={{ fontSize: '1.125rem', fontWeight: '700', color: '#111827', marginBottom: '1rem' }}>
+                  Actividad Reciente
+                </h3>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                  {recentActivity.map((activity, idx) => (
+                    <div key={idx} style={{ display: 'flex', gap: '0.75rem' }}>
+                      <div style={{
+                        width: '36px',
+                        height: '36px',
+                        borderRadius: '50%',
+                        background: `${activity.color}15`,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        fontSize: '16px',
+                        flexShrink: 0
                       }}>
-                        {header}
-                      </th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {courses.map(course => (
-                    <tr key={course.id} style={{ borderTop: '1px solid #e5e7eb' }}>
-                      <td style={{ padding: '16px 24px', fontSize: '14px', color: '#1a202c' }}>
-                        {course.id}
-                      </td>
-                      <td style={{ padding: '16px 24px', fontSize: '14px', color: '#1a202c', fontWeight: '500' }}>
+                        {activity.icon}
+                      </div>
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{
+                          fontSize: '13px',
+                          fontWeight: '600',
+                          color: '#111827',
+                          marginBottom: '0.125rem',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                          whiteSpace: 'nowrap'
+                        }}>
+                          {activity.user}
+                        </div>
+                        <div style={{
+                          fontSize: '12px',
+                          color: '#6b7280',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                          whiteSpace: 'nowrap'
+                        }}>
+                          {activity.course}
+                        </div>
+                        <div style={{ fontSize: '11px', color: '#9ca3af', marginTop: '0.25rem' }}>
+                          Hace {activity.time}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* Top Courses */}
+            <div style={{
+              background: '#fff',
+              borderRadius: '12px',
+              padding: '1.5rem',
+              border: '1px solid #e5e7eb',
+              marginTop: '1.5rem'
+            }}>
+              <h3 style={{ fontSize: '1.125rem', fontWeight: '700', color: '#111827', marginBottom: '1rem' }}>
+                Cursos Más Populares
+              </h3>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                {topCourses.map((course, idx) => (
+                  <div key={idx} style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '1rem',
+                    padding: '0.75rem',
+                    borderRadius: '8px',
+                    background: '#f9fafb'
+                  }}>
+                    <div style={{
+                      width: '32px',
+                      height: '32px',
+                      borderRadius: '50%',
+                      background: `linear-gradient(135deg, ${['#8b5cf6', '#3b82f6', '#10b981', '#f59e0b', '#ec4899'][idx]} 0%, ${['#d946ef', '#1d4ed8', '#059669', '#d97706', '#c026d3'][idx]} 100%)`,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      color: '#fff',
+                      fontSize: '14px',
+                      fontWeight: '700'
+                    }}>
+                      {idx + 1}
+                    </div>
+                    <div style={{ flex: 1 }}>
+                      <div style={{ fontSize: '14px', fontWeight: '600', color: '#111827', marginBottom: '0.25rem' }}>
                         {course.title}
-                      </td>
-                      <td style={{ padding: '16px 24px', fontSize: '14px', color: '#6b7280' }}>
-                        {course.slug}
-                      </td>
-                      <td style={{ padding: '16px 24px', fontSize: '14px', color: '#6b7280' }}>
-                        {course.instructor_name || '-'}
-                      </td>
-                      <td style={{ padding: '16px 24px', fontSize: '14px', color: '#1a202c' }}>
-                        ${course.price_vivo}
-                      </td>
-                      <td style={{ padding: '16px 24px', fontSize: '14px', color: '#1a202c' }}>
-                        ${course.price_grabado}
-                      </td>
-                      <td style={{ padding: '16px 24px' }}>
-                        <span style={{
-                          padding: '4px 12px',
-                          borderRadius: '12px',
-                          fontSize: '12px',
-                          fontWeight: '600',
-                          background: course.is_active ? '#d1fae5' : '#fee2e2',
-                          color: course.is_active ? '#065f46' : '#991b1b'
-                        }}>
-                          {course.is_active ? 'Activo' : 'Inactivo'}
-                        </span>
-                      </td>
-                      <td style={{ padding: '16px 24px' }}>
-                        <button
-                          onClick={() => handleEditCourse(course)}
-                          style={{
-                            padding: '6px 12px',
-                            background: '#f3f4f6',
-                            border: '1px solid #e5e7eb',
-                            borderRadius: '6px',
-                            fontSize: '13px',
-                            cursor: 'pointer',
-                            marginRight: '8px'
-                          }}
-                        >
-                          Editar
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+                      </div>
+                      <div style={{ fontSize: '12px', color: '#6b7280' }}>
+                        {course.students} estudiantes
+                      </div>
+                    </div>
+                    <div style={{ textAlign: 'right' }}>
+                      <div style={{ fontSize: '14px', fontWeight: '600', color: '#10b981', marginBottom: '0.25rem' }}>
+                        {course.completion}%
+                      </div>
+                      <div style={{ fontSize: '11px', color: '#9ca3af' }}>Finalización</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Other Tabs - Placeholder */}
+        {activeTab !== 'dashboard' && (
+          <div style={{
+            padding: '2rem',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            minHeight: '400px'
+          }}>
+            <div style={{ textAlign: 'center' }}>
+              <div style={{ fontSize: '4rem', marginBottom: '1rem' }}>🚧</div>
+              <h2 style={{ fontSize: '1.5rem', fontWeight: '700', color: '#111827', marginBottom: '0.5rem' }}>
+                En construcción
+              </h2>
+              <p style={{ fontSize: '14px', color: '#6b7280' }}>
+                Esta sección estará disponible próximamente
+              </p>
             </div>
           </div>
         )}
       </main>
-
-      {editingCourse && (
-        <div style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          background: 'rgba(0,0,0,0.5)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          zIndex: 1000
-        }}>
-          <div style={{
-            background: 'white',
-            borderRadius: '12px',
-            padding: '32px',
-            maxWidth: '600px',
-            width: '90%',
-            maxHeight: '90vh',
-            overflowY: 'auto'
-          }}>
-            <h3 style={{
-              fontSize: '20px',
-              fontWeight: '600',
-              color: '#1a202c',
-              marginBottom: '24px'
-            }}>
-              Editar Curso
-            </h3>
-
-            <div style={{ marginBottom: '20px' }}>
-              <label style={{
-                display: 'block',
-                fontSize: '14px',
-                fontWeight: '600',
-                color: '#374151',
-                marginBottom: '8px'
-              }}>
-                Título del Curso
-              </label>
-              <p style={{
-                fontSize: '16px',
-                color: '#1a202c',
-                margin: 0,
-                padding: '12px',
-                background: '#f9fafb',
-                borderRadius: '8px'
-              }}>
-                {editingCourse.title}
-              </p>
-            </div>
-
-            <div style={{ marginBottom: '24px' }}>
-              <label style={{
-                display: 'block',
-                fontSize: '14px',
-                fontWeight: '600',
-                color: '#374151',
-                marginBottom: '8px'
-              }}>
-                Asignar Instructor
-              </label>
-              <select
-                value={editingCourse.instructor_id || ''}
-                onChange={(e) => setEditingCourse({
-                  ...editingCourse,
-                  instructor_id: e.target.value ? parseInt(e.target.value) : null
-                })}
-                style={{
-                  width: '100%',
-                  padding: '12px',
-                  border: '1px solid #e5e7eb',
-                  borderRadius: '8px',
-                  fontSize: '14px',
-                  color: '#1a202c',
-                  background: 'white'
-                }}
-              >
-                <option value="">Sin asignar</option>
-                {instructors.map(instructor => (
-                  <option key={instructor.id} value={instructor.id}>
-                    {instructor.name || instructor.email} ({instructor.role})
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div style={{ marginBottom: '24px' }}>
-              <label style={{
-                display: 'block',
-                fontSize: '14px',
-                fontWeight: '600',
-                color: '#374151',
-                marginBottom: '8px'
-              }}>
-                Usuarios Inscritos
-              </label>
-              {loadingEnrollments ? (
-                <p style={{ fontSize: '14px', color: '#6b7280' }}>Cargando...</p>
-              ) : (
-                <div style={{
-                  maxHeight: '200px',
-                  overflowY: 'auto',
-                  border: '1px solid #e5e7eb',
-                  borderRadius: '8px',
-                  padding: '8px'
-                }}>
-                  {users.length === 0 ? (
-                    <p style={{ fontSize: '14px', color: '#6b7280', margin: '8px' }}>
-                      No hay usuarios disponibles
-                    </p>
-                  ) : (
-                    users.map(user => (
-                      <label
-                        key={user.id}
-                        style={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          padding: '8px',
-                          cursor: 'pointer',
-                          borderRadius: '6px',
-                          marginBottom: '4px',
-                          background: enrolledStudents.includes(user.id) ? '#f0f9ff' : 'transparent'
-                        }}
-                      >
-                        <input
-                          type="checkbox"
-                          checked={enrolledStudents.includes(user.id)}
-                          onChange={() => toggleStudentEnrollment(user.id)}
-                          style={{
-                            marginRight: '8px',
-                            width: '16px',
-                            height: '16px',
-                            cursor: 'pointer'
-                          }}
-                        />
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flex: 1 }}>
-                          <span style={{ fontSize: '14px', color: '#1a202c' }}>
-                            {user.name || user.email}
-                          </span>
-                          <span style={{
-                            padding: '2px 8px',
-                            borderRadius: '12px',
-                            fontSize: '11px',
-                            fontWeight: '600',
-                            background: user.role === 'admin' ? '#fef3c7' : user.role === 'instructor' ? '#dbeafe' : '#e0e7ff',
-                            color: user.role === 'admin' ? '#92400e' : user.role === 'instructor' ? '#1e40af' : '#3730a3'
-                          }}>
-                            {user.role === 'admin' ? 'Admin' : user.role === 'instructor' ? 'Instructor' : 'Estudiante'}
-                          </span>
-                        </div>
-                      </label>
-                    ))
-                  )}
-                </div>
-              )}
-            </div>
-
-            <div style={{
-              display: 'flex',
-              gap: '12px',
-              justifyContent: 'flex-end'
-            }}>
-              <button
-                onClick={() => setEditingCourse(null)}
-                disabled={saving}
-                style={{
-                  padding: '10px 20px',
-                  background: '#f3f4f6',
-                  border: '1px solid #e5e7eb',
-                  borderRadius: '8px',
-                  fontSize: '14px',
-                  fontWeight: '600',
-                  cursor: saving ? 'not-allowed' : 'pointer',
-                  color: '#374151',
-                  opacity: saving ? 0.5 : 1
-                }}
-              >
-                Cancelar
-              </button>
-              <button
-                onClick={handleSaveCourse}
-                disabled={saving}
-                style={{
-                  padding: '10px 20px',
-                  background: saving ? '#9ca3af' : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                  border: 'none',
-                  borderRadius: '8px',
-                  fontSize: '14px',
-                  fontWeight: '600',
-                  cursor: saving ? 'not-allowed' : 'pointer',
-                  color: 'white'
-                }}
-              >
-                {saving ? 'Guardando...' : 'Guardar Cambios'}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {showNewCourseModal && (
-        <div style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          background: 'rgba(0,0,0,0.5)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          zIndex: 1000
-        }}>
-          <div style={{
-            background: 'white',
-            borderRadius: '12px',
-            padding: '32px',
-            maxWidth: '600px',
-            width: '90%',
-            maxHeight: '90vh',
-            overflowY: 'auto'
-          }}>
-            <h3 style={{
-              fontSize: '20px',
-              fontWeight: '600',
-              color: '#1a202c',
-              marginBottom: '24px'
-            }}>
-              Crear Nuevo Curso
-            </h3>
-
-            <div style={{ marginBottom: '16px' }}>
-              <label style={{
-                display: 'block',
-                fontSize: '14px',
-                fontWeight: '600',
-                color: '#374151',
-                marginBottom: '8px'
-              }}>
-                Título *
-              </label>
-              <input
-                type="text"
-                value={newCourse.title}
-                onChange={(e) => setNewCourse({ ...newCourse, title: e.target.value })}
-                style={{
-                  width: '100%',
-                  padding: '12px',
-                  border: '1px solid #e5e7eb',
-                  borderRadius: '8px',
-                  fontSize: '14px',
-                  boxSizing: 'border-box'
-                }}
-                placeholder="Ej: Certificación IA 10X"
-              />
-            </div>
-
-            <div style={{ marginBottom: '16px' }}>
-              <label style={{
-                display: 'block',
-                fontSize: '14px',
-                fontWeight: '600',
-                color: '#374151',
-                marginBottom: '8px'
-              }}>
-                Slug *
-              </label>
-              <input
-                type="text"
-                value={newCourse.slug}
-                onChange={(e) => setNewCourse({ ...newCourse, slug: e.target.value })}
-                style={{
-                  width: '100%',
-                  padding: '12px',
-                  border: '1px solid #e5e7eb',
-                  borderRadius: '8px',
-                  fontSize: '14px',
-                  boxSizing: 'border-box'
-                }}
-                placeholder="Ej: certificacion-ia-10x"
-              />
-            </div>
-
-            <div style={{ marginBottom: '16px' }}>
-              <label style={{
-                display: 'block',
-                fontSize: '14px',
-                fontWeight: '600',
-                color: '#374151',
-                marginBottom: '8px'
-              }}>
-                Descripción
-              </label>
-              <textarea
-                value={newCourse.description}
-                onChange={(e) => setNewCourse({ ...newCourse, description: e.target.value })}
-                style={{
-                  width: '100%',
-                  padding: '12px',
-                  border: '1px solid #e5e7eb',
-                  borderRadius: '8px',
-                  fontSize: '14px',
-                  minHeight: '100px',
-                  boxSizing: 'border-box',
-                  fontFamily: 'inherit'
-                }}
-                placeholder="Describe el curso..."
-              />
-            </div>
-
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '16px' }}>
-              <div>
-                <label style={{
-                  display: 'block',
-                  fontSize: '14px',
-                  fontWeight: '600',
-                  color: '#374151',
-                  marginBottom: '8px'
-                }}>
-                  Precio Vivo ($)
-                </label>
-                <input
-                  type="number"
-                  value={newCourse.price_vivo}
-                  onChange={(e) => setNewCourse({ ...newCourse, price_vivo: parseFloat(e.target.value) || 0 })}
-                  style={{
-                    width: '100%',
-                    padding: '12px',
-                    border: '1px solid #e5e7eb',
-                    borderRadius: '8px',
-                    fontSize: '14px',
-                    boxSizing: 'border-box'
-                  }}
-                />
-              </div>
-              <div>
-                <label style={{
-                  display: 'block',
-                  fontSize: '14px',
-                  fontWeight: '600',
-                  color: '#374151',
-                  marginBottom: '8px'
-                }}>
-                  Precio Grabado ($)
-                </label>
-                <input
-                  type="number"
-                  value={newCourse.price_grabado}
-                  onChange={(e) => setNewCourse({ ...newCourse, price_grabado: parseFloat(e.target.value) || 0 })}
-                  style={{
-                    width: '100%',
-                    padding: '12px',
-                    border: '1px solid #e5e7eb',
-                    borderRadius: '8px',
-                    fontSize: '14px',
-                    boxSizing: 'border-box'
-                  }}
-                />
-              </div>
-            </div>
-
-            <div style={{ marginBottom: '24px' }}>
-              <label style={{
-                display: 'block',
-                fontSize: '14px',
-                fontWeight: '600',
-                color: '#374151',
-                marginBottom: '8px'
-              }}>
-                Asignar Instructor
-              </label>
-              <select
-                value={newCourse.instructor_id || ''}
-                onChange={(e) => setNewCourse({
-                  ...newCourse,
-                  instructor_id: e.target.value ? parseInt(e.target.value) : null
-                })}
-                style={{
-                  width: '100%',
-                  padding: '12px',
-                  border: '1px solid #e5e7eb',
-                  borderRadius: '8px',
-                  fontSize: '14px',
-                  color: '#1a202c',
-                  background: 'white'
-                }}
-              >
-                <option value="">Sin asignar</option>
-                {instructors.map(instructor => (
-                  <option key={instructor.id} value={instructor.id}>
-                    {instructor.name || instructor.email} ({instructor.role})
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div style={{
-              display: 'flex',
-              gap: '12px',
-              justifyContent: 'flex-end'
-            }}>
-              <button
-                onClick={() => {
-                  setShowNewCourseModal(false);
-                  setNewCourse({
-                    title: '',
-                    slug: '',
-                    description: '',
-                    price_vivo: 0,
-                    price_grabado: 0,
-                    instructor_id: null
-                  });
-                }}
-                disabled={saving}
-                style={{
-                  padding: '10px 20px',
-                  background: '#f3f4f6',
-                  border: '1px solid #e5e7eb',
-                  borderRadius: '8px',
-                  fontSize: '14px',
-                  fontWeight: '600',
-                  cursor: saving ? 'not-allowed' : 'pointer',
-                  color: '#374151',
-                  opacity: saving ? 0.5 : 1
-                }}
-              >
-                Cancelar
-              </button>
-              <button
-                onClick={handleCreateCourse}
-                disabled={saving}
-                style={{
-                  padding: '10px 20px',
-                  background: saving ? '#9ca3af' : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                  border: 'none',
-                  borderRadius: '8px',
-                  fontSize: '14px',
-                  fontWeight: '600',
-                  cursor: saving ? 'not-allowed' : 'pointer',
-                  color: 'white'
-                }}
-              >
-                {saving ? 'Creando...' : 'Crear Curso'}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {editingUser && (
-        <div style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          background: 'rgba(0,0,0,0.5)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          zIndex: 1000
-        }}>
-          <div style={{
-            background: 'white',
-            borderRadius: '12px',
-            padding: '32px',
-            maxWidth: '600px',
-            width: '90%',
-            maxHeight: '90vh',
-            overflowY: 'auto'
-          }}>
-            <h3 style={{
-              fontSize: '20px',
-              fontWeight: '600',
-              color: '#1a202c',
-              marginBottom: '24px'
-            }}>
-              Editar Usuario
-            </h3>
-
-            <div style={{ marginBottom: '16px' }}>
-              <label style={{
-                display: 'block',
-                fontSize: '14px',
-                fontWeight: '600',
-                color: '#374151',
-                marginBottom: '8px'
-              }}>
-                Nombre
-              </label>
-              <input
-                type="text"
-                value={editingUser.name || ''}
-                onChange={(e) => setEditingUser({ ...editingUser, name: e.target.value })}
-                style={{
-                  width: '100%',
-                  padding: '12px',
-                  border: '1px solid #e5e7eb',
-                  borderRadius: '8px',
-                  fontSize: '14px',
-                  boxSizing: 'border-box'
-                }}
-                placeholder="Nombre del usuario"
-              />
-            </div>
-
-            <div style={{ marginBottom: '24px' }}>
-              <label style={{
-                display: 'block',
-                fontSize: '14px',
-                fontWeight: '600',
-                color: '#374151',
-                marginBottom: '8px'
-              }}>
-                Email
-              </label>
-              <input
-                type="email"
-                value={editingUser.email}
-                onChange={(e) => setEditingUser({ ...editingUser, email: e.target.value })}
-                style={{
-                  width: '100%',
-                  padding: '12px',
-                  border: '1px solid #e5e7eb',
-                  borderRadius: '8px',
-                  fontSize: '14px',
-                  boxSizing: 'border-box'
-                }}
-                placeholder="email@ejemplo.com"
-              />
-            </div>
-
-            <div style={{ marginBottom: '24px' }}>
-              <label style={{
-                display: 'block',
-                fontSize: '14px',
-                fontWeight: '600',
-                color: '#374151',
-                marginBottom: '8px'
-              }}>
-                Cursos Asignados
-              </label>
-              {loadingUserCourses ? (
-                <p style={{ fontSize: '14px', color: '#6b7280' }}>Cargando...</p>
-              ) : (
-                <div style={{
-                  maxHeight: '200px',
-                  overflowY: 'auto',
-                  border: '1px solid #e5e7eb',
-                  borderRadius: '8px',
-                  padding: '8px'
-                }}>
-                  {courses.length === 0 ? (
-                    <p style={{ fontSize: '14px', color: '#6b7280', margin: '8px' }}>
-                      No hay cursos disponibles
-                    </p>
-                  ) : (
-                    courses.map(course => (
-                      <label
-                        key={course.id}
-                        style={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          padding: '8px',
-                          cursor: 'pointer',
-                          borderRadius: '6px',
-                          marginBottom: '4px',
-                          background: userCourses.includes(course.id) ? '#f0f9ff' : 'transparent'
-                        }}
-                      >
-                        <input
-                          type="checkbox"
-                          checked={userCourses.includes(course.id)}
-                          onChange={() => toggleUserCourse(course.id)}
-                          style={{
-                            marginRight: '8px',
-                            width: '16px',
-                            height: '16px',
-                            cursor: 'pointer'
-                          }}
-                        />
-                        <span style={{ fontSize: '14px', color: '#1a202c' }}>
-                          {course.title}
-                        </span>
-                      </label>
-                    ))
-                  )}
-                </div>
-              )}
-            </div>
-
-            <div style={{
-              display: 'flex',
-              gap: '12px',
-              justifyContent: 'space-between'
-            }}>
-              <button
-                onClick={() => setShowDeleteConfirm(true)}
-                disabled={saving || deleting}
-                style={{
-                  padding: '10px 20px',
-                  background: '#ef4444',
-                  border: 'none',
-                  borderRadius: '8px',
-                  fontSize: '14px',
-                  fontWeight: '600',
-                  cursor: (saving || deleting) ? 'not-allowed' : 'pointer',
-                  color: 'white',
-                  opacity: (saving || deleting) ? 0.7 : 1
-                }}
-              >
-                🗑️ Eliminar
-              </button>
-              <div style={{ display: 'flex', gap: '12px' }}>
-                <button
-                  onClick={() => setEditingUser(null)}
-                  disabled={saving || deleting}
-                  style={{
-                    padding: '10px 20px',
-                    background: '#f3f4f6',
-                    border: '1px solid #e5e7eb',
-                    borderRadius: '8px',
-                    fontSize: '14px',
-                    fontWeight: '600',
-                    cursor: (saving || deleting) ? 'not-allowed' : 'pointer',
-                    color: '#374151',
-                    opacity: (saving || deleting) ? 0.5 : 1
-                  }}
-                >
-                  Cancelar
-                </button>
-                <button
-                  onClick={handleSaveUser}
-                  disabled={saving || deleting}
-                  style={{
-                    padding: '10px 20px',
-                    background: (saving || deleting) ? '#9ca3af' : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                    border: 'none',
-                    borderRadius: '8px',
-                    fontSize: '14px',
-                    fontWeight: '600',
-                    cursor: (saving || deleting) ? 'not-allowed' : 'pointer',
-                    color: 'white'
-                  }}
-                >
-                  {saving ? 'Guardando...' : 'Guardar Cambios'}
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {activeTab === 'configuración' && (
-        <div>
-          <div style={{
-            backgroundColor: '#ffffff',
-            borderRadius: '8px',
-            padding: '24px',
-            boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1)',
-            marginBottom: '24px'
-          }}>
-            <h2 style={{
-              fontSize: '20px',
-              fontWeight: '600',
-              color: '#1a202c',
-              marginBottom: '8px'
-            }}>
-              Configuración del Sitio
-            </h2>
-            <p style={{
-              fontSize: '14px',
-              color: '#6b7280',
-              marginBottom: '24px'
-            }}>
-              Personaliza la configuración de la página principal
-            </p>
-
-            {loadingSettings ? (
-              <div style={{ textAlign: 'center', padding: '40px', color: '#6b7280' }}>
-                Cargando configuración...
-              </div>
-            ) : (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-                <div style={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                  padding: '16px',
-                  border: '1px solid #e5e7eb',
-                  borderRadius: '8px',
-                  backgroundColor: '#f9fafb'
-                }}>
-                  <div>
-                    <h3 style={{
-                      fontSize: '16px',
-                      fontWeight: '600',
-                      color: '#1a202c',
-                      marginBottom: '4px'
-                    }}>
-                      Mostrar Carrusel "Explora más cursos"
-                    </h3>
-                    <p style={{
-                      fontSize: '14px',
-                      color: '#6b7280',
-                      margin: 0
-                    }}>
-                      Activa o desactiva el carrusel de cursos relacionados en la página de detalle de curso
-                    </p>
-                  </div>
-                  <label style={{
-                    position: 'relative',
-                    display: 'inline-block',
-                    width: '52px',
-                    height: '28px',
-                    cursor: 'pointer'
-                  }}>
-                    <input
-                      type="checkbox"
-                      checked={settings.show_courses_carousel === true}
-                      onChange={(e) => updateSetting('show_courses_carousel', e.target.checked)}
-                      style={{
-                        opacity: 0,
-                        width: 0,
-                        height: 0
-                      }}
-                    />
-                    <span style={{
-                      position: 'absolute',
-                      top: 0,
-                      left: 0,
-                      right: 0,
-                      bottom: 0,
-                      backgroundColor: settings.show_courses_carousel === true ? '#667eea' : '#cbd5e0',
-                      borderRadius: '28px',
-                      transition: 'background-color 0.3s'
-                    }}>
-                      <span style={{
-                        position: 'absolute',
-                        content: '',
-                        height: '20px',
-                        width: '20px',
-                        left: settings.show_courses_carousel === true ? '28px' : '4px',
-                        bottom: '4px',
-                        backgroundColor: 'white',
-                        borderRadius: '50%',
-                        transition: 'left 0.3s'
-                      }}></span>
-                    </span>
-                  </label>
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-      )}
-
-      {showDeleteConfirm && editingUser && (
-        <div style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          background: 'rgba(0,0,0,0.6)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          zIndex: 1100
-        }}>
-          <div style={{
-            background: 'white',
-            borderRadius: '12px',
-            padding: '32px',
-            maxWidth: '480px',
-            width: '90%',
-            boxShadow: '0 20px 60px rgba(0,0,0,0.3)'
-          }}>
-            <div style={{
-              width: '56px',
-              height: '56px',
-              background: '#fee2e2',
-              borderRadius: '50%',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              margin: '0 auto 20px',
-              fontSize: '28px'
-            }}>
-              ⚠️
-            </div>
-
-            <h3 style={{
-              fontSize: '20px',
-              fontWeight: '600',
-              color: '#1a202c',
-              marginBottom: '12px',
-              textAlign: 'center'
-            }}>
-              ¿Eliminar usuario?
-            </h3>
-
-            <p style={{
-              fontSize: '14px',
-              color: '#6b7280',
-              textAlign: 'center',
-              marginBottom: '24px',
-              lineHeight: '1.6'
-            }}>
-              Estás a punto de eliminar al usuario <strong>{editingUser.name || editingUser.email}</strong>.
-              <br />
-              Esta acción no se puede deshacer.
-            </p>
-
-            <div style={{
-              display: 'flex',
-              gap: '12px',
-              justifyContent: 'center'
-            }}>
-              <button
-                onClick={() => setShowDeleteConfirm(false)}
-                disabled={deleting}
-                style={{
-                  padding: '10px 24px',
-                  background: '#f3f4f6',
-                  border: '1px solid #e5e7eb',
-                  borderRadius: '8px',
-                  fontSize: '14px',
-                  fontWeight: '600',
-                  cursor: deleting ? 'not-allowed' : 'pointer',
-                  color: '#374151',
-                  opacity: deleting ? 0.5 : 1
-                }}
-              >
-                Cancelar
-              </button>
-              <button
-                onClick={handleDeleteUser}
-                disabled={deleting}
-                style={{
-                  padding: '10px 24px',
-                  background: deleting ? '#fca5a5' : '#ef4444',
-                  border: 'none',
-                  borderRadius: '8px',
-                  fontSize: '14px',
-                  fontWeight: '600',
-                  cursor: deleting ? 'not-allowed' : 'pointer',
-                  color: 'white'
-                }}
-              >
-                {deleting ? 'Eliminando...' : 'Sí, eliminar'}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
