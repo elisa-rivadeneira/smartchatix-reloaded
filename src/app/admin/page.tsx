@@ -585,21 +585,21 @@ export default function AdminPanel() {
                     </div>
                   </div>
 
-                  <svg width="100%" height="180" viewBox="0 0 700 160" preserveAspectRatio="xMidYMid meet">
+                  <svg width="100%" height="180" viewBox="0 0 800 160" preserveAspectRatio="xMidYMid meet">
                     {/* Grid lines */}
                     {[0, 1, 2, 3, 4].map((i) => (
                       <line
                         key={i}
-                        x1="50"
+                        x1="40"
                         y1={i * 40}
-                        x2="700"
+                        x2="800"
                         y2={i * 40}
                         stroke="#f3f4f6"
                         strokeWidth="1"
                       />
                     ))}
 
-                    {/* Area bajo línea azul (Estudiantes) */}
+                    {/* Area bajo línea azul (Estudiantes) - Quincenal Ene-Ago */}
                     <defs>
                       <linearGradient id="blueGradient" x1="0%" y1="0%" x2="0%" y2="100%">
                         <stop offset="0%" style={{ stopColor: '#3b82f6', stopOpacity: 0.15 }} />
@@ -607,13 +607,13 @@ export default function AdminPanel() {
                       </linearGradient>
                     </defs>
                     <path
-                      d="M 50,90 L 150,75 L 250,95 L 350,70 L 450,80 L 550,65 L 650,55 L 700,50 L 700,160 L 50,160 Z"
+                      d="M 40,100 L 85,95 L 130,92 L 175,88 L 220,90 L 265,85 L 310,80 L 355,78 L 400,75 L 445,73 L 490,70 L 535,68 L 580,65 L 625,63 L 670,60 L 760,55 L 800,160 L 40,160 Z"
                       fill="url(#blueGradient)"
                     />
 
                     {/* Línea Azul (Estudiantes inscritos) */}
                     <path
-                      d="M 50,90 L 150,75 L 250,95 L 350,70 L 450,80 L 550,65 L 650,55 L 700,50"
+                      d="M 40,100 L 85,95 L 130,92 L 175,88 L 220,90 L 265,85 L 310,80 L 355,78 L 400,75 L 445,73 L 490,70 L 535,68 L 580,65 L 625,63 L 670,60 L 760,55"
                       fill="none"
                       stroke="#3b82f6"
                       strokeWidth="2.5"
@@ -621,22 +621,30 @@ export default function AdminPanel() {
                       strokeLinejoin="round"
                     />
 
-                    {/* Puntos línea azul */}
+                    {/* Puntos línea azul - Quincenal (2 por mes, 8 meses = 16 puntos) */}
                     {[
-                      { x: 50, y: 90 },
-                      { x: 150, y: 75 },
-                      { x: 250, y: 95 },
-                      { x: 350, y: 70 },
-                      { x: 450, y: 80 },
-                      { x: 550, y: 65 },
-                      { x: 650, y: 55 },
-                      { x: 700, y: 50 }
+                      { x: 40, y: 100 },   // Ene 1
+                      { x: 85, y: 95 },    // Ene 15
+                      { x: 130, y: 92 },   // Feb 1
+                      { x: 175, y: 88 },   // Feb 15
+                      { x: 220, y: 90 },   // Mar 1
+                      { x: 265, y: 85 },   // Mar 15
+                      { x: 310, y: 80 },   // Abr 1
+                      { x: 355, y: 78 },   // Abr 15
+                      { x: 400, y: 75 },   // May 1
+                      { x: 445, y: 73 },   // May 15
+                      { x: 490, y: 70 },   // Jun 1
+                      { x: 535, y: 68 },   // Jun 15
+                      { x: 580, y: 65 },   // Jul 1
+                      { x: 625, y: 63 },   // Jul 15
+                      { x: 670, y: 60 },   // Ago 1
+                      { x: 760, y: 55 }    // Ago 15
                     ].map((point, idx) => (
                       <circle
                         key={`blue-${idx}`}
                         cx={point.x}
                         cy={point.y}
-                        r="4"
+                        r="3.5"
                         fill="#fff"
                         stroke="#3b82f6"
                         strokeWidth="2.5"
@@ -651,13 +659,13 @@ export default function AdminPanel() {
                       </linearGradient>
                     </defs>
                     <path
-                      d="M 50,120 L 150,110 L 250,125 L 350,105 L 450,100 L 550,95 L 650,85 L 700,80 L 700,160 L 50,160 Z"
+                      d="M 40,125 L 85,122 L 130,120 L 175,118 L 220,120 L 265,115 L 310,112 L 355,110 L 400,108 L 445,105 L 490,103 L 535,100 L 580,98 L 625,95 L 670,92 L 760,88 L 800,160 L 40,160 Z"
                       fill="url(#purpleGradient)"
                     />
 
                     {/* Línea Morada (Cursos completados) */}
                     <path
-                      d="M 50,120 L 150,110 L 250,125 L 350,105 L 450,100 L 550,95 L 650,85 L 700,80"
+                      d="M 40,125 L 85,122 L 130,120 L 175,118 L 220,120 L 265,115 L 310,112 L 355,110 L 400,108 L 445,105 L 490,103 L 535,100 L 580,98 L 625,95 L 670,92 L 760,88"
                       fill="none"
                       stroke="#8b5cf6"
                       strokeWidth="2.5"
@@ -665,22 +673,30 @@ export default function AdminPanel() {
                       strokeLinejoin="round"
                     />
 
-                    {/* Puntos línea morada */}
+                    {/* Puntos línea morada - Quincenal */}
                     {[
-                      { x: 50, y: 120 },
-                      { x: 150, y: 110 },
-                      { x: 250, y: 125 },
-                      { x: 350, y: 105 },
-                      { x: 450, y: 100 },
-                      { x: 550, y: 95 },
-                      { x: 650, y: 85 },
-                      { x: 700, y: 80 }
+                      { x: 40, y: 125 },   // Ene 1
+                      { x: 85, y: 122 },   // Ene 15
+                      { x: 130, y: 120 },  // Feb 1
+                      { x: 175, y: 118 },  // Feb 15
+                      { x: 220, y: 120 },  // Mar 1
+                      { x: 265, y: 115 },  // Mar 15
+                      { x: 310, y: 112 },  // Abr 1
+                      { x: 355, y: 110 },  // Abr 15
+                      { x: 400, y: 108 },  // May 1
+                      { x: 445, y: 105 },  // May 15
+                      { x: 490, y: 103 },  // Jun 1
+                      { x: 535, y: 100 },  // Jun 15
+                      { x: 580, y: 98 },   // Jul 1
+                      { x: 625, y: 95 },   // Jul 15
+                      { x: 670, y: 92 },   // Ago 1
+                      { x: 760, y: 88 }    // Ago 15
                     ].map((point, idx) => (
                       <circle
                         key={`purple-${idx}`}
                         cx={point.x}
                         cy={point.y}
-                        r="4"
+                        r="3.5"
                         fill="#fff"
                         stroke="#8b5cf6"
                         strokeWidth="2.5"
@@ -693,8 +709,8 @@ export default function AdminPanel() {
                     display: 'flex',
                     justifyContent: 'space-between',
                     marginTop: '0.5rem',
-                    paddingLeft: '3rem',
-                    paddingRight: '0.5rem'
+                    paddingLeft: '2.5rem',
+                    paddingRight: '1.5rem'
                   }}>
                     {['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago'].map((month, idx) => (
                       <div key={idx} style={{
