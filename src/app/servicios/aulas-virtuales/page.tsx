@@ -490,28 +490,6 @@ export default function AulasVirtualesPage() {
                   ))}
                 </ul>
 
-                {/* CTA */}
-                <a
-                  href={card.link}
-                  style={{
-                    fontSize: '16px',
-                    color: card.titleColor,
-                    textDecoration: 'none',
-                    fontWeight: '500',
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: '0.5rem',
-                    transition: 'gap 0.2s ease'
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.gap = '0.75rem';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.gap = '0.5rem';
-                  }}
-                >
-                  Ver caso de uso →
-                </a>
               </div>
             ))}
           </div>

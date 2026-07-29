@@ -36,7 +36,7 @@ export default function Footer() {
           {/* Main Grid */}
           <div style={{
             display: 'grid',
-            gridTemplateColumns: '2fr 1fr 1fr 1fr 1.5fr',
+            gridTemplateColumns: '2fr 1fr 1fr 1.5fr',
             gap: '4rem',
             marginBottom: '4rem'
           }}>
@@ -112,54 +112,6 @@ export default function Footer() {
               </div>
             </div>
 
-            {/* Producto Column */}
-            <div>
-              <h3 style={{
-                fontSize: '16px',
-                fontWeight: '600',
-                marginBottom: '1.5rem',
-                color: '#ffffff',
-                letterSpacing: '-0.01em'
-              }}>
-                Producto
-              </h3>
-              <ul style={{
-                listStyle: 'none',
-                padding: 0,
-                margin: 0,
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '0.875rem'
-              }}>
-                {[
-                  { label: 'Funciones', href: '#' },
-                  { label: 'Casos de uso', href: '#' },
-                  { label: 'Precios', href: '#' }
-                ].map((item, idx) => (
-                  <li key={idx}>
-                    <Link
-                      href={item.href}
-                      style={{
-                        fontSize: '15px',
-                        color: 'rgba(255, 255, 255, 0.7)',
-                        textDecoration: 'none',
-                        transition: 'color 0.2s ease',
-                        fontWeight: '400'
-                      }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.color = '#8b5cf6';
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.color = 'rgba(255, 255, 255, 0.7)';
-                      }}
-                    >
-                      {item.label}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
             {/* Recursos Column */}
             <div>
               <h3 style={{
@@ -228,29 +180,52 @@ export default function Footer() {
                 gap: '0.875rem'
               }}>
                 {[
-                  { label: 'Nosotros', href: '#' },
-                  { label: 'Contacto', href: '#' },
+                  { label: 'Nosotros', href: '/nosotros' },
+                  { label: 'Contacto', href: 'https://wa.me/51968374191?text=Hola,%20me%20gustaría%20conocer%20cómo%20SmartChatix%20puede%20ayudar%20a%20mi%20empresa.%20¿Podrían%20brindarme%20más%20información?', external: true },
                   { label: 'Privacidad', href: '/politica-privacidad' }
                 ].map((item, idx) => (
                   <li key={idx}>
-                    <Link
-                      href={item.href}
-                      style={{
-                        fontSize: '15px',
-                        color: 'rgba(255, 255, 255, 0.7)',
-                        textDecoration: 'none',
-                        transition: 'color 0.2s ease',
-                        fontWeight: '400'
-                      }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.color = '#8b5cf6';
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.color = 'rgba(255, 255, 255, 0.7)';
-                      }}
-                    >
-                      {item.label}
-                    </Link>
+                    {item.external ? (
+                      <a
+                        href={item.href}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{
+                          fontSize: '15px',
+                          color: 'rgba(255, 255, 255, 0.7)',
+                          textDecoration: 'none',
+                          transition: 'color 0.2s ease',
+                          fontWeight: '400'
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.color = '#8b5cf6';
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.color = 'rgba(255, 255, 255, 0.7)';
+                        }}
+                      >
+                        {item.label}
+                      </a>
+                    ) : (
+                      <Link
+                        href={item.href}
+                        style={{
+                          fontSize: '15px',
+                          color: 'rgba(255, 255, 255, 0.7)',
+                          textDecoration: 'none',
+                          transition: 'color 0.2s ease',
+                          fontWeight: '400'
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.color = '#8b5cf6';
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.color = 'rgba(255, 255, 255, 0.7)';
+                        }}
+                      >
+                        {item.label}
+                      </Link>
+                    )}
                   </li>
                 ))}
               </ul>
