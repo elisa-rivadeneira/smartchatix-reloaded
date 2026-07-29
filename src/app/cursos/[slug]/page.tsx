@@ -4,6 +4,7 @@ import React from 'react';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import Footer from '@/components/Footer';
+import Header from '@/components/layout/Header';
 
 export default function CursoPage({ params }: { params: Promise<{ slug: string }> }) {
   const [showModal, setShowModal] = React.useState(false);
@@ -62,19 +63,19 @@ export default function CursoPage({ params }: { params: Promise<{ slug: string }
     setSidebarVisible(false);
 
     const handleScroll = () => {
-      const carrusel = document.querySelector('.related-courses-carousel');
+      const footer = document.querySelector('footer');
       const sticky = document.querySelector('.sticky-sidebar') as HTMLElement;
 
-      if (!carrusel || !sticky) return;
+      if (!footer || !sticky) return;
 
       const scrollY = window.scrollY || window.pageYOffset;
-      const carruselOffsetTop = (carrusel as HTMLElement).offsetTop;
+      const footerOffsetTop = footer.offsetTop;
       const stickyHeight = sticky.offsetHeight;
       const windowHeight = window.innerHeight;
       const stickyTopOffset = 80;
 
-      // Calcular en qué punto el sticky debería detenerse (antes del carrusel)
-      const stopPoint = carruselOffsetTop - stickyHeight - 20;
+      // Calcular en qué punto el sticky debería detenerse (antes del footer)
+      const stopPoint = footerOffsetTop - stickyHeight - 20;
 
       // Si el scroll ha llegado al punto donde debe detenerse
       if (scrollY + stickyTopOffset >= stopPoint) {
@@ -222,37 +223,7 @@ export default function CursoPage({ params }: { params: Promise<{ slug: string }
         }
       `}</style>
 
-      {/* Header Simple */}
-      <header style={{
-        backgroundColor: colors.white,
-        borderBottom: `2px solid ${colors.primary}`,
-        padding: `${spacing.sm} ${spacing.lg}`,
-        boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
-      }}>
-        <div style={{
-          maxWidth: '1200px',
-          margin: '0 auto',
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center'
-        }}>
-          <Link href="/" style={{ textDecoration: 'none' }}>
-            <img
-              src="/images/logo_samartchatix.png"
-              alt="SmartChatix Academy"
-              style={{ height: '65px', width: 'auto' }}
-            />
-          </Link>
-          <Link href="/" className="mobile-hidden" style={{
-            textDecoration: 'none',
-            color: colors.primary,
-            fontWeight: '600',
-            fontSize: '0.95rem'
-          }}>
-            ← Volver al inicio
-          </Link>
-        </div>
-      </header>
+      <Header showCursos={true} showServicios={false} courses={allCourses} />
 
       {/* Menú Hamburguesa Móvil */}
       <button

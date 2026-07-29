@@ -3,6 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import Footer from '@/components/Footer';
+import Header from '@/components/layout/Header';
 import { useCurrency } from '@/hooks/useCurrency';
 import SmartChatixBusiness from '@/components/sections/SmartChatixBusiness';
 
@@ -11,8 +12,6 @@ export default function SmartChatixPrincipalPage() {
 
   const [courses, setCourses] = React.useState<any[]>([]);
   const [showModal, setShowModal] = React.useState(false);
-  const [showServiciosMenu, setShowServiciosMenu] = React.useState(false);
-  const [showCursosMenu, setShowCursosMenu] = React.useState(false);
   const [showMobileMenu, setShowMobileMenu] = React.useState(false);
   const [videoOpacity1, setVideoOpacity1] = React.useState(1);
   const [videoOpacity2, setVideoOpacity2] = React.useState(0);
@@ -228,6 +227,8 @@ export default function SmartChatixPrincipalPage() {
       backgroundColor: colors.white,
       color: colors.gray[700]
     }}>
+      <Header showCursos={true} showServicios={false} courses={courses} />
+
       <style>{`
         @keyframes shine-sweep {
           0% {
@@ -393,305 +394,6 @@ export default function SmartChatixPrincipalPage() {
         }
       `}</style>
 
-      {/* HEADER ESTILO INSTITUCIONAL */}
-      <header className="desktop-sticky" style={{
-        backgroundColor: colors.white,
-        borderBottom: `1px solid ${colors.gray[200]}`,
-        position: 'sticky',
-        top: 0,
-        zIndex: 1000,
-        boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
-      }}>
-        {/* Top Bar */}
-        <div className="mobile-hidden" style={{
-          backgroundColor: colors.primary,
-          color: colors.white,
-          padding: `${spacing.xs} 0`,
-          fontSize: '0.8rem'
-        }}>
-          <div style={{
-            maxWidth: '1200px',
-            margin: '0 auto',
-            padding: `0 ${spacing.md}`,
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center'
-          }}>
-            <div>
-              📧 admin@smartchatix.com | 📞 +51 967 717 179
-            </div>
-            <div style={{ display: 'flex', gap: spacing.sm }}>
-              <span>🌐 ES</span>
-              <span>|</span>
-              <Link href="/login" style={{ color: 'inherit', textDecoration: 'none' }}>Ingresar</Link>
-            </div>
-          </div>
-        </div>
-
-        {/* Main Navigation */}
-        <div className="mobile-flex-col mobile-gap-md" style={{
-          maxWidth: '1200px',
-          margin: '0 auto',
-          padding: `${spacing.sm} ${spacing.md}`,
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center'
-        }}>
-          {/* Logo */}
-          <Link href="/" style={{
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '0.1rem',
-            textDecoration: 'none'
-          }}>
-            <img
-              src="/images/smartchatix_logov3.png"
-              alt="SMARTCHATIX"
-              style={{
-                height: '43px',
-                width: 'auto',
-                cursor: 'pointer'
-              }}
-            />
-            <div style={{
-              fontSize: '9px',
-              fontWeight: '600',
-              letterSpacing: '0.15em',
-              color: '#64748b',
-              textAlign: 'center',
-              textTransform: 'uppercase',
-              marginTop: '-0.25rem'
-            }}>
-              Interactúa <span style={{ margin: '0 0.35rem', color: '#8b5cf6' }}>•</span> Automatiza <span style={{ margin: '0 0.35rem', color: '#8b5cf6' }}>•</span> Evoluciona
-            </div>
-          </Link>
-
-          {/* Navigation Menu */}
-          <nav className="mobile-hidden" style={{
-            display: 'flex',
-            gap: spacing.xs,
-            alignItems: 'center'
-          }}>
-            {['Inicio', 'Servicios', 'Cursos', 'Nosotros', 'Contacto'].map((item, index) => {
-              if (item === 'Servicios') {
-                return (
-                  <div
-                    key={index}
-                    style={{ position: 'relative' }}
-                    onMouseEnter={() => setShowServiciosMenu(true)}
-                    onMouseLeave={() => setShowServiciosMenu(false)}
-                  >
-                    <a
-                      href="#"
-                      style={{
-                        textDecoration: 'none',
-                        color: colors.gray[600],
-                        fontWeight: '500',
-                        padding: `${spacing.xs} ${spacing.md}`,
-                        borderRadius: '6px',
-                        border: '2px solid transparent',
-                        transition: 'all 0.3s ease',
-                        display: 'inline-block'
-                      }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.border = `2px solid ${colors.primary}`;
-                        e.currentTarget.style.backgroundColor = colors.gray[50];
-                        e.currentTarget.style.color = colors.primary;
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.border = '2px solid transparent';
-                        e.currentTarget.style.backgroundColor = 'transparent';
-                        e.currentTarget.style.color = colors.gray[600];
-                      }}
-                    >
-                      {item} ▾
-                    </a>
-
-                    {showServiciosMenu && (
-                      <div style={{
-                        position: 'absolute',
-                        top: '100%',
-                        left: 0,
-                        paddingTop: '0.5rem',
-                        zIndex: 1000
-                      }}>
-                        <div style={{
-                          backgroundColor: colors.white,
-                          boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
-                          borderRadius: '8px',
-                          minWidth: '280px',
-                          padding: spacing.sm
-                        }}>
-                          <Link
-                            href="/servicios/aulas-virtuales"
-                            style={{
-                              display: 'block',
-                              padding: spacing.sm,
-                              textDecoration: 'none',
-                              color: colors.gray[700],
-                              borderRadius: '6px',
-                              transition: 'all 0.2s ease'
-                            }}
-                            onMouseEnter={(e) => {
-                              e.currentTarget.style.backgroundColor = colors.gray[50];
-                              e.currentTarget.style.color = colors.primary;
-                            }}
-                            onMouseLeave={(e) => {
-                              e.currentTarget.style.backgroundColor = 'transparent';
-                              e.currentTarget.style.color = colors.gray[700];
-                            }}
-                          >
-                            <div style={{ fontWeight: '600', marginBottom: '2px', fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                              🎓 Aulas Virtuales con IA
-                            </div>
-                            <div style={{ fontSize: '0.75rem', color: colors.gray[500] }}>
-                              Plataforma e-learning para colegios
-                            </div>
-                          </Link>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                );
-              }
-
-              if (item === 'Cursos') {
-                return (
-                  <div
-                    key={index}
-                    style={{ position: 'relative' }}
-                    onMouseEnter={() => setShowCursosMenu(true)}
-                    onMouseLeave={() => setShowCursosMenu(false)}
-                  >
-                    <a
-                      href="#"
-                      style={{
-                        textDecoration: 'none',
-                        color: colors.gray[600],
-                        fontWeight: '500',
-                        padding: `${spacing.xs} ${spacing.md}`,
-                        borderRadius: '6px',
-                        border: '2px solid transparent',
-                        transition: 'all 0.3s ease',
-                        display: 'inline-block'
-                      }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.border = `2px solid ${colors.primary}`;
-                        e.currentTarget.style.backgroundColor = colors.gray[50];
-                        e.currentTarget.style.color = colors.primary;
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.border = '2px solid transparent';
-                        e.currentTarget.style.backgroundColor = 'transparent';
-                        e.currentTarget.style.color = colors.gray[600];
-                      }}
-                    >
-                      {item} ▾
-                    </a>
-
-                    {showCursosMenu && (
-                      <div style={{
-                        position: 'absolute',
-                        top: '100%',
-                        left: 0,
-                        paddingTop: '0.5rem',
-                        zIndex: 1000
-                      }}>
-                        <div style={{
-                          backgroundColor: colors.white,
-                          boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
-                          borderRadius: '8px',
-                          minWidth: '320px',
-                          maxHeight: '400px',
-                          overflowY: 'auto',
-                          padding: spacing.sm
-                        }}>
-                          {courses.filter((course: any) => course.publication_status === 'published').map((course, idx) => (
-                            <Link
-                              key={idx}
-                              href={`/cursos/${course.slug}`}
-                              style={{
-                                display: 'block',
-                                padding: spacing.sm,
-                                textDecoration: 'none',
-                                color: colors.gray[700],
-                                borderRadius: '6px',
-                                transition: 'all 0.2s ease',
-                                borderBottom: idx < courses.filter((c: any) => c.publication_status === 'published').length - 1 ? `1px solid ${colors.gray[200]}` : 'none'
-                              }}
-                              onMouseEnter={(e) => {
-                                e.currentTarget.style.backgroundColor = colors.gray[50];
-                                e.currentTarget.style.color = colors.primary;
-                              }}
-                              onMouseLeave={(e) => {
-                                e.currentTarget.style.backgroundColor = 'transparent';
-                                e.currentTarget.style.color = colors.gray[700];
-                              }}
-                            >
-                              <div style={{ fontWeight: '600', marginBottom: '2px', fontSize: '0.9rem' }}>
-                                {course.title}
-                              </div>
-                              <div style={{ fontSize: '0.75rem', color: colors.gray[500] }}>
-                                {course.hours} • {loading ? 'S/ ' + course.priceGrabado : symbol + ' ' + convertPrice(course.priceGrabado || 0)}
-                              </div>
-                            </Link>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                );
-              }
-
-              return (
-                <a
-                  key={index}
-                  href="#"
-                  style={{
-                    textDecoration: 'none',
-                    color: colors.gray[600],
-                    fontWeight: '500',
-                    padding: `${spacing.xs} ${spacing.md}`,
-                    borderRadius: '6px',
-                    border: '2px solid transparent',
-                    borderBottom: index === 0 ? `2px solid ${colors.accent}` : 'none',
-                    transition: 'all 0.3s ease'
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.border = `2px solid ${colors.primary}`;
-                    e.currentTarget.style.backgroundColor = colors.gray[50];
-                    e.currentTarget.style.color = colors.primary;
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.border = '2px solid transparent';
-                    e.currentTarget.style.backgroundColor = 'transparent';
-                    e.currentTarget.style.color = colors.gray[600];
-                    if (index === 0) {
-                      e.currentTarget.style.borderBottom = `2px solid ${colors.accent}`;
-                    }
-                  }}
-                >
-                  {item}
-                </a>
-              );
-            })}
-
-            <button style={{
-              backgroundColor: colors.accent,
-              color: colors.white,
-              border: 'none',
-              padding: `${spacing.xs} ${spacing.md}`,
-              borderRadius: '6px',
-              fontWeight: '600',
-              cursor: 'pointer',
-              fontSize: '0.9rem'
-            }}>
-              Inscríbete Hoy
-            </button>
-          </nav>
-        </div>
-      </header>
-
       {/* HERO SECTION ESTILO INSTITUCIONAL CON SLIDER */}
       <section className="mobile-p-md mobile-min-h-auto" style={{
         color: colors.white,
@@ -764,8 +466,20 @@ export default function SmartChatixPrincipalPage() {
               left: 0,
               width: '100%',
               height: '100%',
-              background: 'linear-gradient(135deg, rgba(0, 20, 40, 0.75) 0%, rgba(0, 0, 0, 0.8) 100%)',
+              backgroundImage: 'url(/images/background_hero.png)',
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
+              opacity: 0.6,
               zIndex: 1
+            }}></div>
+            <div style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              width: '100%',
+              height: '100%',
+              background: 'rgba(7, 10, 35, 0.4)',
+              zIndex: 2
             }}></div>
           </div>
 

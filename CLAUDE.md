@@ -135,6 +135,73 @@ Debe retornar: `HTTP/1.1 200 OK`
   - Usado en el Header con Next.js Image component
   - Dimensiones en código: width={120} height={40}
 
+## Header - Menús Segmentados por Audiencia
+
+**Estrategia:** El proyecto tiene 2 audiencias diferentes:
+- **B2B (Servicios)**: Colegios/instituciones → Aulas Virtuales
+- **B2C (Cursos)**: Profesionales → Cursos de IA
+
+**Componente unificado:** `/src/components/layout/Header.tsx`
+
+### Configuración por tipo de página
+
+#### 1. Páginas de CURSOS (B2C)
+```tsx
+import Header from '@/components/layout/Header';
+
+<Header showCursos={true} showServicios={false} courses={courses} />
+```
+**Menú muestra:** Inicio, Cursos (dropdown), Nosotros, Contacto
+
+**Ejemplos:**
+- `/src/app/page.tsx` (index)
+- `/src/app/cursos/[slug]/page.tsx`
+
+#### 2. Páginas de SERVICIOS (B2B)
+```tsx
+import Header from '@/components/layout/Header';
+
+<Header showCursos={false} showServicios={true} />
+// O simplemente:
+<Header />  // Por defecto muestra Servicios
+```
+**Menú muestra:** Inicio, Servicios (dropdown), Nosotros, Contacto
+
+**Ejemplos:**
+- `/src/app/servicios/aulas-virtuales/page.tsx`
+
+#### 3. Páginas mixtas (si es necesario)
+```tsx
+<Header showCursos={true} showServicios={true} courses={courses} />
+```
+
+### Props disponibles
+
+| Prop | Tipo | Default | Descripción |
+|------|------|---------|-------------|
+| `showCursos` | boolean | `false` | Muestra menú dropdown de Cursos |
+| `showServicios` | boolean | `true` | Muestra menú dropdown de Servicios |
+| `courses` | array | `[]` | Lista de cursos para el dropdown (requerido si showCursos=true) |
+
+### Obtener lista de cursos
+
+```tsx
+const [courses, setCourses] = React.useState<any[]>([]);
+
+React.useEffect(() => {
+  fetch('/api/public/courses')
+    .then(res => res.json())
+    .then(data => setCourses(data.courses || []))
+    .catch(err => console.error('Error fetching courses:', err));
+}, []);
+```
+
+### ⚠️ Importante
+
+- **NO crear headers embebidos** - Siempre usar el componente Header
+- **Segmentar audiencias** - No mostrar Cursos en páginas B2B y viceversa
+- **Un solo archivo** - Todos los cambios en `/src/components/layout/Header.tsx`
+
 ## Comandos útiles
 
 - Lint: `npm run lint` (si está configurado)

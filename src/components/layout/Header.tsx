@@ -4,41 +4,54 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 
-const navigation = [
-  {
-    name: 'Inicio',
-    href: '/',
-  },
-  {
-    name: 'Servicios',
-    href: '/servicios',
-    children: [
-      { name: 'Aulas Virtuales', href: '/servicios/aulas-virtuales' },
-      { name: 'Capacitación Empresarial', href: '/servicios/capacitacion' },
-    ],
-  },
-  {
-    name: 'Cursos',
-    href: '/cursos',
-    children: [
-      { name: 'Todos los Cursos', href: '/cursos' },
-      { name: 'Más Populares', href: '/cursos?filter=popular' },
-      { name: 'Nuevos', href: '/cursos?filter=new' },
-    ],
-  },
-  {
-    name: 'Nosotros',
-    href: '/nosotros',
-  },
-  {
-    name: 'Contacto',
-    href: '/contacto',
-  },
-];
+interface HeaderProps {
+  showCursos?: boolean;
+  showServicios?: boolean;
+  courses?: any[];
+}
 
-const Header: React.FC = () => {
+const Header: React.FC<HeaderProps> = ({
+  showCursos = false,
+  showServicios = true,
+  courses = []
+}) => {
   const [isOpen, setIsOpen] = useState(false);
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
+
+  const navigationItems = [
+    {
+      name: 'Inicio',
+      href: '/',
+      show: true
+    },
+    {
+      name: 'Servicios',
+      href: '/servicios',
+      show: showServicios,
+      children: [
+        { name: 'Aulas Virtuales', href: '/servicios/aulas-virtuales' },
+      ],
+    },
+    {
+      name: 'Cursos',
+      href: '#',
+      show: showCursos,
+      type: 'cursos'
+    },
+    {
+      name: 'Nosotros',
+      href: '/nosotros',
+      show: true
+    },
+    {
+      name: 'Contacto',
+      href: 'https://wa.me/51968374191?text=Hola,%20me%20gustaría%20conocer%20cómo%20SmartChatix%20puede%20ayudar%20a%20mi%20empresa.%20¿Podrían%20brindarme%20más%20información?',
+      external: true,
+      show: true
+    },
+  ];
+
+  const navigation = navigationItems.filter(item => item.show);
 
   return (
     <header style={{
@@ -120,7 +133,7 @@ const Header: React.FC = () => {
                   width={480}
                   height={120}
                   quality={100}
-                  style={{ height: '2.7rem', width: 'auto', objectFit: 'contain' }}
+                  style={{ height: '2.43rem', width: 'auto', objectFit: 'contain' }}
                   priority
                 />
                 <div style={{
@@ -141,9 +154,9 @@ const Header: React.FC = () => {
             {/* Desktop Navigation */}
             <div style={{ display: 'none' }} className="desktop-nav">
               <div style={{ display: 'flex', alignItems: 'center', gap: '2rem' }}>
-                {navigation.map((item) => (
+                {navigation.map((item: any) => (
                   <div key={item.name} style={{ position: 'relative' }}>
-                    {item.children ? (
+                    {item.type === 'cursos' ? (
                       <div style={{ position: 'relative' }}>
                         <button
                           style={{
@@ -166,7 +179,75 @@ const Header: React.FC = () => {
                           <span style={{ fontSize: '12px' }}>▼</span>
                         </button>
 
-                        {/* Dropdown */}
+                        {openDropdown === item.name && (
+                          <div
+                            style={{
+                              position: 'absolute',
+                              left: 0,
+                              top: '100%',
+                              marginTop: '0.25rem',
+                              width: '20rem',
+                              background: '#fff',
+                              borderRadius: '0.5rem',
+                              boxShadow: '0 10px 25px rgba(0,0,0,0.1)',
+                              border: '1px solid #e5e7eb',
+                              padding: '0.5rem 0',
+                              zIndex: 50,
+                              maxHeight: '400px',
+                              overflowY: 'auto'
+                            }}
+                            onMouseEnter={() => setOpenDropdown(item.name)}
+                            onMouseLeave={() => setOpenDropdown(null)}
+                          >
+                            {courses.filter((course: any) => course.publication_status === 'published').map((course: any) => (
+                              <Link
+                                key={course.slug}
+                                href={`/cursos/${course.slug}`}
+                                style={{
+                                  display: 'block',
+                                  padding: '0.5rem 1rem',
+                                  fontSize: '14px',
+                                  color: '#374151',
+                                  textDecoration: 'none',
+                                  transition: 'background 0.2s'
+                                }}
+                                onMouseEnter={(e) => e.currentTarget.style.background = '#f3f4f6'}
+                                onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
+                              >
+                                <div style={{ fontWeight: '600', marginBottom: '2px' }}>
+                                  {course.title}
+                                </div>
+                                <div style={{ fontSize: '12px', color: '#6b7280' }}>
+                                  {course.hours}
+                                </div>
+                              </Link>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    ) : item.children ? (
+                      <div style={{ position: 'relative' }}>
+                        <button
+                          style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '0.25rem',
+                            padding: '0.5rem 0.75rem',
+                            fontSize: '14px',
+                            fontWeight: '500',
+                            color: '#374151',
+                            background: 'transparent',
+                            border: 'none',
+                            cursor: 'pointer',
+                            transition: 'color 0.2s'
+                          }}
+                          onMouseEnter={() => setOpenDropdown(item.name)}
+                          onMouseLeave={() => setOpenDropdown(null)}
+                        >
+                          <span>{item.name}</span>
+                          <span style={{ fontSize: '12px' }}>▼</span>
+                        </button>
+
                         {openDropdown === item.name && (
                           <div
                             style={{
@@ -185,7 +266,7 @@ const Header: React.FC = () => {
                             onMouseEnter={() => setOpenDropdown(item.name)}
                             onMouseLeave={() => setOpenDropdown(null)}
                           >
-                            {item.children.map((child) => (
+                            {item.children.map((child: any) => (
                               <Link
                                 key={child.name}
                                 href={child.href}
@@ -206,6 +287,22 @@ const Header: React.FC = () => {
                           </div>
                         )}
                       </div>
+                    ) : item.external ? (
+                      <a
+                        href={item.href}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{
+                          padding: '0.5rem 0.75rem',
+                          fontSize: '14px',
+                          fontWeight: '500',
+                          color: '#374151',
+                          textDecoration: 'none',
+                          transition: 'color 0.2s'
+                        }}
+                      >
+                        {item.name}
+                      </a>
                     ) : (
                       <Link
                         href={item.href}
@@ -228,7 +325,12 @@ const Header: React.FC = () => {
 
             {/* CTA Button */}
             <div style={{ display: 'none' }} className="desktop-nav">
-              <Link href="/register">
+              <a
+                href="https://wa.me/51968374191?text=Hola,%20me%20gustaría%20conocer%20cómo%20SmartChatix%20puede%20ayudar%20a%20mi%20empresa.%20¿Podrían%20brindarme%20más%20información?"
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{ textDecoration: 'none' }}
+              >
                 <button
                   style={{
                     background: '#FF6600',
@@ -248,9 +350,9 @@ const Header: React.FC = () => {
                     e.currentTarget.style.background = '#FF6600';
                   }}
                 >
-                  Solicitar demostración
+                  Conversemos
                 </button>
-              </Link>
+              </a>
             </div>
 
             {/* Mobile menu button */}
@@ -278,9 +380,9 @@ const Header: React.FC = () => {
           {isOpen && (
             <div className="mobile-nav" style={{ paddingBottom: '1rem' }}>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
-                {navigation.map((item) => (
+                {navigation.map((item: any) => (
                   <div key={item.name}>
-                    {item.children ? (
+                    {item.type === 'cursos' ? (
                       <div>
                         <button
                           onClick={() => setOpenDropdown(openDropdown === item.name ? null : item.name)}
@@ -304,7 +406,50 @@ const Header: React.FC = () => {
                         </button>
                         {openDropdown === item.name && (
                           <div style={{ paddingLeft: '1rem' }}>
-                            {item.children.map((child) => (
+                            {courses.filter((course: any) => course.publication_status === 'published').map((course: any) => (
+                              <Link
+                                key={course.slug}
+                                href={`/cursos/${course.slug}`}
+                                style={{
+                                  display: 'block',
+                                  padding: '0.5rem 0.75rem',
+                                  fontSize: '14px',
+                                  color: '#6b7280',
+                                  textDecoration: 'none'
+                                }}
+                                onClick={() => setIsOpen(false)}
+                              >
+                                {course.title}
+                              </Link>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    ) : item.children ? (
+                      <div>
+                        <button
+                          onClick={() => setOpenDropdown(openDropdown === item.name ? null : item.name)}
+                          style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'space-between',
+                            width: '100%',
+                            padding: '0.5rem 0.75rem',
+                            fontSize: '16px',
+                            fontWeight: '500',
+                            color: '#374151',
+                            background: 'transparent',
+                            border: 'none',
+                            textAlign: 'left',
+                            cursor: 'pointer'
+                          }}
+                        >
+                          <span>{item.name}</span>
+                          <span style={{ fontSize: '12px' }}>{openDropdown === item.name ? '▲' : '▼'}</span>
+                        </button>
+                        {openDropdown === item.name && (
+                          <div style={{ paddingLeft: '1rem' }}>
+                            {item.children.map((child: any) => (
                               <Link
                                 key={child.name}
                                 href={child.href}
@@ -323,6 +468,23 @@ const Header: React.FC = () => {
                           </div>
                         )}
                       </div>
+                    ) : item.external ? (
+                      <a
+                        href={item.href}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{
+                          display: 'block',
+                          padding: '0.5rem 0.75rem',
+                          fontSize: '16px',
+                          fontWeight: '500',
+                          color: '#374151',
+                          textDecoration: 'none'
+                        }}
+                        onClick={() => setIsOpen(false)}
+                      >
+                        {item.name}
+                      </a>
                     ) : (
                       <Link
                         href={item.href}
