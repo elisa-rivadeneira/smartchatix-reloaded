@@ -18,6 +18,7 @@ export default function CursoPage({ params }: { params: Promise<{ slug: string }
   const [loading, setLoading] = React.useState(true);
   const [sidebarVisible, setSidebarVisible] = React.useState(false);
   const [showCarousel, setShowCarousel] = React.useState(true);
+  const [sidebarZIndex, setSidebarZIndex] = React.useState(999);
 
   React.useEffect(() => {
     params.then(async ({ slug }) => {
@@ -73,6 +74,13 @@ export default function CursoPage({ params }: { params: Promise<{ slug: string }
       const stickyHeight = sticky.offsetHeight;
       const windowHeight = window.innerHeight;
       const stickyTopOffset = 80;
+
+      // Ajustar z-index según scroll: si está arriba (scrollY < 100), z-index bajo
+      if (scrollY < 100) {
+        setSidebarZIndex(999);
+      } else {
+        setSidebarZIndex(1001);
+      }
 
       // Calcular en qué punto el sticky debería detenerse (antes del footer)
       const stopPoint = footerOffsetTop - stickyHeight - 20;
@@ -158,7 +166,6 @@ export default function CursoPage({ params }: { params: Promise<{ slug: string }
         .sticky-sidebar {
           right: max(calc((100vw - 1200px) / 2), 20px);
           width: 380px;
-          z-index: 50;
         }
         @media (max-width: 1024px) {
           .sticky-sidebar {
@@ -329,7 +336,8 @@ export default function CursoPage({ params }: { params: Promise<{ slug: string }
       {sidebarVisible && (
       <aside className="sticky-sidebar" style={{
         position: stickyPosition,
-        top: `${stickyTop}px`
+        top: `${stickyTop}px`,
+        zIndex: sidebarZIndex
       }}>
         <div className="floating-card" style={{
           background: 'linear-gradient(135deg, #003366 0%, #0066CC 100%)',

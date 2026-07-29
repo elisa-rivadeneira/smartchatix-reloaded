@@ -3,7 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Linkedin, Youtube, Facebook, Mail, MapPin } from 'lucide-react';
+import { Linkedin, Facebook, Mail, MapPin } from 'lucide-react';
 
 export default function Footer() {
   return (
@@ -72,15 +72,16 @@ export default function Footer() {
                 alignItems: 'center'
               }}>
                 {[
-                  { icon: Linkedin, href: '#', label: 'LinkedIn' },
-                  { icon: Youtube, href: '#', label: 'YouTube' },
-                  { icon: Facebook, href: '#', label: 'Facebook' }
+                  { icon: Linkedin, href: 'https://www.linkedin.com/company/107201411/', label: 'LinkedIn' },
+                  { icon: Facebook, href: 'https://www.facebook.com/profile.php?id=61558066553571', label: 'Facebook' }
                 ].map((social, idx) => {
                   const Icon = social.icon;
                   return (
                     <a
                       key={idx}
                       href={social.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
                       aria-label={social.label}
                       style={{
                         width: '40px',
