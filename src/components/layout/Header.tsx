@@ -29,7 +29,7 @@ const Header: React.FC<HeaderProps> = ({
       href: '/servicios',
       show: showServicios,
       children: [
-        { name: 'Aulas Virtuales', href: '/servicios/aulas-virtuales' },
+        { name: 'Aulas Virtuales con IA', href: '/servicios/aulas-virtuales' },
       ],
     },
     {
@@ -185,43 +185,49 @@ const Header: React.FC<HeaderProps> = ({
                               position: 'absolute',
                               left: 0,
                               top: '100%',
-                              marginTop: '0.25rem',
+                              paddingTop: '0.5rem',
                               width: '20rem',
-                              background: '#fff',
-                              borderRadius: '0.5rem',
-                              boxShadow: '0 10px 25px rgba(0,0,0,0.1)',
-                              border: '1px solid #e5e7eb',
-                              padding: '0.5rem 0',
-                              zIndex: 50,
-                              maxHeight: '400px',
-                              overflowY: 'auto'
+                              background: 'transparent',
+                              zIndex: 50
                             }}
                             onMouseEnter={() => setOpenDropdown(item.name)}
                             onMouseLeave={() => setOpenDropdown(null)}
                           >
-                            {courses.filter((course: any) => course.publication_status === 'published').map((course: any) => (
-                              <Link
-                                key={course.slug}
-                                href={`/cursos/${course.slug}`}
-                                style={{
-                                  display: 'block',
-                                  padding: '0.5rem 1rem',
-                                  fontSize: '14px',
-                                  color: '#374151',
-                                  textDecoration: 'none',
-                                  transition: 'background 0.2s'
-                                }}
-                                onMouseEnter={(e) => e.currentTarget.style.background = '#f3f4f6'}
-                                onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
-                              >
-                                <div style={{ fontWeight: '600', marginBottom: '2px' }}>
-                                  {course.title}
-                                </div>
-                                <div style={{ fontSize: '12px', color: '#6b7280' }}>
-                                  {course.hours}
-                                </div>
-                              </Link>
-                            ))}
+                            <div
+                              style={{
+                                background: '#fff',
+                                borderRadius: '0.5rem',
+                                boxShadow: '0 10px 25px rgba(0,0,0,0.1)',
+                                border: '1px solid #e5e7eb',
+                                padding: '0.5rem 0',
+                                maxHeight: '400px',
+                                overflowY: 'auto'
+                              }}
+                            >
+                              {courses.filter((course: any) => course.publication_status === 'published').map((course: any) => (
+                                <Link
+                                  key={course.slug}
+                                  href={`/cursos/${course.slug}`}
+                                  style={{
+                                    display: 'block',
+                                    padding: '0.5rem 1rem',
+                                    fontSize: '14px',
+                                    color: '#374151',
+                                    textDecoration: 'none',
+                                    transition: 'background 0.2s'
+                                  }}
+                                  onMouseEnter={(e) => e.currentTarget.style.background = '#f3f4f6'}
+                                  onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
+                                >
+                                  <div style={{ fontWeight: '600', marginBottom: '2px' }}>
+                                    {course.title}
+                                  </div>
+                                  <div style={{ fontSize: '12px', color: '#6b7280' }}>
+                                    {course.hours}
+                                  </div>
+                                </Link>
+                              ))}
+                            </div>
                           </div>
                         )}
                       </div>
@@ -254,36 +260,42 @@ const Header: React.FC<HeaderProps> = ({
                               position: 'absolute',
                               left: 0,
                               top: '100%',
-                              marginTop: '0.25rem',
+                              paddingTop: '0.5rem',
                               width: '16rem',
-                              background: '#fff',
-                              borderRadius: '0.5rem',
-                              boxShadow: '0 10px 25px rgba(0,0,0,0.1)',
-                              border: '1px solid #e5e7eb',
-                              padding: '0.5rem 0',
+                              background: 'transparent',
                               zIndex: 50
                             }}
                             onMouseEnter={() => setOpenDropdown(item.name)}
                             onMouseLeave={() => setOpenDropdown(null)}
                           >
-                            {item.children.map((child: any) => (
-                              <Link
-                                key={child.name}
-                                href={child.href}
-                                style={{
-                                  display: 'block',
-                                  padding: '0.5rem 1rem',
-                                  fontSize: '14px',
-                                  color: '#374151',
-                                  textDecoration: 'none',
-                                  transition: 'background 0.2s'
-                                }}
-                                onMouseEnter={(e) => e.currentTarget.style.background = '#f3f4f6'}
-                                onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
-                              >
-                                {child.name}
-                              </Link>
-                            ))}
+                            <div
+                              style={{
+                                background: '#fff',
+                                borderRadius: '0.5rem',
+                                boxShadow: '0 10px 25px rgba(0,0,0,0.1)',
+                                border: '1px solid #e5e7eb',
+                                padding: '0.5rem 0'
+                              }}
+                            >
+                              {item.children.map((child: any) => (
+                                <Link
+                                  key={child.name}
+                                  href={child.href}
+                                  style={{
+                                    display: 'block',
+                                    padding: '0.5rem 1rem',
+                                    fontSize: '14px',
+                                    color: '#374151',
+                                    textDecoration: 'none',
+                                    transition: 'background 0.2s'
+                                  }}
+                                  onMouseEnter={(e) => e.currentTarget.style.background = '#f3f4f6'}
+                                  onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
+                                >
+                                  {child.name}
+                                </Link>
+                              ))}
+                            </div>
                           </div>
                         )}
                       </div>

@@ -227,7 +227,7 @@ export default function SmartChatixPrincipalPage() {
       backgroundColor: colors.white,
       color: colors.gray[700]
     }}>
-      <Header showCursos={true} showServicios={false} courses={courses} />
+      <Header showCursos={true} showServicios={true} courses={courses} />
 
       <style>{`
         @keyframes shine-sweep {
