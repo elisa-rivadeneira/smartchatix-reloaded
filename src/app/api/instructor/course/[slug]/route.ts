@@ -19,9 +19,16 @@ export async function GET(
 
     const { slug } = await params;
 
-    const courseData = await query(`
-      SELECT * FROM courses WHERE slug = ? AND instructor_id = ?
-    `, [slug, decoded.id]);
+    let courseData;
+    if (decoded.role === 'admin') {
+      courseData = await query(`
+        SELECT * FROM courses WHERE slug = ?
+      `, [slug]);
+    } else {
+      courseData = await query(`
+        SELECT * FROM courses WHERE slug = ? AND instructor_id = ?
+      `, [slug, decoded.id]);
+    }
 
     if (!courseData || courseData.length === 0) {
       return NextResponse.json({ error: 'Curso no encontrado' }, { status: 404 });
@@ -76,9 +83,16 @@ export async function DELETE(
 
     const { slug } = await params;
 
-    const courseData = await query(`
-      SELECT id, title FROM courses WHERE slug = ? AND instructor_id = ?
-    `, [slug, decoded.id]);
+    let courseData;
+    if (decoded.role === 'admin') {
+      courseData = await query(`
+        SELECT id, title FROM courses WHERE slug = ?
+      `, [slug]);
+    } else {
+      courseData = await query(`
+        SELECT id, title FROM courses WHERE slug = ? AND instructor_id = ?
+      `, [slug, decoded.id]);
+    }
 
     if (!courseData || courseData.length === 0) {
       return NextResponse.json({ error: 'Curso no encontrado' }, { status: 404 });

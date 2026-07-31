@@ -155,6 +155,26 @@ export async function PATCH(
     const updates: string[] = [];
     const values: any[] = [];
 
+    if (body.title !== undefined) {
+      updates.push('title = ?');
+      values.push(body.title);
+    }
+
+    if (body.description !== undefined) {
+      updates.push('description = ?');
+      values.push(body.description);
+    }
+
+    if (typeof body.price_vivo === 'number') {
+      updates.push('price_vivo = ?');
+      values.push(body.price_vivo);
+    }
+
+    if (typeof body.price_grabado === 'number') {
+      updates.push('price_grabado = ?');
+      values.push(body.price_grabado);
+    }
+
     if (typeof body.is_certification_enabled === 'boolean') {
       updates.push('is_certification_enabled = ?');
       values.push(body.is_certification_enabled);

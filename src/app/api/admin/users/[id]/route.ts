@@ -1,38 +1,70 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { query } from '@/lib/db';
+import { verifyToken } from '@/lib/auth';
 
 export async function PATCH(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const token = request.cookies.get('auth_token')?.value;
+    if (!token) {
+      return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
+    }
+
+    const decoded = verifyToken(token);
+    if (!decoded || decoded.role !== 'admin') {
+      return NextResponse.json({ error: 'Acceso denegado' }, { status: 403 });
+    }
+
     const { id } = await params;
     const userId = parseInt(id);
     const body = await request.json();
-    const { name, email } = body;
 
-    if (!email) {
-      return NextResponse.json(
-        { error: 'El email es obligatorio' },
-        { status: 400 }
-      );
+    const updates: string[] = [];
+    const values: any[] = [];
+
+    if (body.name !== undefined) {
+      updates.push('name = ?');
+      values.push(body.name);
     }
 
-    const existingUser = await query(
-      'SELECT id FROM users WHERE email = ? AND id != ?',
-      [email, userId]
-    );
-
-    if (existingUser && existingUser.length > 0) {
-      return NextResponse.json(
-        { error: 'Ya existe otro usuario con ese email' },
-        { status: 400 }
+    if (body.email !== undefined) {
+      const existingUser = await query(
+        'SELECT id FROM users WHERE email = ? AND id != ?',
+        [body.email, userId]
       );
+
+      if (existingUser && existingUser.length > 0) {
+        return NextResponse.json(
+          { error: 'Ya existe otro usuario con ese email' },
+          { status: 400 }
+        );
+      }
+
+      updates.push('email = ?');
+      values.push(body.email);
     }
+
+    if (body.role !== undefined && ['student', 'instructor', 'admin'].includes(body.role)) {
+      updates.push('role = ?');
+      values.push(body.role);
+    }
+
+    if (typeof body.is_active === 'boolean') {
+      updates.push('is_active = ?');
+      values.push(body.is_active);
+    }
+
+    if (updates.length === 0) {
+      return NextResponse.json({ error: 'No hay cambios para actualizar' }, { status: 400 });
+    }
+
+    values.push(userId);
 
     await query(
-      'UPDATE users SET name = ?, email = ? WHERE id = ?',
-      [name || 'Usuario', email, userId]
+      `UPDATE users SET ${updates.join(', ')} WHERE id = ?`,
+      values
     );
 
     return NextResponse.json({
