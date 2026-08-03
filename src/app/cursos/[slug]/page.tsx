@@ -5,8 +5,10 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import Footer from '@/components/Footer';
 import Header from '@/components/layout/Header';
+import { useCurrency } from '@/hooks/useCurrency';
 
 export default function CursoPage({ params }: { params: Promise<{ slug: string }> }) {
+  const { currency, symbol, exchangeRate } = useCurrency();
   const [showModal, setShowModal] = React.useState(false);
   const [showMobileMenu, setShowMobileMenu] = React.useState(false);
   const [slug, setSlug] = React.useState<string>('');
@@ -19,6 +21,19 @@ export default function CursoPage({ params }: { params: Promise<{ slug: string }
   const [sidebarVisible, setSidebarVisible] = React.useState(false);
   const [showCarousel, setShowCarousel] = React.useState(true);
   const [sidebarZIndex, setSidebarZIndex] = React.useState(999);
+
+  const getPrice = (penPrice: number, usdPrice?: number | null): number => {
+    if (currency === 'USD') {
+      return usdPrice !== null && usdPrice !== undefined
+        ? usdPrice
+        : Math.round((penPrice / exchangeRate) * 100) / 100;
+    }
+    return penPrice;
+  };
+
+  const formatPrice = (price: number): string => {
+    return `${symbol} ${price}`;
+  };
 
   React.useEffect(() => {
     params.then(async ({ slug }) => {
@@ -405,15 +420,23 @@ export default function CursoPage({ params }: { params: Promise<{ slug: string }
                   fontWeight: '700',
                   color: colors.white
                 }}>
-                  S/ {curso.hasLiveMode ? curso.priceVivo : curso.priceGrabado}
+                  {formatPrice(getPrice(
+                    curso.hasLiveMode ? curso.priceVivo : curso.priceGrabado,
+                    curso.hasLiveMode ? curso.priceVivoUsd : curso.priceGrabadoUsd
+                  ))}
                 </span>
-                <span style={{
-                  fontSize: '1.2rem',
-                  color: 'rgba(255,255,255,0.5)',
-                  textDecoration: 'line-through'
-                }}>
-                  S/ {curso.hasLiveMode ? curso.oldPriceVivo : curso.oldPriceGrabado}
-                </span>
+                {(curso.hasLiveMode ? curso.priceVivoOld : curso.priceGrabadoOld) && (
+                  <span style={{
+                    fontSize: '1.2rem',
+                    color: 'rgba(255,255,255,0.5)',
+                    textDecoration: 'line-through'
+                  }}>
+                    {formatPrice(getPrice(
+                      curso.hasLiveMode ? curso.priceVivoOld : curso.priceGrabadoOld,
+                      curso.hasLiveMode ? curso.priceVivoUsdOld : curso.priceGrabadoUsdOld
+                    ))}
+                  </span>
+                )}
               </div>
             </div>
             <div style={{
@@ -867,15 +890,17 @@ export default function CursoPage({ params }: { params: Promise<{ slug: string }
                       color: colors.accent,
                       marginBottom: '2px'
                     }}>
-                      S/ {curso.priceVivo}
+                      {formatPrice(getPrice(curso.priceVivo, curso.priceVivoUsd))}
                     </div>
-                    <div style={{
-                      fontSize: '0.85rem',
-                      color: colors.gray[400],
-                      textDecoration: 'line-through'
-                    }}>
-                      S/ {curso.oldPriceVivo}
-                    </div>
+                    {curso.priceVivoOld && (
+                      <div style={{
+                        fontSize: '0.85rem',
+                        color: colors.gray[400],
+                        textDecoration: 'line-through'
+                      }}>
+                        {formatPrice(getPrice(curso.priceVivoOld, curso.priceVivoUsdOld))}
+                      </div>
+                    )}
                   </div>
 
                   <ul style={{
@@ -936,15 +961,17 @@ export default function CursoPage({ params }: { params: Promise<{ slug: string }
                         color: colors.primary,
                         marginBottom: '2px'
                       }}>
-                        S/ {curso.priceGrabado}
+                        {formatPrice(getPrice(curso.priceGrabado, curso.priceGrabadoUsd))}
                       </div>
-                      <div style={{
-                        fontSize: '0.85rem',
-                        color: colors.gray[400],
-                        textDecoration: 'line-through'
-                      }}>
-                        S/ {curso.oldPriceGrabado}
-                      </div>
+                      {curso.priceGrabadoOld && (
+                        <div style={{
+                          fontSize: '0.85rem',
+                          color: colors.gray[400],
+                          textDecoration: 'line-through'
+                        }}>
+                          {formatPrice(getPrice(curso.priceGrabadoOld, curso.priceGrabadoUsdOld))}
+                        </div>
+                      )}
                     </div>
                   )}
 
@@ -1116,7 +1143,7 @@ export default function CursoPage({ params }: { params: Promise<{ slug: string }
                             fontWeight: '700',
                             color: colors.accent
                           }}>
-                            S/ {course.priceGrabado}
+                            {formatPrice(getPrice(course.priceGrabado, course.priceGrabadoUsd))}
                           </span>
                         </div>
                         <div style={{

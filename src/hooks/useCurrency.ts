@@ -8,6 +8,7 @@ export interface CurrencyData {
   currency: Currency;
   symbol: string;
   loading: boolean;
+  exchangeRate: number;
   convertPrice: (priceInPEN: number) => number;
   formatPrice: (priceInPEN: number) => string;
 }
@@ -16,12 +17,21 @@ export function useCurrency(): CurrencyData {
   const [currency, setCurrency] = useState<Currency>('USD');
   const [symbol, setSymbol] = useState('US$');
   const [loading, setLoading] = useState(true);
+  const [exchangeRate, setExchangeRate] = useState(3.80);
 
   useEffect(() => {
-    setLoading(false);
-
-    async function detectCountry() {
+    async function init() {
       try {
+        const [rateResponse] = await Promise.all([
+          fetch('/api/public/settings/exchange-rate')
+        ]);
+
+        if (rateResponse.ok) {
+          const rateData = await rateResponse.json();
+          setExchangeRate(rateData.exchangeRate || 3.80);
+          console.log('💱 Tipo de cambio:', rateData.exchangeRate);
+        }
+
         const testCountry = typeof window !== 'undefined' ? localStorage.getItem('test_country') : null;
 
         let countryCode = 'US';
@@ -59,18 +69,20 @@ export function useCurrency(): CurrencyData {
           console.log('💰 Mostrando precios en Dólares (US$)');
         }
       } catch (error) {
-        console.error('Error detecting location:', error);
+        console.error('Error initializing currency:', error);
         setCurrency('USD');
         setSymbol('US$');
+      } finally {
+        setLoading(false);
       }
     }
 
-    detectCountry();
+    init();
   }, []);
 
   const convertPrice = (priceInPEN: number): number => {
     if (currency === 'USD') {
-      return Math.round(priceInPEN / 3.8);
+      return Math.round((priceInPEN / exchangeRate) * 100) / 100;
     }
     return priceInPEN;
   };
@@ -83,6 +95,7 @@ export function useCurrency(): CurrencyData {
   return {
     currency,
     symbol,
+    exchangeRate,
     convertPrice,
     formatPrice,
     loading

@@ -56,7 +56,7 @@ export async function PUT(
       values.push(body.price_vivo);
     }
 
-    if (typeof body.price_vivo_usd === 'number') {
+    if (body.price_vivo_usd !== undefined) {
       updates.push('price_vivo_usd = ?');
       values.push(body.price_vivo_usd);
     }
@@ -76,7 +76,7 @@ export async function PUT(
       values.push(body.price_grabado);
     }
 
-    if (typeof body.price_grabado_usd === 'number') {
+    if (body.price_grabado_usd !== undefined) {
       updates.push('price_grabado_usd = ?');
       values.push(body.price_grabado_usd);
     }
@@ -210,7 +210,7 @@ export async function PATCH(
       values.push(body.price_vivo);
     }
 
-    if (typeof body.price_vivo_usd === 'number') {
+    if (body.price_vivo_usd !== undefined) {
       updates.push('price_vivo_usd = ?');
       values.push(body.price_vivo_usd);
     }
@@ -230,7 +230,7 @@ export async function PATCH(
       values.push(body.price_grabado);
     }
 
-    if (typeof body.price_grabado_usd === 'number') {
+    if (body.price_grabado_usd !== undefined) {
       updates.push('price_grabado_usd = ?');
       values.push(body.price_grabado_usd);
     }

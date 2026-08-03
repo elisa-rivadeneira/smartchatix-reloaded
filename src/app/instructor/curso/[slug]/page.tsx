@@ -1453,6 +1453,7 @@ function CourseConfigForm({ course, onUpdate }: { course: Course | null; onUpdat
                 onChange={(e) => {
                   const pen = parseFloat(e.target.value) || 0;
                   const usd = Math.round((pen / 3.8) * 100) / 100;
+                  setPriceVivoUsdEdited(false);
                   setFormData(prev => ({ ...prev, price_vivo: pen, price_vivo_usd: usd }));
                 }}
                 style={{ width: '100%', padding: '10px 12px', border: '1px solid #d1d5db', borderRadius: '6px', fontSize: '14px', boxSizing: 'border-box' }}
@@ -1489,6 +1490,7 @@ function CourseConfigForm({ course, onUpdate }: { course: Course | null; onUpdat
                     onChange={(e) => {
                       const pen = parseFloat(e.target.value) || 0;
                       const usd = Math.round((pen / 3.8) * 100) / 100;
+                      setPriceVivoUsdOldEdited(false);
                       setFormData(prev => ({ ...prev, price_vivo_old: pen, price_vivo_usd_old: usd }));
                     }}
                     style={{ width: '100%', padding: '8px 12px', border: '1px solid #ffc107', borderRadius: '6px', fontSize: '13px', boxSizing: 'border-box' }}
@@ -1549,6 +1551,7 @@ function CourseConfigForm({ course, onUpdate }: { course: Course | null; onUpdat
                 onChange={(e) => {
                   const pen = parseFloat(e.target.value) || 0;
                   const usd = Math.round((pen / 3.8) * 100) / 100;
+                  setPriceGrabadoUsdEdited(false);
                   setFormData(prev => ({ ...prev, price_grabado: pen, price_grabado_usd: usd }));
                 }}
                 style={{ width: '100%', padding: '10px 12px', border: '1px solid #d1d5db', borderRadius: '6px', fontSize: '14px', boxSizing: 'border-box' }}
@@ -1585,6 +1588,7 @@ function CourseConfigForm({ course, onUpdate }: { course: Course | null; onUpdat
                     onChange={(e) => {
                       const pen = parseFloat(e.target.value) || 0;
                       const usd = Math.round((pen / 3.8) * 100) / 100;
+                      setPriceGrabadoUsdOldEdited(false);
                       setFormData(prev => ({ ...prev, price_grabado_old: pen, price_grabado_usd_old: usd }));
                     }}
                     style={{ width: '100%', padding: '8px 12px', border: '1px solid #ffc107', borderRadius: '6px', fontSize: '13px', boxSizing: 'border-box' }}
