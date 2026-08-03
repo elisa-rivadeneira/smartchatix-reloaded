@@ -10,9 +10,12 @@
 -- NOTA: Si alguna columna ya existe, MySQL mostrará un error pero continuará.
 -- Puedes ignorar errores tipo "Duplicate column name"
 
--- Modalidad en vivo (si no existe, se agregará)
+-- Modalidades del curso
 ALTER TABLE courses
 ADD COLUMN has_live_mode BOOLEAN DEFAULT FALSE COMMENT 'Si el curso está disponible en modalidad en vivo';
+
+ALTER TABLE courses
+ADD COLUMN has_recorded_mode BOOLEAN DEFAULT TRUE COMMENT 'Si el curso está disponible en modalidad grabada';
 
 ALTER TABLE courses
 ADD COLUMN live_start_date DATE NULL COMMENT 'Fecha de inicio del curso en vivo';

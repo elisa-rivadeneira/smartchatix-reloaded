@@ -29,6 +29,7 @@ CREATE TABLE IF NOT EXISTS courses (
   price_grabado_usd DECIMAL(10, 2),
   duration VARCHAR(50),
   has_live_mode BOOLEAN DEFAULT FALSE COMMENT 'Si el curso está disponible en modalidad en vivo',
+  has_recorded_mode BOOLEAN DEFAULT TRUE COMMENT 'Si el curso está disponible en modalidad grabada',
   live_start_date DATE NULL COMMENT 'Fecha de inicio del curso en vivo',
   live_schedule VARCHAR(500) NULL COMMENT 'Horario del curso en vivo',
   recorded_features JSON NULL COMMENT 'Características del curso grabado',
