@@ -81,6 +81,22 @@ ALTER TABLE courses
 ADD COLUMN price_grabado_usd DECIMAL(10, 2) NULL COMMENT 'Precio en USD para modalidad grabada';
 
 -- =====================================================
+-- 6. PRECIOS "OLD" PARA MOSTRAR TACHADOS (OFERTAS)
+-- =====================================================
+
+ALTER TABLE courses
+ADD COLUMN price_vivo_old DECIMAL(10, 2) NULL COMMENT 'Precio normal en soles (tachado si hay oferta)';
+
+ALTER TABLE courses
+ADD COLUMN price_vivo_usd_old DECIMAL(10, 2) NULL COMMENT 'Precio normal en USD (tachado si hay oferta)';
+
+ALTER TABLE courses
+ADD COLUMN price_grabado_old DECIMAL(10, 2) NULL COMMENT 'Precio normal en soles (tachado si hay oferta)';
+
+ALTER TABLE courses
+ADD COLUMN price_grabado_usd_old DECIMAL(10, 2) NULL COMMENT 'Precio normal en USD (tachado si hay oferta)';
+
+-- =====================================================
 -- 5. RESUMEN DE CAMBIOS
 -- =====================================================
 SELECT 'MIGRACIÓN COMPLETADA - VERIFICAR RESULTADOS' AS STATUS;

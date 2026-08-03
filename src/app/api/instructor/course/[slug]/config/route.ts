@@ -61,6 +61,16 @@ export async function PUT(
       values.push(body.price_vivo_usd);
     }
 
+    if (body.price_vivo_old !== undefined) {
+      updates.push('price_vivo_old = ?');
+      values.push(body.price_vivo_old);
+    }
+
+    if (body.price_vivo_usd_old !== undefined) {
+      updates.push('price_vivo_usd_old = ?');
+      values.push(body.price_vivo_usd_old);
+    }
+
     if (typeof body.price_grabado === 'number') {
       updates.push('price_grabado = ?');
       values.push(body.price_grabado);
@@ -69,6 +79,16 @@ export async function PUT(
     if (typeof body.price_grabado_usd === 'number') {
       updates.push('price_grabado_usd = ?');
       values.push(body.price_grabado_usd);
+    }
+
+    if (body.price_grabado_old !== undefined) {
+      updates.push('price_grabado_old = ?');
+      values.push(body.price_grabado_old);
+    }
+
+    if (body.price_grabado_usd_old !== undefined) {
+      updates.push('price_grabado_usd_old = ?');
+      values.push(body.price_grabado_usd_old);
     }
 
     if (typeof body.is_active === 'boolean') {
@@ -195,6 +215,16 @@ export async function PATCH(
       values.push(body.price_vivo_usd);
     }
 
+    if (body.price_vivo_old !== undefined) {
+      updates.push('price_vivo_old = ?');
+      values.push(body.price_vivo_old);
+    }
+
+    if (body.price_vivo_usd_old !== undefined) {
+      updates.push('price_vivo_usd_old = ?');
+      values.push(body.price_vivo_usd_old);
+    }
+
     if (typeof body.price_grabado === 'number') {
       updates.push('price_grabado = ?');
       values.push(body.price_grabado);
@@ -203,6 +233,16 @@ export async function PATCH(
     if (typeof body.price_grabado_usd === 'number') {
       updates.push('price_grabado_usd = ?');
       values.push(body.price_grabado_usd);
+    }
+
+    if (body.price_grabado_old !== undefined) {
+      updates.push('price_grabado_old = ?');
+      values.push(body.price_grabado_old);
+    }
+
+    if (body.price_grabado_usd_old !== undefined) {
+      updates.push('price_grabado_usd_old = ?');
+      values.push(body.price_grabado_usd_old);
     }
 
     if (typeof body.is_certification_enabled === 'boolean') {

@@ -1133,9 +1133,13 @@ function CourseConfigForm({ course, onUpdate }: { course: Course | null; onUpdat
     description: course?.description || '',
     thumbnail: course?.thumbnail || '',
     price_vivo: course?.price_vivo || 0,
+    price_vivo_old: (course as any)?.price_vivo_old || null,
     price_vivo_usd: (course as any)?.price_vivo_usd || 0,
+    price_vivo_usd_old: (course as any)?.price_vivo_usd_old || null,
     price_grabado: course?.price_grabado || 0,
+    price_grabado_old: (course as any)?.price_grabado_old || null,
     price_grabado_usd: (course as any)?.price_grabado_usd || 0,
+    price_grabado_usd_old: (course as any)?.price_grabado_usd_old || null,
     is_active: course?.is_active || false,
     has_live_mode: Boolean((course as any)?.has_live_mode),
     has_recorded_mode: Boolean((course as any)?.has_recorded_mode),
@@ -1189,9 +1193,13 @@ function CourseConfigForm({ course, onUpdate }: { course: Course | null; onUpdat
         description: course.description,
         thumbnail: course.thumbnail || '',
         price_vivo: course.price_vivo,
+        price_vivo_old: (course as any).price_vivo_old || null,
         price_vivo_usd: (course as any).price_vivo_usd || 0,
+        price_vivo_usd_old: (course as any).price_vivo_usd_old || null,
         price_grabado: course.price_grabado,
+        price_grabado_old: (course as any).price_grabado_old || null,
         price_grabado_usd: (course as any).price_grabado_usd || 0,
+        price_grabado_usd_old: (course as any).price_grabado_usd_old || null,
         is_active: course.is_active,
         has_live_mode: Boolean((course as any).has_live_mode),
         has_recorded_mode: Boolean((course as any).has_recorded_mode),
@@ -1401,16 +1409,29 @@ function CourseConfigForm({ course, onUpdate }: { course: Course | null; onUpdat
           <h4 style={{ fontSize: '14px', fontWeight: '600', color: '#111827', marginBottom: '12px' }}>
             💰 Precios Modalidad En Vivo
           </h4>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+
+          <div style={{ marginBottom: '16px' }}>
+            <label style={{ display: 'flex', alignItems: 'center', cursor: 'pointer', fontSize: '14px', color: '#374151' }}>
+              <input
+                type="checkbox"
+                checked={formData.price_vivo_old !== null && formData.price_vivo_old > 0}
+                onChange={(e) => {
+                  if (e.target.checked) {
+                    setFormData(prev => ({ ...prev, price_vivo_old: prev.price_vivo * 1.5, price_vivo_usd_old: prev.price_vivo_usd * 1.5 }));
+                  } else {
+                    setFormData(prev => ({ ...prev, price_vivo_old: null, price_vivo_usd_old: null }));
+                  }
+                }}
+                style={{ marginRight: '8px', cursor: 'pointer' }}
+              />
+              <span style={{ fontWeight: '500' }}>🎯 Este curso está en oferta</span>
+            </label>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '12px' }}>
             <div>
-              <label style={{
-                display: 'block',
-                fontSize: '14px',
-                fontWeight: '500',
-                color: '#374151',
-                marginBottom: '8px'
-              }}>
-                Precio en Soles (S/)
+              <label style={{ display: 'block', fontSize: '14px', fontWeight: '500', color: '#374151', marginBottom: '8px' }}>
+                {formData.price_vivo_old ? 'Precio Oferta (S/)' : 'Precio (S/)'}
               </label>
               <input
                 type="number"
@@ -1418,28 +1439,15 @@ function CourseConfigForm({ course, onUpdate }: { course: Course | null; onUpdat
                 value={formData.price_vivo}
                 onChange={(e) => {
                   const pen = parseFloat(e.target.value) || 0;
-                  const usd = Math.round((pen / 3.7) * 100) / 100;
+                  const usd = Math.round((pen / 3.8) * 100) / 100;
                   setFormData(prev => ({ ...prev, price_vivo: pen, price_vivo_usd: usd }));
                 }}
-                style={{
-                  width: '100%',
-                  padding: '10px 12px',
-                  border: '1px solid #d1d5db',
-                  borderRadius: '6px',
-                  fontSize: '14px',
-                  boxSizing: 'border-box'
-                }}
+                style={{ width: '100%', padding: '10px 12px', border: '1px solid #d1d5db', borderRadius: '6px', fontSize: '14px', boxSizing: 'border-box' }}
               />
             </div>
             <div>
-              <label style={{
-                display: 'block',
-                fontSize: '14px',
-                fontWeight: '500',
-                color: '#374151',
-                marginBottom: '8px'
-              }}>
-                Precio en Dólares (USD)
+              <label style={{ display: 'block', fontSize: '14px', fontWeight: '500', color: '#374151', marginBottom: '8px' }}>
+                {formData.price_vivo_old ? 'Precio Oferta (USD)' : 'Precio (USD)'}
                 <span style={{ fontSize: '12px', color: '#6b7280', fontWeight: '400' }}> - editable</span>
               </label>
               <input
@@ -1447,17 +1455,42 @@ function CourseConfigForm({ course, onUpdate }: { course: Course | null; onUpdat
                 step="0.01"
                 value={formData.price_vivo_usd}
                 onChange={(e) => setFormData(prev => ({ ...prev, price_vivo_usd: parseFloat(e.target.value) || 0 }))}
-                style={{
-                  width: '100%',
-                  padding: '10px 12px',
-                  border: '1px solid #d1d5db',
-                  borderRadius: '6px',
-                  fontSize: '14px',
-                  boxSizing: 'border-box'
-                }}
+                style={{ width: '100%', padding: '10px 12px', border: '1px solid #d1d5db', borderRadius: '6px', fontSize: '14px', boxSizing: 'border-box' }}
               />
             </div>
           </div>
+
+          {formData.price_vivo_old !== null && formData.price_vivo_old > 0 && (
+            <div style={{ padding: '12px', background: '#fff3cd', borderRadius: '6px', border: '1px solid #ffc107' }}>
+              <p style={{ fontSize: '13px', fontWeight: '600', color: '#856404', marginBottom: '8px' }}>📌 Precio Normal (será mostrado tachado)</p>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                <div>
+                  <label style={{ display: 'block', fontSize: '13px', fontWeight: '500', color: '#856404', marginBottom: '6px' }}>Precio Normal (S/)</label>
+                  <input
+                    type="number"
+                    step="0.01"
+                    value={formData.price_vivo_old || 0}
+                    onChange={(e) => {
+                      const pen = parseFloat(e.target.value) || 0;
+                      const usd = Math.round((pen / 3.8) * 100) / 100;
+                      setFormData(prev => ({ ...prev, price_vivo_old: pen, price_vivo_usd_old: usd }));
+                    }}
+                    style={{ width: '100%', padding: '8px 12px', border: '1px solid #ffc107', borderRadius: '6px', fontSize: '13px', boxSizing: 'border-box' }}
+                  />
+                </div>
+                <div>
+                  <label style={{ display: 'block', fontSize: '13px', fontWeight: '500', color: '#856404', marginBottom: '6px' }}>Precio Normal (USD)</label>
+                  <input
+                    type="number"
+                    step="0.01"
+                    value={formData.price_vivo_usd_old || 0}
+                    onChange={(e) => setFormData(prev => ({ ...prev, price_vivo_usd_old: parseFloat(e.target.value) || 0 }))}
+                    style={{ width: '100%', padding: '8px 12px', border: '1px solid #ffc107', borderRadius: '6px', fontSize: '13px', boxSizing: 'border-box' }}
+                  />
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       )}
 
@@ -1466,16 +1499,29 @@ function CourseConfigForm({ course, onUpdate }: { course: Course | null; onUpdat
           <h4 style={{ fontSize: '14px', fontWeight: '600', color: '#111827', marginBottom: '12px' }}>
             💰 Precios Modalidad Grabado
           </h4>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+
+          <div style={{ marginBottom: '16px' }}>
+            <label style={{ display: 'flex', alignItems: 'center', cursor: 'pointer', fontSize: '14px', color: '#374151' }}>
+              <input
+                type="checkbox"
+                checked={formData.price_grabado_old !== null && formData.price_grabado_old > 0}
+                onChange={(e) => {
+                  if (e.target.checked) {
+                    setFormData(prev => ({ ...prev, price_grabado_old: prev.price_grabado * 1.5, price_grabado_usd_old: prev.price_grabado_usd * 1.5 }));
+                  } else {
+                    setFormData(prev => ({ ...prev, price_grabado_old: null, price_grabado_usd_old: null }));
+                  }
+                }}
+                style={{ marginRight: '8px', cursor: 'pointer' }}
+              />
+              <span style={{ fontWeight: '500' }}>🎯 Este curso está en oferta</span>
+            </label>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '12px' }}>
             <div>
-              <label style={{
-                display: 'block',
-                fontSize: '14px',
-                fontWeight: '500',
-                color: '#374151',
-                marginBottom: '8px'
-              }}>
-                Precio en Soles (S/)
+              <label style={{ display: 'block', fontSize: '14px', fontWeight: '500', color: '#374151', marginBottom: '8px' }}>
+                {formData.price_grabado_old ? 'Precio Oferta (S/)' : 'Precio (S/)'}
               </label>
               <input
                 type="number"
@@ -1483,28 +1529,15 @@ function CourseConfigForm({ course, onUpdate }: { course: Course | null; onUpdat
                 value={formData.price_grabado}
                 onChange={(e) => {
                   const pen = parseFloat(e.target.value) || 0;
-                  const usd = Math.round((pen / 3.7) * 100) / 100;
+                  const usd = Math.round((pen / 3.8) * 100) / 100;
                   setFormData(prev => ({ ...prev, price_grabado: pen, price_grabado_usd: usd }));
                 }}
-                style={{
-                  width: '100%',
-                  padding: '10px 12px',
-                  border: '1px solid #d1d5db',
-                  borderRadius: '6px',
-                  fontSize: '14px',
-                  boxSizing: 'border-box'
-                }}
+                style={{ width: '100%', padding: '10px 12px', border: '1px solid #d1d5db', borderRadius: '6px', fontSize: '14px', boxSizing: 'border-box' }}
               />
             </div>
             <div>
-              <label style={{
-                display: 'block',
-                fontSize: '14px',
-                fontWeight: '500',
-                color: '#374151',
-                marginBottom: '8px'
-              }}>
-                Precio en Dólares (USD)
+              <label style={{ display: 'block', fontSize: '14px', fontWeight: '500', color: '#374151', marginBottom: '8px' }}>
+                {formData.price_grabado_old ? 'Precio Oferta (USD)' : 'Precio (USD)'}
                 <span style={{ fontSize: '12px', color: '#6b7280', fontWeight: '400' }}> - editable</span>
               </label>
               <input
@@ -1512,17 +1545,42 @@ function CourseConfigForm({ course, onUpdate }: { course: Course | null; onUpdat
                 step="0.01"
                 value={formData.price_grabado_usd}
                 onChange={(e) => setFormData(prev => ({ ...prev, price_grabado_usd: parseFloat(e.target.value) || 0 }))}
-                style={{
-                  width: '100%',
-                  padding: '10px 12px',
-                  border: '1px solid #d1d5db',
-                  borderRadius: '6px',
-                  fontSize: '14px',
-                  boxSizing: 'border-box'
-                }}
+                style={{ width: '100%', padding: '10px 12px', border: '1px solid #d1d5db', borderRadius: '6px', fontSize: '14px', boxSizing: 'border-box' }}
               />
             </div>
           </div>
+
+          {formData.price_grabado_old !== null && formData.price_grabado_old > 0 && (
+            <div style={{ padding: '12px', background: '#fff3cd', borderRadius: '6px', border: '1px solid #ffc107' }}>
+              <p style={{ fontSize: '13px', fontWeight: '600', color: '#856404', marginBottom: '8px' }}>📌 Precio Normal (será mostrado tachado)</p>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                <div>
+                  <label style={{ display: 'block', fontSize: '13px', fontWeight: '500', color: '#856404', marginBottom: '6px' }}>Precio Normal (S/)</label>
+                  <input
+                    type="number"
+                    step="0.01"
+                    value={formData.price_grabado_old || 0}
+                    onChange={(e) => {
+                      const pen = parseFloat(e.target.value) || 0;
+                      const usd = Math.round((pen / 3.8) * 100) / 100;
+                      setFormData(prev => ({ ...prev, price_grabado_old: pen, price_grabado_usd_old: usd }));
+                    }}
+                    style={{ width: '100%', padding: '8px 12px', border: '1px solid #ffc107', borderRadius: '6px', fontSize: '13px', boxSizing: 'border-box' }}
+                  />
+                </div>
+                <div>
+                  <label style={{ display: 'block', fontSize: '13px', fontWeight: '500', color: '#856404', marginBottom: '6px' }}>Precio Normal (USD)</label>
+                  <input
+                    type="number"
+                    step="0.01"
+                    value={formData.price_grabado_usd_old || 0}
+                    onChange={(e) => setFormData(prev => ({ ...prev, price_grabado_usd_old: parseFloat(e.target.value) || 0 }))}
+                    style={{ width: '100%', padding: '8px 12px', border: '1px solid #ffc107', borderRadius: '6px', fontSize: '13px', boxSizing: 'border-box' }}
+                  />
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       )}
 
