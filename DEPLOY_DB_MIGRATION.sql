@@ -59,6 +59,10 @@ INSERT INTO site_settings (setting_key, setting_value, description)
 VALUES ('show_courses_carousel', 'true', 'Mostrar carrusel "Explora más cursos" en página principal')
 ON DUPLICATE KEY UPDATE setting_key = setting_key;
 
+INSERT INTO site_settings (setting_key, setting_value, description)
+VALUES ('exchange_rate', '3.80', 'Tipo de cambio PEN a USD para conversión automática de precios')
+ON DUPLICATE KEY UPDATE setting_key = setting_key;
+
 -- =====================================================
 -- 3. VERIFICAR ESTRUCTURA DE ENROLLMENTS
 -- =====================================================

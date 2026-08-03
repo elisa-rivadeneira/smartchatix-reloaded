@@ -1163,6 +1163,10 @@ function CourseConfigForm({ course, onUpdate }: { course: Course | null; onUpdat
   const [showErrorModal, setShowErrorModal] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [dateDisplay, setDateDisplay] = useState('');
+  const [priceVivoUsdEdited, setPriceVivoUsdEdited] = useState(false);
+  const [priceVivoUsdOldEdited, setPriceVivoUsdOldEdited] = useState(false);
+  const [priceGrabadoUsdEdited, setPriceGrabadoUsdEdited] = useState(false);
+  const [priceGrabadoUsdOldEdited, setPriceGrabadoUsdOldEdited] = useState(false);
 
   useEffect(() => {
     if (course) {
@@ -1217,6 +1221,11 @@ function CourseConfigForm({ course, onUpdate }: { course: Course | null; onUpdat
         module_titles: moduleTitles,
         module_descriptions: moduleDescriptions
       });
+
+      setPriceVivoUsdEdited(Boolean((course as any).price_vivo_usd));
+      setPriceVivoUsdOldEdited(Boolean((course as any).price_vivo_usd_old));
+      setPriceGrabadoUsdEdited(Boolean((course as any).price_grabado_usd));
+      setPriceGrabadoUsdOldEdited(Boolean((course as any).price_grabado_usd_old));
     }
   }, [course]);
 
@@ -1260,6 +1269,10 @@ function CourseConfigForm({ course, onUpdate }: { course: Course | null; onUpdat
     const modulesCount = course?.modules?.length || 0;
     const dataToSend = {
       ...formData,
+      price_vivo_usd: priceVivoUsdEdited ? formData.price_vivo_usd : null,
+      price_vivo_usd_old: priceVivoUsdOldEdited ? formData.price_vivo_usd_old : null,
+      price_grabado_usd: priceGrabadoUsdEdited ? formData.price_grabado_usd : null,
+      price_grabado_usd_old: priceGrabadoUsdOldEdited ? formData.price_grabado_usd_old : null,
       recorded_features: {
         ...formData.recorded_features,
         modules: `${modulesCount} módulos especializados`
@@ -1454,7 +1467,10 @@ function CourseConfigForm({ course, onUpdate }: { course: Course | null; onUpdat
                 type="number"
                 step="0.01"
                 value={formData.price_vivo_usd}
-                onChange={(e) => setFormData(prev => ({ ...prev, price_vivo_usd: parseFloat(e.target.value) || 0 }))}
+                onChange={(e) => {
+                  setPriceVivoUsdEdited(true);
+                  setFormData(prev => ({ ...prev, price_vivo_usd: parseFloat(e.target.value) || 0 }));
+                }}
                 style={{ width: '100%', padding: '10px 12px', border: '1px solid #d1d5db', borderRadius: '6px', fontSize: '14px', boxSizing: 'border-box' }}
               />
             </div>
@@ -1484,7 +1500,10 @@ function CourseConfigForm({ course, onUpdate }: { course: Course | null; onUpdat
                     type="number"
                     step="0.01"
                     value={formData.price_vivo_usd_old || 0}
-                    onChange={(e) => setFormData(prev => ({ ...prev, price_vivo_usd_old: parseFloat(e.target.value) || 0 }))}
+                    onChange={(e) => {
+                      setPriceVivoUsdOldEdited(true);
+                      setFormData(prev => ({ ...prev, price_vivo_usd_old: parseFloat(e.target.value) || 0 }));
+                    }}
                     style={{ width: '100%', padding: '8px 12px', border: '1px solid #ffc107', borderRadius: '6px', fontSize: '13px', boxSizing: 'border-box' }}
                   />
                 </div>
@@ -1544,7 +1563,10 @@ function CourseConfigForm({ course, onUpdate }: { course: Course | null; onUpdat
                 type="number"
                 step="0.01"
                 value={formData.price_grabado_usd}
-                onChange={(e) => setFormData(prev => ({ ...prev, price_grabado_usd: parseFloat(e.target.value) || 0 }))}
+                onChange={(e) => {
+                  setPriceGrabadoUsdEdited(true);
+                  setFormData(prev => ({ ...prev, price_grabado_usd: parseFloat(e.target.value) || 0 }));
+                }}
                 style={{ width: '100%', padding: '10px 12px', border: '1px solid #d1d5db', borderRadius: '6px', fontSize: '14px', boxSizing: 'border-box' }}
               />
             </div>
@@ -1574,7 +1596,10 @@ function CourseConfigForm({ course, onUpdate }: { course: Course | null; onUpdat
                     type="number"
                     step="0.01"
                     value={formData.price_grabado_usd_old || 0}
-                    onChange={(e) => setFormData(prev => ({ ...prev, price_grabado_usd_old: parseFloat(e.target.value) || 0 }))}
+                    onChange={(e) => {
+                      setPriceGrabadoUsdOldEdited(true);
+                      setFormData(prev => ({ ...prev, price_grabado_usd_old: parseFloat(e.target.value) || 0 }));
+                    }}
                     style={{ width: '100%', padding: '8px 12px', border: '1px solid #ffc107', borderRadius: '6px', fontSize: '13px', boxSizing: 'border-box' }}
                   />
                 </div>
