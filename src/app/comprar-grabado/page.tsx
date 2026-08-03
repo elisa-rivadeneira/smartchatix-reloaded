@@ -11,8 +11,9 @@ function ComprarGrabadoContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const cursoSlug = searchParams.get('curso');
-  const curso = cursoSlug ? getProductBySlug(cursoSlug) : null;
 
+  const [curso, setCurso] = React.useState<any>(null);
+  const [loading, setLoading] = React.useState(true);
   const [step, setStep] = React.useState(1);
   const [paymentMethod, setPaymentMethod] = React.useState('card');
   const [fullName, setFullName] = React.useState('');
@@ -21,6 +22,26 @@ function ComprarGrabadoContent() {
   const [paymentSuccess, setPaymentSuccess] = React.useState(false);
   const [paymentError, setPaymentError] = React.useState('');
   const [enrollment, setEnrollment] = React.useState<any>(null);
+
+  React.useEffect(() => {
+    if (!cursoSlug) {
+      setLoading(false);
+      return;
+    }
+
+    fetch(`/api/public/courses/${cursoSlug}`)
+      .then(res => res.json())
+      .then(data => {
+        if (data.course) {
+          setCurso(data.course);
+        }
+        setLoading(false);
+      })
+      .catch(err => {
+        console.error('Error fetching course:', err);
+        setLoading(false);
+      });
+  }, [cursoSlug]);
 
   const colors = {
     primary: '#003366',
@@ -55,6 +76,38 @@ function ComprarGrabadoContent() {
     h3: { fontSize: '1.5rem', fontWeight: '600', lineHeight: '1.4' },
     body: { fontSize: '1rem', fontWeight: '400', lineHeight: '1.6' }
   };
+
+  if (loading) {
+    return (
+      <div style={{
+        minHeight: '100vh',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: colors.gray[50]
+      }}>
+        <div style={{ textAlign: 'center', color: colors.gray[600] }}>
+          Cargando...
+        </div>
+      </div>
+    );
+  }
+
+  if (!curso) {
+    return (
+      <div style={{
+        minHeight: '100vh',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: colors.gray[50]
+      }}>
+        <div style={{ textAlign: 'center', color: colors.gray[600] }}>
+          Curso no encontrado
+        </div>
+      </div>
+    );
+  }
 
   return (
     <>
