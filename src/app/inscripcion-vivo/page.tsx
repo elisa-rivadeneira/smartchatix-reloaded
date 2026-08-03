@@ -6,11 +6,13 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import { getProductBySlug } from '@/data/courses';
 import Footer from '@/components/Footer';
 import CulqiPaymentForm from '@/components/CulqiPaymentForm';
+import { useCurrency } from '@/hooks/useCurrency';
 
 function InscripcionVivoContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const cursoSlug = searchParams.get('curso');
+  const { currency, symbol, formatPrice, convertPrice } = useCurrency();
 
   const [curso, setCurso] = React.useState<any>(null);
   const [loading, setLoading] = React.useState(true);
@@ -44,6 +46,22 @@ function InscripcionVivoContent() {
         setLoading(false);
       });
   }, [cursoSlug]);
+
+  const getPrice = () => {
+    if (!curso) return 0;
+    if (currency === 'USD') {
+      return curso.priceVivoUsd || convertPrice(curso.priceVivo || 0);
+    }
+    return curso.priceVivo || 0;
+  };
+
+  const getOldPrice = () => {
+    if (!curso) return 0;
+    if (currency === 'USD') {
+      return curso.priceVivoUsdOld || convertPrice(curso.priceVivoOld || 0);
+    }
+    return curso.priceVivoOld || 0;
+  };
 
   const colors = {
     primary: '#003366',
@@ -513,7 +531,7 @@ function InscripcionVivoContent() {
                           fontWeight: '700',
                           color: colors.gray[700]
                         }}>
-                          S/ {curso.priceVivo}
+                          {symbol} {getPrice().toFixed(2)}
                         </div>
                       </div>
                     )}
@@ -696,7 +714,7 @@ function InscripcionVivoContent() {
 
                   {!paymentSuccess ? (
                     <CulqiPaymentForm
-                      amount={curso.priceVivo || 0}
+                      amount={getPrice()}
                       courseSlug={curso.slug}
                       courseTitle={curso.title}
                       modality="vivo"
@@ -965,7 +983,7 @@ function InscripcionVivoContent() {
                         borderRadius: '8px',
                         fontSize: '0.85rem'
                       }}>
-                        💡 Monto: S/ {curso?.priceVivo || 999}
+                        💡 Monto: {symbol} {getPrice().toFixed(2)}
                       </div>
                     </div>
                   )}
@@ -1020,7 +1038,7 @@ function InscripcionVivoContent() {
                           fontWeight: '700',
                           color: colors.primary
                         }}>
-                          S/ {curso.priceVivo}
+                          {symbol} {getPrice().toFixed(2)}
                         </div>
                       </div>
                     )}
@@ -1041,7 +1059,7 @@ function InscripcionVivoContent() {
                     }}
                   >
                     <span className="mobile-only">
-                      {paymentMethod === 'card' ? `Pagar Ahora S/ ${curso?.priceVivo || 999}` : 'Continuar'}
+                      {paymentMethod === 'card' ? `Pagar Ahora ${symbol} ${getPrice().toFixed(2)}` : 'Continuar'}
                     </span>
                     <span className="desktop-only">
                       {paymentMethod === 'card' ? 'Pagar Ahora' : 'Continuar'}
@@ -1140,15 +1158,17 @@ function InscripcionVivoContent() {
                       fontWeight: '700',
                       color: colors.white
                     }}>
-                      S/ {curso?.priceVivo || 999}
+                      {symbol} {getPrice().toFixed(2)}
                     </span>
-                    <span style={{
-                      fontSize: '1.2rem',
-                      color: 'rgba(255,255,255,0.5)',
-                      textDecoration: 'line-through'
-                    }}>
-                      S/ {curso?.oldPriceVivo || 1299}
-                    </span>
+                    {getOldPrice() > 0 && (
+                      <span style={{
+                        fontSize: '1.2rem',
+                        color: 'rgba(255,255,255,0.5)',
+                        textDecoration: 'line-through'
+                      }}>
+                        {symbol} {getOldPrice().toFixed(2)}
+                      </span>
+                    )}
                   </div>
                 </div>
                 <div style={{
