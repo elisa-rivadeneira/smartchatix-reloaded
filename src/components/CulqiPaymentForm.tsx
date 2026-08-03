@@ -150,11 +150,10 @@ export default function CulqiPaymentForm({
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    console.log('🔥 PAGAR AHORA - Build:', new Date().toISOString());
-    console.log('🔥 Public Key:', process.env.NEXT_PUBLIC_CULQI_PUBLIC_KEY);
+    console.log('🔥 PAGAR AHORA');
 
     if (!culqiLoaded || !window.Culqi) {
       onError('Culqi no está cargado. Por favor, recarga la página.');
@@ -176,51 +175,7 @@ export default function CulqiPaymentForm({
     const fullYear = expYear.length === 2 ? `20${expYear}` : expYear;
 
     try {
-      const tokenResponse = await fetch('/api/payment/create-token', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          card_number: cardNumber,
-          cvv: cvv,
-          expiration_month: expMonth,
-          expiration_year: fullYear,
-          email: email
-        })
-      });
-
-      const tokenData = await tokenResponse.json();
-
-      if (!tokenResponse.ok || !tokenData.success) {
-        throw new Error(tokenData.error || 'Error al procesar la tarjeta');
-      }
-
-      const chargeResponse = await fetch('/api/payment/charge', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          token: tokenData.token,
-          amount: amount,
-          email: email,
-          description: `${courseTitle} - ${modality}`,
-          metadata: {
-            course_slug: courseSlug,
-            course_title: courseTitle,
-            modality: modality,
-            student_name: fullName,
-            student_email: email,
-            student_phone: phone
-          }
-        })
-      });
-
-      const chargeData = await chargeResponse.json();
-
-      if (!chargeResponse.ok) {
-        throw new Error(chargeData.error || 'Error al procesar el pago');
-      }
-
-      setProcessing(false);
-      onSuccess(chargeData);
+      window.Culqi.createToken();
     } catch (error: any) {
       setProcessing(false);
       onError(error.message || 'Error al procesar el pago');
@@ -230,7 +185,7 @@ export default function CulqiPaymentForm({
   return (
     <div>
       <form id="culqi-form" onSubmit={handleSubmit}>
-        <input type="hidden" id="card[email]" name="card[email]" defaultValue={email} />
+        <input type="hidden" id="card[email]" data-culqi="card[email]" defaultValue={email} />
 
         <div style={{ marginBottom: '1rem' }}>
           <label style={{
@@ -245,9 +200,9 @@ export default function CulqiPaymentForm({
           <input
             type="text"
             id="card[number]"
-            name="card[number]"
+            data-culqi="card[number]"
             placeholder="4111 1111 1111 1111"
-            maxLength={16}
+            maxLength={19}
             required
             disabled={processing}
             style={{
@@ -283,7 +238,7 @@ export default function CulqiPaymentForm({
               <input
                 type="text"
                 id="card[exp_month]"
-                name="card[exp_month]"
+                data-culqi="card[exp_month]"
                 placeholder="MM"
                 maxLength={2}
                 required
@@ -302,7 +257,7 @@ export default function CulqiPaymentForm({
               <input
                 type="text"
                 id="card[exp_year]"
-                name="card[exp_year]"
+                data-culqi="card[exp_year]"
                 placeholder="YY"
                 maxLength={2}
                 required
@@ -334,7 +289,7 @@ export default function CulqiPaymentForm({
               <input
                 type="text"
                 id="card[cvv]"
-                name="card[cvv]"
+                data-culqi="card[cvv]"
                 placeholder="CVV"
                 maxLength={4}
                 required
