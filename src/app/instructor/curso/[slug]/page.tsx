@@ -1133,10 +1133,12 @@ function CourseConfigForm({ course, onUpdate }: { course: Course | null; onUpdat
     description: course?.description || '',
     thumbnail: course?.thumbnail || '',
     price_vivo: course?.price_vivo || 0,
+    price_vivo_usd: (course as any)?.price_vivo_usd || 0,
     price_grabado: course?.price_grabado || 0,
+    price_grabado_usd: (course as any)?.price_grabado_usd || 0,
     is_active: course?.is_active || false,
-    has_live_mode: (course as any)?.has_live_mode || false,
-    has_recorded_mode: (course as any)?.has_recorded_mode !== false,
+    has_live_mode: Boolean((course as any)?.has_live_mode),
+    has_recorded_mode: Boolean((course as any)?.has_recorded_mode),
     live_start_date: (course as any)?.live_start_date || '',
     live_schedule: (course as any)?.live_schedule || '',
     recorded_features: (course as any)?.recorded_features || {
@@ -1147,7 +1149,7 @@ function CourseConfigForm({ course, onUpdate }: { course: Course | null; onUpdat
       certificate: 'Certificado digital',
       support: 'Soporte del instructor'
     },
-    learning_outcomes: (course as any)?.learning_outcomes || ['', '', '', '', ''],
+    learning_outcomes: (course as any)?.learning_outcomes || ['', '', '', '', '', '', '', ''],
     module_titles: (course as any)?.module_titles || (course?.modules?.map((m: any) => m.title) || [])
   });
   const [saving, setSaving] = useState(false);
@@ -1184,10 +1186,12 @@ function CourseConfigForm({ course, onUpdate }: { course: Course | null; onUpdat
         description: course.description,
         thumbnail: course.thumbnail || '',
         price_vivo: course.price_vivo,
+        price_vivo_usd: (course as any).price_vivo_usd || 0,
         price_grabado: course.price_grabado,
+        price_grabado_usd: (course as any).price_grabado_usd || 0,
         is_active: course.is_active,
-        has_live_mode: (course as any).has_live_mode || false,
-        has_recorded_mode: (course as any).has_recorded_mode !== false,
+        has_live_mode: Boolean((course as any).has_live_mode),
+        has_recorded_mode: Boolean((course as any).has_recorded_mode),
         live_start_date: formattedDate,
         live_schedule: (course as any).live_schedule || '',
         recorded_features: (course as any).recorded_features || {
@@ -1198,7 +1202,7 @@ function CourseConfigForm({ course, onUpdate }: { course: Course | null; onUpdat
           certificate: 'Certificado digital',
           support: 'Soporte del instructor'
         },
-        learning_outcomes: (course as any).learning_outcomes || ['', '', '', '', ''],
+        learning_outcomes: (course as any).learning_outcomes || ['', '', '', '', '', '', '', ''],
         module_titles: moduleTitles
       });
     }
@@ -1388,78 +1392,135 @@ function CourseConfigForm({ course, onUpdate }: { course: Course | null; onUpdat
         {uploadingImage && <p style={{ fontSize: '12px', color: '#6b7280', marginTop: '4px' }}>Subiendo imagen...</p>}
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '20px' }}>
-        <div>
-          <label style={{
-            display: 'block',
-            fontSize: '14px',
-            fontWeight: '500',
-            color: '#374151',
-            marginBottom: '8px'
-          }}>
-            Precio modalidad vivo (S/)
-          </label>
-          <input
-            type="number"
-            step="0.01"
-            value={formData.price_vivo}
-            onChange={(e) => setFormData(prev => ({ ...prev, price_vivo: parseFloat(e.target.value) || 0 }))}
-            style={{
-              width: '100%',
-              padding: '10px 12px',
-              border: '1px solid #d1d5db',
-              borderRadius: '6px',
-              fontSize: '14px',
-              boxSizing: 'border-box'
-            }}
-          />
+      {formData.has_live_mode && (
+        <div style={{ marginBottom: '20px', padding: '16px', background: '#f9fafb', borderRadius: '8px', border: '1px solid #e5e7eb' }}>
+          <h4 style={{ fontSize: '14px', fontWeight: '600', color: '#111827', marginBottom: '12px' }}>
+            💰 Precios Modalidad En Vivo
+          </h4>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+            <div>
+              <label style={{
+                display: 'block',
+                fontSize: '14px',
+                fontWeight: '500',
+                color: '#374151',
+                marginBottom: '8px'
+              }}>
+                Precio en Soles (S/)
+              </label>
+              <input
+                type="number"
+                step="0.01"
+                value={formData.price_vivo}
+                onChange={(e) => {
+                  const pen = parseFloat(e.target.value) || 0;
+                  const usd = Math.round((pen / 3.7) * 100) / 100;
+                  setFormData(prev => ({ ...prev, price_vivo: pen, price_vivo_usd: usd }));
+                }}
+                style={{
+                  width: '100%',
+                  padding: '10px 12px',
+                  border: '1px solid #d1d5db',
+                  borderRadius: '6px',
+                  fontSize: '14px',
+                  boxSizing: 'border-box'
+                }}
+              />
+            </div>
+            <div>
+              <label style={{
+                display: 'block',
+                fontSize: '14px',
+                fontWeight: '500',
+                color: '#374151',
+                marginBottom: '8px'
+              }}>
+                Precio en Dólares (USD)
+                <span style={{ fontSize: '12px', color: '#6b7280', fontWeight: '400' }}> - editable</span>
+              </label>
+              <input
+                type="number"
+                step="0.01"
+                value={formData.price_vivo_usd}
+                onChange={(e) => setFormData(prev => ({ ...prev, price_vivo_usd: parseFloat(e.target.value) || 0 }))}
+                style={{
+                  width: '100%',
+                  padding: '10px 12px',
+                  border: '1px solid #d1d5db',
+                  borderRadius: '6px',
+                  fontSize: '14px',
+                  boxSizing: 'border-box'
+                }}
+              />
+            </div>
+          </div>
         </div>
-        <div>
-          <label style={{
-            display: 'block',
-            fontSize: '14px',
-            fontWeight: '500',
-            color: '#374151',
-            marginBottom: '8px'
-          }}>
-            Precio modalidad grabado (S/)
-          </label>
-          <input
-            type="number"
-            step="0.01"
-            value={formData.price_grabado}
-            onChange={(e) => setFormData(prev => ({ ...prev, price_grabado: parseFloat(e.target.value) || 0 }))}
-            style={{
-              width: '100%',
-              padding: '10px 12px',
-              border: '1px solid #d1d5db',
-              borderRadius: '6px',
-              fontSize: '14px',
-              boxSizing: 'border-box'
-            }}
-          />
-        </div>
-      </div>
+      )}
 
-      <div style={{ marginBottom: '24px' }}>
-        <label style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: '8px',
-          fontSize: '14px',
-          fontWeight: '500',
-          color: '#374151',
-          cursor: 'pointer'
-        }}>
-          <input
-            type="checkbox"
-            checked={formData.is_active}
-            onChange={(e) => setFormData(prev => ({ ...prev, is_active: e.target.checked }))}
-            style={{ width: '16px', height: '16px' }}
-          />
-          Curso activo (visible para estudiantes)
-        </label>
-      </div>
+      {formData.has_recorded_mode && (
+        <div style={{ marginBottom: '20px', padding: '16px', background: '#f9fafb', borderRadius: '8px', border: '1px solid #e5e7eb' }}>
+          <h4 style={{ fontSize: '14px', fontWeight: '600', color: '#111827', marginBottom: '12px' }}>
+            💰 Precios Modalidad Grabado
+          </h4>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+            <div>
+              <label style={{
+                display: 'block',
+                fontSize: '14px',
+                fontWeight: '500',
+                color: '#374151',
+                marginBottom: '8px'
+              }}>
+                Precio en Soles (S/)
+              </label>
+              <input
+                type="number"
+                step="0.01"
+                value={formData.price_grabado}
+                onChange={(e) => {
+                  const pen = parseFloat(e.target.value) || 0;
+                  const usd = Math.round((pen / 3.7) * 100) / 100;
+                  setFormData(prev => ({ ...prev, price_grabado: pen, price_grabado_usd: usd }));
+                }}
+                style={{
+                  width: '100%',
+                  padding: '10px 12px',
+                  border: '1px solid #d1d5db',
+                  borderRadius: '6px',
+                  fontSize: '14px',
+                  boxSizing: 'border-box'
+                }}
+              />
+            </div>
+            <div>
+              <label style={{
+                display: 'block',
+                fontSize: '14px',
+                fontWeight: '500',
+                color: '#374151',
+                marginBottom: '8px'
+              }}>
+                Precio en Dólares (USD)
+                <span style={{ fontSize: '12px', color: '#6b7280', fontWeight: '400' }}> - editable</span>
+              </label>
+              <input
+                type="number"
+                step="0.01"
+                value={formData.price_grabado_usd}
+                onChange={(e) => setFormData(prev => ({ ...prev, price_grabado_usd: parseFloat(e.target.value) || 0 }))}
+                style={{
+                  width: '100%',
+                  padding: '10px 12px',
+                  border: '1px solid #d1d5db',
+                  borderRadius: '6px',
+                  fontSize: '14px',
+                  boxSizing: 'border-box'
+                }}
+              />
+            </div>
+          </div>
+        </div>
+      )}
 
       <hr style={{ margin: '32px 0', border: 'none', borderTop: '1px solid #e5e7eb' }} />
 
@@ -1878,7 +1939,7 @@ function CourseConfigForm({ course, onUpdate }: { course: Course | null; onUpdat
         Estos bullets aparecerán en la página del curso (/cursos/[slug])
       </p>
 
-      {[0, 1, 2, 3, 4].map((index) => (
+      {[0, 1, 2, 3, 4, 5, 6, 7].map((index) => (
         <div key={index} style={{ marginBottom: '12px' }}>
           <label style={{
             display: 'block',
@@ -1893,7 +1954,7 @@ function CourseConfigForm({ course, onUpdate }: { course: Course | null; onUpdat
             type="text"
             value={(formData.learning_outcomes && formData.learning_outcomes[index]) || ''}
             onChange={(e) => {
-              const newOutcomes = formData.learning_outcomes ? [...formData.learning_outcomes] : ['', '', '', '', ''];
+              const newOutcomes = formData.learning_outcomes ? [...formData.learning_outcomes] : ['', '', '', '', '', '', '', ''];
               newOutcomes[index] = e.target.value;
               setFormData(prev => ({ ...prev, learning_outcomes: newOutcomes }));
             }}

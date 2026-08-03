@@ -29,11 +29,62 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const isDemoMode = metadata?.demo_mode === true;
+    if (metadata?.course_slug && metadata?.student_email) {
+      try {
+        console.log('🔍 Verificando inscripción previa para:', metadata.student_email, 'en curso:', metadata.course_slug);
+
+        const courseResult = await query(
+          'SELECT id, title FROM courses WHERE slug = ?',
+          [metadata.course_slug]
+        );
+
+        if (courseResult && courseResult.length > 0) {
+          const course = courseResult[0];
+          console.log('📚 Curso encontrado:', course.title, 'ID:', course.id);
+
+          const userResult = await query(
+            'SELECT id FROM users WHERE email = ?',
+            [metadata.student_email]
+          );
+
+          if (userResult && userResult.length > 0) {
+            const userId = userResult[0].id;
+            console.log('👤 Usuario encontrado, ID:', userId);
+
+            const existingEnrollment = await query(
+              'SELECT id FROM enrollments WHERE user_id = ? AND course_id = ?',
+              [userId, course.id]
+            );
+
+            console.log('📋 Inscripciones existentes:', existingEnrollment);
+
+            if (existingEnrollment && existingEnrollment.length > 0) {
+              console.log('❌ INSCRIPCIÓN DUPLICADA DETECTADA - Bloqueando pago');
+              return NextResponse.json(
+                {
+                  error: 'Ya estás inscrito en este curso',
+                  message: 'Ya tienes una inscripción activa en este curso. Por favor revisa tu correo electrónico para ver la confirmación de tu inscripción anterior.',
+                  alreadyEnrolled: true
+                },
+                { status: 400 }
+              );
+            } else {
+              console.log('✅ No hay inscripción previa, procediendo con el pago');
+            }
+          } else {
+            console.log('✅ Usuario nuevo, procediendo con el pago');
+          }
+        }
+      } catch (dbError) {
+        console.error('Error verificando inscripción existente:', dbError);
+      }
+    }
+
+    const isDemoMode = process.env.PAYMENT_DEMO_MODE === 'true' || metadata?.demo_mode === true;
     let charge: any;
 
     if (isDemoMode) {
-      console.log('🎭 DEMO MODE: Simulating successful payment');
+      console.log('🎭 DEMO MODE: Simulating successful payment (PAYMENT_DEMO_MODE=true)');
 
       await new Promise(resolve => setTimeout(resolve, 1500));
 
@@ -68,6 +119,7 @@ export async function POST(request: NextRequest) {
       });
 
       charge = await culqiResponse.json();
+      console.log('🔍 Respuesta de Culqi:', JSON.stringify(charge, null, 2));
 
       if (!culqiResponse.ok) {
         console.error('Culqi charge error:', charge);
@@ -80,7 +132,7 @@ export async function POST(request: NextRequest) {
         );
       }
 
-      if (charge.outcome.type !== 'venta_exitosa') {
+      if (charge.outcome && charge.outcome.type !== 'venta_exitosa') {
         return NextResponse.json(
           {
             error: 'El pago no fue exitoso',
@@ -94,7 +146,7 @@ export async function POST(request: NextRequest) {
     if (metadata?.course_slug && metadata?.student_email) {
       try {
         const courseResult = await query(
-          'SELECT id, title FROM courses WHERE slug = ?',
+          'SELECT id, title, live_start_date, live_schedule FROM courses WHERE slug = ?',
           [metadata.course_slug]
         );
 
@@ -138,25 +190,36 @@ export async function POST(request: NextRequest) {
             );
           }
 
-          if (isNewUser && temporaryPassword) {
-            console.log('📧 Queuing credentials email to:', metadata.student_email);
-            console.log('📧 Password:', temporaryPassword);
+          console.log('📧 Sending purchase confirmation email to:', metadata.student_email);
 
-            fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/email/send-credentials`, {
+          try {
+            const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+
+            const emailResponse = await fetch(`${baseUrl}/api/email/send-purchase-confirmation`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({
                 email: metadata.student_email,
                 name: metadata.student_name || 'Estudiante',
-                password: temporaryPassword,
-                courseTitle: course.title
+                courseTitle: course.title,
+                modality: metadata.modality || 'grabado',
+                amount: amount,
+                password: isNewUser ? temporaryPassword : null,
+                isNewUser: isNewUser,
+                liveStartDate: course.live_start_date,
+                liveSchedule: course.live_schedule
               })
-            }).then(async (response) => {
-              const result = await response.json();
-              console.log('📧 Email response:', result);
-            }).catch((emailError) => {
-              console.error('⚠️ Error enviando correo:', emailError.message);
             });
+
+            if (emailResponse.ok) {
+              const result = await emailResponse.json();
+              console.log('📧 Purchase confirmation email sent:', result);
+            } else {
+              const errorText = await emailResponse.text();
+              console.error('⚠️ Error sending email - Status:', emailResponse.status, 'Response:', errorText);
+            }
+          } catch (emailError: any) {
+            console.error('⚠️ Error enviando correo de confirmación:', emailError.message);
           }
 
           return NextResponse.json({

@@ -69,6 +69,7 @@ export async function GET(
       priceGrabado: course.publication_status === 'published' ? course.price_grabado : null,
       oldPriceGrabado: course.publication_status === 'published' ? course.price_grabado : null,
       hasLiveMode: Boolean(course.has_live_mode),
+      hasRecordedMode: Boolean(course.has_recorded_mode),
       live_start_date: course.live_start_date,
       live_schedule: course.live_schedule,
       keyTopics: learningOutcomes,

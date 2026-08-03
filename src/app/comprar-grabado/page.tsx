@@ -22,6 +22,8 @@ function ComprarGrabadoContent() {
   const [paymentSuccess, setPaymentSuccess] = React.useState(false);
   const [paymentError, setPaymentError] = React.useState('');
   const [enrollment, setEnrollment] = React.useState<any>(null);
+  const [showAlreadyEnrolledModal, setShowAlreadyEnrolledModal] = React.useState(false);
+  const [alreadyEnrolledMessage, setAlreadyEnrolledMessage] = React.useState('');
 
   React.useEffect(() => {
     if (!cursoSlug) {
@@ -303,12 +305,32 @@ function ComprarGrabadoContent() {
                 </h2>
               )}
 
-              <form onSubmit={(e) => {
+              <form onSubmit={async (e) => {
                 e.preventDefault();
                 if (step === 1) {
-                  setStep(2);
-                } else {
-                  alert('Procesando pago...');
+                  try {
+                    const checkResponse = await fetch('/api/enrollment/check', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({
+                        email: email,
+                        courseSlug: curso.slug
+                      })
+                    });
+
+                    const checkData = await checkResponse.json();
+
+                    if (checkData.alreadyEnrolled) {
+                      setAlreadyEnrolledMessage(checkData.message);
+                      setShowAlreadyEnrolledModal(true);
+                      return;
+                    }
+
+                    setStep(2);
+                  } catch (error) {
+                    console.error('Error verificando inscripción:', error);
+                    setStep(2);
+                  }
                 }
               }}>
 
@@ -635,17 +657,41 @@ function ComprarGrabadoContent() {
                   marginTop: spacing.md
                 }}>
                   {paymentError && (
-                        <div style={{
-                          padding: '1rem',
-                          background: '#FFEBEE',
-                          border: '1px solid #EF5350',
-                          borderRadius: '8px',
-                          marginBottom: '1rem',
-                          color: '#C62828'
-                        }}>
-                          ❌ {paymentError}
+                    <div style={{
+                      padding: '1.5rem',
+                      background: 'linear-gradient(135deg, #FFEBEE 0%, #FFCDD2 100%)',
+                      border: '2px solid #EF5350',
+                      borderRadius: '12px',
+                      marginBottom: '1.5rem',
+                      boxShadow: '0 4px 12px rgba(239, 83, 80, 0.2)'
+                    }}>
+                      <div style={{
+                        display: 'flex',
+                        alignItems: 'flex-start',
+                        gap: '12px'
+                      }}>
+                        <div style={{ fontSize: '1.5rem', flexShrink: 0 }}>❌</div>
+                        <div style={{ flex: 1 }}>
+                          <h4 style={{
+                            color: '#C62828',
+                            margin: '0 0 8px 0',
+                            fontSize: '1.1rem',
+                            fontWeight: '700'
+                          }}>
+                            Error al procesar el pago
+                          </h4>
+                          <p style={{
+                            color: '#D32F2F',
+                            margin: 0,
+                            fontSize: '0.95rem',
+                            lineHeight: '1.5'
+                          }}>
+                            {paymentError}
+                          </p>
                         </div>
-                      )}
+                      </div>
+                    </div>
+                  )}
 
                       {!paymentSuccess ? (
                         <CulqiPaymentForm
@@ -1099,6 +1145,82 @@ function ComprarGrabadoContent() {
     <div className="hide-on-mobile">
       <Footer />
     </div>
+
+    {showAlreadyEnrolledModal && (
+      <div
+        style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(0, 0, 0, 0.5)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 9999,
+          padding: spacing.md
+        }}
+        onClick={() => setShowAlreadyEnrolledModal(false)}
+      >
+        <div
+          style={{
+            backgroundColor: colors.white,
+            borderRadius: '12px',
+            padding: '2rem',
+            maxWidth: '500px',
+            width: '100%',
+            boxShadow: '0 8px 32px rgba(0,0,0,0.3)',
+            textAlign: 'center'
+          }}
+          onClick={(e) => e.stopPropagation()}
+        >
+          <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>⚠️</div>
+          <h2 style={{
+            fontSize: '1.5rem',
+            fontWeight: '700',
+            color: colors.gray[700],
+            marginBottom: '1rem'
+          }}>
+            Ya estás inscrito en este curso
+          </h2>
+          <p style={{
+            fontSize: '1rem',
+            color: colors.gray[600],
+            lineHeight: '1.6',
+            marginBottom: '1.5rem'
+          }}>
+            {alreadyEnrolledMessage}
+          </p>
+          <p style={{
+            fontSize: '0.9rem',
+            color: colors.gray[600],
+            marginBottom: '1.5rem',
+            padding: '1rem',
+            background: '#f8f9fa',
+            borderRadius: '8px'
+          }}>
+            📧 Revisa tu correo electrónico (incluyendo la carpeta de spam) para ver la confirmación de tu inscripción.
+          </p>
+          <button
+            onClick={() => setShowAlreadyEnrolledModal(false)}
+            style={{
+              backgroundColor: colors.primary,
+              color: colors.white,
+              border: 'none',
+              padding: `${spacing.md} ${spacing.xl}`,
+              borderRadius: '8px',
+              fontSize: '1rem',
+              fontWeight: '600',
+              cursor: 'pointer',
+              boxShadow: '0 4px 12px rgba(0, 51, 102, 0.3)'
+            }}
+          >
+            Entendido
+          </button>
+        </div>
+      </div>
+    )}
     </>
   );
 }

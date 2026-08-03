@@ -578,7 +578,7 @@ export default function CursoPage({ params }: { params: Promise<{ slug: string }
               }}>
                 ⏳ PRÓXIMAMENTE DISPONIBLE
               </div>
-            ) : curso?.hasLiveMode ? (
+            ) : curso?.hasLiveMode && curso?.hasRecordedMode ? (
               <button
                 onClick={() => setShowModal(true)}
                 style={{
@@ -598,6 +598,27 @@ export default function CursoPage({ params }: { params: Promise<{ slug: string }
               >
                 ELIGE TU ACCESO AL CURSO →
               </button>
+            ) : curso?.hasLiveMode ? (
+              <Link href={`/inscripcion-vivo?curso=${slug}`} style={{ textDecoration: 'none' }}>
+                <button
+                  style={{
+                    backgroundColor: colors.accent,
+                    color: colors.white,
+                    border: 'none',
+                    padding: `${spacing.md} ${spacing.xl}`,
+                    borderRadius: '8px',
+                    fontSize: '0.95rem',
+                    fontWeight: '700',
+                    cursor: 'pointer',
+                    boxShadow: '0 4px 12px rgba(255,102,0,0.3)',
+                    transition: 'transform 0.2s'
+                  }}
+                  onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.02)'}
+                  onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
+                >
+                  INSCRIBIRME AL CURSO EN VIVO →
+                </button>
+              </Link>
             ) : (
               <Link href={`/comprar-grabado?curso=${slug}`} style={{ textDecoration: 'none' }}>
                 <button
@@ -616,7 +637,7 @@ export default function CursoPage({ params }: { params: Promise<{ slug: string }
                   onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.02)'}
                   onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
                 >
-                  COMPRAR AHORA →
+                  COMPRAR ACCESO GRABADO →
                 </button>
               </Link>
             )}
