@@ -71,6 +71,11 @@ export async function PUT(
       values.push(body.has_live_mode);
     }
 
+    if (typeof body.has_recorded_mode === 'boolean') {
+      updates.push('has_recorded_mode = ?');
+      values.push(body.has_recorded_mode);
+    }
+
     if (body.live_start_date !== undefined) {
       updates.push('live_start_date = ?');
       values.push(body.live_start_date || null);

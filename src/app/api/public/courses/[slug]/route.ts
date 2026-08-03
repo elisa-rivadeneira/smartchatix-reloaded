@@ -20,6 +20,7 @@ export async function GET(
         price_grabado,
         duration,
         has_live_mode,
+        has_recorded_mode,
         live_start_date,
         live_schedule,
         recorded_features,

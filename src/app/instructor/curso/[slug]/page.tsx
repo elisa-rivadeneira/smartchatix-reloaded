@@ -1136,6 +1136,7 @@ function CourseConfigForm({ course, onUpdate }: { course: Course | null; onUpdat
     price_grabado: course?.price_grabado || 0,
     is_active: course?.is_active || false,
     has_live_mode: (course as any)?.has_live_mode || false,
+    has_recorded_mode: (course as any)?.has_recorded_mode !== false,
     live_start_date: (course as any)?.live_start_date || '',
     live_schedule: (course as any)?.live_schedule || '',
     recorded_features: (course as any)?.recorded_features || {
@@ -1186,6 +1187,7 @@ function CourseConfigForm({ course, onUpdate }: { course: Course | null; onUpdat
         price_grabado: course.price_grabado,
         is_active: course.is_active,
         has_live_mode: (course as any).has_live_mode || false,
+        has_recorded_mode: (course as any).has_recorded_mode !== false,
         live_start_date: formattedDate,
         live_schedule: (course as any).live_schedule || '',
         recorded_features: (course as any).recorded_features || {
@@ -1231,6 +1233,13 @@ function CourseConfigForm({ course, onUpdate }: { course: Course | null; onUpdat
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!course) return;
+
+    // Validación: Si el curso está publicado, debe tener al menos una modalidad habilitada
+    if (course.publication_status === 'published' && !formData.has_live_mode && !formData.has_recorded_mode) {
+      setErrorMessage('⚠️ Un curso publicado debe tener al menos una modalidad habilitada (En Vivo o Grabado)');
+      setShowErrorModal(true);
+      return;
+    }
 
     const modulesCount = course?.modules?.length || 0;
     const dataToSend = {
@@ -1464,26 +1473,55 @@ function CourseConfigForm({ course, onUpdate }: { course: Course | null; onUpdat
       </h3>
 
       <div style={{ marginBottom: '20px' }}>
-        <label style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: '8px',
-          fontSize: '14px',
-          fontWeight: '500',
-          color: '#374151',
-          cursor: 'pointer'
-        }}>
-          <input
-            type="checkbox"
-            checked={formData.has_live_mode}
-            onChange={(e) => setFormData(prev => ({ ...prev, has_live_mode: e.target.checked }))}
-            style={{ width: '16px', height: '16px' }}
-          />
-          Habilitar modalidad en vivo
-        </label>
-        <p style={{ fontSize: '12px', color: '#6b7280', marginTop: '4px', marginLeft: '24px' }}>
-          Si activas esto, el curso aparecerá en la página de "Inscripción en Vivo"
-        </p>
+        <h4 style={{ fontSize: '14px', fontWeight: '600', color: '#111827', marginBottom: '12px' }}>
+          Modalidades Disponibles
+        </h4>
+
+        <div style={{ marginBottom: '12px' }}>
+          <label style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            fontSize: '14px',
+            fontWeight: '500',
+            color: '#374151',
+            cursor: 'pointer'
+          }}>
+            <input
+              type="checkbox"
+              checked={formData.has_live_mode}
+              onChange={(e) => setFormData(prev => ({ ...prev, has_live_mode: e.target.checked }))}
+              style={{ width: '16px', height: '16px' }}
+            />
+            Habilitar modalidad en vivo
+          </label>
+          <p style={{ fontSize: '12px', color: '#6b7280', marginTop: '4px', marginLeft: '24px' }}>
+            El curso estará disponible con clases en vivo programadas
+          </p>
+        </div>
+
+        <div style={{ marginBottom: '12px' }}>
+          <label style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            fontSize: '14px',
+            fontWeight: '500',
+            color: '#374151',
+            cursor: 'pointer'
+          }}>
+            <input
+              type="checkbox"
+              checked={formData.has_recorded_mode}
+              onChange={(e) => setFormData(prev => ({ ...prev, has_recorded_mode: e.target.checked }))}
+              style={{ width: '16px', height: '16px' }}
+            />
+            Habilitar modalidad grabado
+          </label>
+          <p style={{ fontSize: '12px', color: '#6b7280', marginTop: '4px', marginLeft: '24px' }}>
+            El curso estará disponible con acceso inmediato a contenido grabado
+          </p>
+        </div>
       </div>
 
       {formData.has_live_mode && (
