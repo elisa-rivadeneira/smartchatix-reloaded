@@ -6,11 +6,13 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import { getProductBySlug } from '@/data/courses';
 import Footer from '@/components/Footer';
 import CulqiPaymentForm from '@/components/CulqiPaymentForm';
+import { useCurrency } from '@/hooks/useCurrency';
 
 function ComprarGrabadoContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const cursoSlug = searchParams.get('curso');
+  const { currency, symbol, formatPrice, convertPrice } = useCurrency();
 
   const [curso, setCurso] = React.useState<any>(null);
   const [loading, setLoading] = React.useState(true);
@@ -44,6 +46,22 @@ function ComprarGrabadoContent() {
         setLoading(false);
       });
   }, [cursoSlug]);
+
+  const getPrice = () => {
+    if (!curso) return 0;
+    if (currency === 'USD') {
+      return curso.priceGrabadoUsd || convertPrice(curso.priceGrabado || 0);
+    }
+    return curso.priceGrabado || 0;
+  };
+
+  const getOldPrice = () => {
+    if (!curso) return 0;
+    if (currency === 'USD') {
+      return curso.priceGrabadoUsdOld || convertPrice(curso.priceGrabadoOld || 0);
+    }
+    return curso.priceGrabadoOld || 0;
+  };
 
   const colors = {
     primary: '#003366',
@@ -513,7 +531,7 @@ function ComprarGrabadoContent() {
                           fontWeight: '700',
                           color: colors.gray[700]
                         }}>
-                          S/ {curso.priceGrabado}
+                          {symbol} {getPrice().toFixed(2)}
                         </div>
                       </div>
                     )}
@@ -695,7 +713,7 @@ function ComprarGrabadoContent() {
 
                       {!paymentSuccess ? (
                         <CulqiPaymentForm
-                          amount={curso.priceGrabado ?? 0}
+                          amount={getPrice()}
                           courseSlug={curso.slug}
                           courseTitle={curso.title}
                           modality="grabado"
@@ -898,7 +916,7 @@ function ComprarGrabadoContent() {
                           boxShadow: '0 4px 12px rgba(0, 112, 186, 0.3)'
                         }}
                       >
-                        Pagar con PayPal - S/ {curso?.priceGrabado || 699}
+                        Pagar con PayPal - {symbol} {getPrice().toFixed(2)}
                       </button>
                     </div>
                   )}
@@ -984,7 +1002,7 @@ function ComprarGrabadoContent() {
                         fontSize: '0.85rem',
                         marginBottom: spacing.md
                       }}>
-                        💡 Monto: S/ {curso?.priceGrabado || 699}
+                        💡 Monto: {symbol} {getPrice().toFixed(2)}
                       </div>
                       <button
                         type="button"
@@ -1090,15 +1108,17 @@ function ComprarGrabadoContent() {
                       fontWeight: '700',
                       color: colors.white
                     }}>
-                      S/ {curso?.priceGrabado || 699}
+                      {symbol} {getPrice().toFixed(2)}
                     </span>
-                    <span style={{
-                      fontSize: '1.2rem',
-                      color: 'rgba(255,255,255,0.5)',
-                      textDecoration: 'line-through'
-                    }}>
-                      S/ {curso?.oldPriceGrabado || 999}
-                    </span>
+                    {getOldPrice() > 0 && (
+                      <span style={{
+                        fontSize: '1.2rem',
+                        color: 'rgba(255,255,255,0.5)',
+                        textDecoration: 'line-through'
+                      }}>
+                        {symbol} {getOldPrice().toFixed(2)}
+                      </span>
+                    )}
                   </div>
                 </div>
                 <div style={{
