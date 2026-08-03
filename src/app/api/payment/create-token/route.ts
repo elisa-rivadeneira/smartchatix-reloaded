@@ -30,7 +30,7 @@ export async function POST(request: NextRequest) {
       email
     };
 
-    console.log('Creating Culqi token...');
+    console.log('Creating Culqi token with public key:', publicKey.substring(0, 20) + '...');
 
     const culqiResponse = await fetch('https://secure.culqi.com/v2/tokens', {
       method: 'POST',

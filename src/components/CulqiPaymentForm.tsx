@@ -150,15 +150,10 @@ export default function CulqiPaymentForm({
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     console.log('🔥 PAGAR AHORA');
-
-    if (!culqiLoaded || !window.Culqi) {
-      onError('Culqi no está cargado. Por favor, recarga la página.');
-      return;
-    }
 
     const cardNumber = (document.getElementById('card[number]') as HTMLInputElement)?.value.replace(/\s/g, '');
     const cvv = (document.getElementById('card[cvv]') as HTMLInputElement)?.value;
@@ -175,7 +170,51 @@ export default function CulqiPaymentForm({
     const fullYear = expYear.length === 2 ? `20${expYear}` : expYear;
 
     try {
-      window.Culqi.createToken();
+      const tokenResponse = await fetch('/api/payment/create-token', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          card_number: cardNumber,
+          cvv: cvv,
+          expiration_month: expMonth,
+          expiration_year: fullYear,
+          email: email
+        })
+      });
+
+      const tokenData = await tokenResponse.json();
+
+      if (!tokenResponse.ok || !tokenData.success) {
+        throw new Error(tokenData.details || tokenData.error || 'Error al procesar la tarjeta');
+      }
+
+      const chargeResponse = await fetch('/api/payment/charge', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          token: tokenData.token,
+          amount: amount,
+          email: email,
+          description: `${courseTitle} - ${modality}`,
+          metadata: {
+            course_slug: courseSlug,
+            course_title: courseTitle,
+            modality: modality,
+            student_name: fullName,
+            student_email: email,
+            student_phone: phone
+          }
+        })
+      });
+
+      const chargeData = await chargeResponse.json();
+
+      if (!chargeResponse.ok) {
+        throw new Error(chargeData.error || 'Error al procesar el pago');
+      }
+
+      setProcessing(false);
+      onSuccess(chargeData);
     } catch (error: any) {
       setProcessing(false);
       onError(error.message || 'Error al procesar el pago');

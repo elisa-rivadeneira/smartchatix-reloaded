@@ -385,7 +385,7 @@ export default function CursoPage({ params }: { params: Promise<{ slug: string }
                 letterSpacing: '0.5px',
                 marginBottom: spacing.xs
               }}>
-                ACCESO GRABADO
+                {curso.hasLiveMode ? 'CURSO EN VIVO' : 'ACCESO GRABADO'}
               </div>
               <div style={{
                 fontSize: '0.8rem',
@@ -405,14 +405,14 @@ export default function CursoPage({ params }: { params: Promise<{ slug: string }
                   fontWeight: '700',
                   color: colors.white
                 }}>
-                  S/ {curso.priceGrabado}
+                  S/ {curso.hasLiveMode ? curso.priceVivo : curso.priceGrabado}
                 </span>
                 <span style={{
                   fontSize: '1.2rem',
                   color: 'rgba(255,255,255,0.5)',
                   textDecoration: 'line-through'
                 }}>
-                  S/ {curso.oldPriceGrabado}
+                  S/ {curso.hasLiveMode ? curso.oldPriceVivo : curso.oldPriceGrabado}
                 </span>
               </div>
             </div>
@@ -904,26 +904,28 @@ export default function CursoPage({ params }: { params: Promise<{ slug: string }
                     textAlign: 'center',
                     marginTop: spacing.xs
                   }}>
-                    Acceso Grabado
+                    {curso.priceGrabado ? 'Acceso Grabado' : ''}
                   </h3>
 
-                  <div style={{ textAlign: 'center', marginBottom: spacing.xs }}>
-                    <div style={{
-                      fontSize: '1.8rem',
-                      fontWeight: '700',
-                      color: colors.primary,
-                      marginBottom: '2px'
-                    }}>
-                      S/ {curso.priceGrabado}
+                  {curso.priceGrabado && (
+                    <div style={{ textAlign: 'center', marginBottom: spacing.xs }}>
+                      <div style={{
+                        fontSize: '1.8rem',
+                        fontWeight: '700',
+                        color: colors.primary,
+                        marginBottom: '2px'
+                      }}>
+                        S/ {curso.priceGrabado}
+                      </div>
+                      <div style={{
+                        fontSize: '0.85rem',
+                        color: colors.gray[400],
+                        textDecoration: 'line-through'
+                      }}>
+                        S/ {curso.oldPriceGrabado}
+                      </div>
                     </div>
-                    <div style={{
-                      fontSize: '0.85rem',
-                      color: colors.gray[400],
-                      textDecoration: 'line-through'
-                    }}>
-                      S/ {curso.oldPriceGrabado}
-                    </div>
-                  </div>
+                  )}
 
                   <ul style={{
                     listStyle: 'none',
