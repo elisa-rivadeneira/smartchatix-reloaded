@@ -26,10 +26,9 @@ export async function GET(
         recorded_features,
         learning_outcomes,
         module_titles,
-        is_active,
         publication_status
       FROM courses
-      WHERE slug = ? AND is_active = TRUE AND publication_status IN ('published', 'coming_soon')
+      WHERE slug = ? AND publication_status IN ('published', 'coming_soon')
     `, [slug]);
 
     if (!courseData || courseData.length === 0) {

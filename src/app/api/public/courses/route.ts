@@ -20,10 +20,9 @@ export async function GET() {
         recorded_features,
         learning_outcomes,
         module_titles,
-        is_active,
         publication_status
       FROM courses
-      WHERE is_active = TRUE AND publication_status IN ('published', 'coming_soon')
+      WHERE publication_status IN ('published', 'coming_soon')
       ORDER BY id ASC
     `);
 
