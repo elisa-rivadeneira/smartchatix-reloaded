@@ -5,61 +5,33 @@
 -- =====================================================
 
 -- =====================================================
--- 1. CONFIGURACIÓN DE MODALIDADES DE CURSO (si no existe)
+-- 1. CONFIGURACIÓN DE MODALIDADES DE CURSO
 -- =====================================================
+-- NOTA: Si alguna columna ya existe, MySQL mostrará un error pero continuará.
+-- Puedes ignorar errores tipo "Duplicate column name"
 
--- Verificar si la columna has_live_mode existe
-SELECT COUNT(*) INTO @columnExists
-FROM information_schema.COLUMNS
-WHERE TABLE_SCHEMA = DATABASE()
-  AND TABLE_NAME = 'courses'
-  AND COLUMN_NAME = 'has_live_mode';
+-- Modalidad en vivo (si no existe, se agregará)
+ALTER TABLE courses
+ADD COLUMN has_live_mode BOOLEAN DEFAULT FALSE COMMENT 'Si el curso está disponible en modalidad en vivo';
 
--- Solo agregar si no existe
-SET @sql = IF(@columnExists = 0,
-  'ALTER TABLE courses
-   ADD COLUMN has_live_mode BOOLEAN DEFAULT FALSE COMMENT "Si el curso está disponible en modalidad en vivo",
-   ADD COLUMN live_start_date DATE NULL COMMENT "Fecha de inicio del curso en vivo",
-   ADD COLUMN live_schedule VARCHAR(500) NULL COMMENT "Horario del curso en vivo"',
-  'SELECT "Las columnas de modalidad en vivo ya existen" AS message');
-PREPARE stmt FROM @sql;
-EXECUTE stmt;
-DEALLOCATE PREPARE stmt;
+ALTER TABLE courses
+ADD COLUMN live_start_date DATE NULL COMMENT 'Fecha de inicio del curso en vivo';
 
--- Verificar si la columna recorded_features existe
-SELECT COUNT(*) INTO @columnExists
-FROM information_schema.COLUMNS
-WHERE TABLE_SCHEMA = DATABASE()
-  AND TABLE_NAME = 'courses'
-  AND COLUMN_NAME = 'recorded_features';
+ALTER TABLE courses
+ADD COLUMN live_schedule VARCHAR(500) NULL COMMENT 'Horario del curso en vivo';
 
--- Solo agregar si no existe
-SET @sql = IF(@columnExists = 0,
-  'ALTER TABLE courses
-   ADD COLUMN recorded_features JSON NULL COMMENT "Características del curso grabado"',
-  'SELECT "La columna recorded_features ya existe" AS message');
-PREPARE stmt FROM @sql;
-EXECUTE stmt;
-DEALLOCATE PREPARE stmt;
+-- Características del curso grabado
+ALTER TABLE courses
+ADD COLUMN recorded_features JSON NULL COMMENT 'Características del curso grabado';
 
--- Verificar si la columna learning_outcomes existe
-SELECT COUNT(*) INTO @columnExists
-FROM information_schema.COLUMNS
-WHERE TABLE_SCHEMA = DATABASE()
-  AND TABLE_NAME = 'courses'
-  AND COLUMN_NAME = 'learning_outcomes';
+-- Learning outcomes y módulos
+ALTER TABLE courses
+ADD COLUMN learning_outcomes JSON NULL COMMENT 'Lo que dominarás (bullets de aprendizaje)';
 
--- Solo agregar si no existe
-SET @sql = IF(@columnExists = 0,
-  'ALTER TABLE courses
-   ADD COLUMN learning_outcomes JSON NULL COMMENT "Lo que dominarás (bullets de aprendizaje)",
-   ADD COLUMN module_titles JSON NULL COMMENT "Títulos de módulos para Plan de Estudios"',
-  'SELECT "Las columnas de learning_outcomes ya existen" AS message');
-PREPARE stmt FROM @sql;
-EXECUTE stmt;
-DEALLOCATE PREPARE stmt;
+ALTER TABLE courses
+ADD COLUMN module_titles JSON NULL COMMENT 'Títulos de módulos para Plan de Estudios';
 
--- Crear índices si no existen
+-- Crear índices (MySQL ignorará si ya existen con IF NOT EXISTS)
 CREATE INDEX IF NOT EXISTS idx_has_live_mode ON courses(has_live_mode);
 CREATE INDEX IF NOT EXISTS idx_live_start_date ON courses(live_start_date);
 
@@ -84,22 +56,11 @@ ON DUPLICATE KEY UPDATE setting_key = setting_key;
 -- =====================================================
 -- 3. VERIFICAR ESTRUCTURA DE ENROLLMENTS
 -- =====================================================
+-- NOTA: Si la columna ya existe, MySQL mostrará un error pero continuará.
 
--- Verificar que la tabla enrollments tenga la columna modality
-SELECT COUNT(*) INTO @columnExists
-FROM information_schema.COLUMNS
-WHERE TABLE_SCHEMA = DATABASE()
-  AND TABLE_NAME = 'enrollments'
-  AND COLUMN_NAME = 'modality';
-
--- Solo agregar si no existe
-SET @sql = IF(@columnExists = 0,
-  'ALTER TABLE enrollments
-   ADD COLUMN modality ENUM("vivo", "grabado") NOT NULL DEFAULT "grabado"',
-  'SELECT "La columna modality ya existe en enrollments" AS message');
-PREPARE stmt FROM @sql;
-EXECUTE stmt;
-DEALLOCATE PREPARE stmt;
+-- Agregar columna modality si no existe
+ALTER TABLE enrollments
+ADD COLUMN modality ENUM('vivo', 'grabado') NOT NULL DEFAULT 'grabado';
 
 -- =====================================================
 -- 4. RESUMEN DE CAMBIOS

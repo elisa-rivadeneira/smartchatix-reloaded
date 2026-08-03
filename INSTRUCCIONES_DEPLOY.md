@@ -44,6 +44,11 @@ USE fluideka_lms;
 source /ruta/al/proyecto/DEPLOY_DB_MIGRATION.sql;
 ```
 
+**⚠️ NOTA IMPORTANTE:**
+- Si ves errores tipo `Duplicate column name 'has_live_mode'`, es **NORMAL**.
+- Significa que la columna ya existe, MySQL simplemente la ignora y continúa.
+- Solo debes preocuparte si ves errores de **sintaxis** o **permisos**.
+
 ### Verificaciones importantes:
 
 1. **Verificar que se crearon las columnas en `courses`:**
