@@ -186,7 +186,7 @@ export default function CulqiPaymentForm({
         installments: false,
         paymentmethods: {
           tarjeta: true,
-          yape: false,
+          yape: true,
           billetera: false,
           bancaMovil: false,
           agente: false,

@@ -35,6 +35,7 @@ CREATE TABLE IF NOT EXISTS courses (
   recorded_features JSON NULL COMMENT 'Características del curso grabado',
   learning_outcomes JSON NULL COMMENT 'Lo que dominarás (bullets de aprendizaje)',
   module_titles JSON NULL COMMENT 'Títulos de módulos para Plan de Estudios',
+  module_descriptions JSON NULL COMMENT 'Descripciones de módulos para Plan de Estudios',
   instructor_id INT,
   is_active BOOLEAN DEFAULT TRUE,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

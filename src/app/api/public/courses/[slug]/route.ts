@@ -26,6 +26,7 @@ export async function GET(
         recorded_features,
         learning_outcomes,
         module_titles,
+        module_descriptions,
         publication_status
       FROM courses
       WHERE slug = ? AND publication_status IN ('published', 'coming_soon')
@@ -47,6 +48,9 @@ export async function GET(
     const moduleTitles = typeof course.module_titles === 'string'
       ? JSON.parse(course.module_titles)
       : (course.module_titles || modules.map((m: any) => m.title));
+    const moduleDescriptions = typeof course.module_descriptions === 'string'
+      ? JSON.parse(course.module_descriptions)
+      : (course.module_descriptions || modules.map((m: any) => m.description || ''));
     const recordedFeatures = typeof course.recorded_features === 'string'
       ? JSON.parse(course.recorded_features)
       : (course.recorded_features || {});
@@ -79,6 +83,7 @@ export async function GET(
       modules: moduleTitles.map((title: string, idx: number) => ({
         num: idx + 1,
         title: title,
+        description: moduleDescriptions[idx] || '',
         hours: recordedFeatures.duration_hours ? `${(recordedFeatures.duration_hours / moduleTitles.length).toFixed(1)}h` : '2h',
         topics: []
       }))

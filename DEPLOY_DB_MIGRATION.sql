@@ -34,6 +34,9 @@ ADD COLUMN learning_outcomes JSON NULL COMMENT 'Lo que dominarás (bullets de ap
 ALTER TABLE courses
 ADD COLUMN module_titles JSON NULL COMMENT 'Títulos de módulos para Plan de Estudios';
 
+ALTER TABLE courses
+ADD COLUMN module_descriptions JSON NULL COMMENT 'Descripciones de módulos para Plan de Estudios';
+
 -- Crear índices (MySQL ignorará si ya existen con IF NOT EXISTS)
 CREATE INDEX IF NOT EXISTS idx_has_live_mode ON courses(has_live_mode);
 CREATE INDEX IF NOT EXISTS idx_live_start_date ON courses(live_start_date);

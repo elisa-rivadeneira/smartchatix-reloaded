@@ -1150,7 +1150,8 @@ function CourseConfigForm({ course, onUpdate }: { course: Course | null; onUpdat
       support: 'Soporte del instructor'
     },
     learning_outcomes: (course as any)?.learning_outcomes || ['', '', '', '', '', '', '', ''],
-    module_titles: (course as any)?.module_titles || (course?.modules?.map((m: any) => m.title) || [])
+    module_titles: (course as any)?.module_titles || (course?.modules?.map((m: any) => m.title) || []),
+    module_descriptions: (course as any)?.module_descriptions || (course?.modules?.map((m: any) => m.description || '') || [])
   });
   const [saving, setSaving] = useState(false);
   const [uploadingImage, setUploadingImage] = useState(false);
@@ -1162,8 +1163,10 @@ function CourseConfigForm({ course, onUpdate }: { course: Course | null; onUpdat
   useEffect(() => {
     if (course) {
       const moduleTitles = (course as any).module_titles || (course.modules?.map((m: any) => m.title) || []);
+      const moduleDescriptions = (course as any).module_descriptions || (course.modules?.map((m: any) => m.description || '') || []);
       console.log('📚 Course modules:', course.modules);
       console.log('📋 Module titles:', moduleTitles);
+      console.log('📝 Module descriptions:', moduleDescriptions);
 
       const liveStartDate = (course as any).live_start_date;
       const formattedDate = liveStartDate
@@ -1203,7 +1206,8 @@ function CourseConfigForm({ course, onUpdate }: { course: Course | null; onUpdat
           support: 'Soporte del instructor'
         },
         learning_outcomes: (course as any).learning_outcomes || ['', '', '', '', '', '', '', ''],
-        module_titles: moduleTitles
+        module_titles: moduleTitles,
+        module_descriptions: moduleDescriptions
       });
     }
   }, [course]);
@@ -1716,10 +1720,13 @@ function CourseConfigForm({ course, onUpdate }: { course: Course | null; onUpdat
           ✓ Módulos especializados
         </label>
         <p style={{ fontSize: '12px', color: '#6b7280', marginBottom: '12px' }}>
-          Títulos cargados automáticamente del aula virtual (editables)
+          Títulos y descripciones cargados automáticamente del aula virtual (editables)
         </p>
         {(formData.module_titles || []).map((moduleTitle: string, index: number) => (
-          <div key={index} style={{ marginBottom: '8px' }}>
+          <div key={index} style={{ marginBottom: '16px', padding: '12px', backgroundColor: '#f9fafb', borderRadius: '8px', border: '1px solid #e5e7eb' }}>
+            <label style={{ display: 'block', fontSize: '12px', fontWeight: '500', color: '#6b7280', marginBottom: '6px' }}>
+              Módulo {index + 1} - Título
+            </label>
             <input
               type="text"
               value={moduleTitle}
@@ -1728,14 +1735,39 @@ function CourseConfigForm({ course, onUpdate }: { course: Course | null; onUpdat
                 newTitles[index] = e.target.value;
                 setFormData(prev => ({ ...prev, module_titles: newTitles }));
               }}
-              placeholder={`Módulo ${index + 1}`}
+              placeholder={`Título del Módulo ${index + 1}`}
               style={{
                 width: '100%',
                 padding: '8px 12px',
                 border: '1px solid #d1d5db',
                 borderRadius: '6px',
                 fontSize: '13px',
-                boxSizing: 'border-box'
+                fontWeight: '600',
+                boxSizing: 'border-box',
+                marginBottom: '8px'
+              }}
+            />
+            <label style={{ display: 'block', fontSize: '12px', fontWeight: '500', color: '#6b7280', marginBottom: '6px' }}>
+              Descripción
+            </label>
+            <textarea
+              value={(formData.module_descriptions || [])[index] || ''}
+              onChange={(e) => {
+                const newDescriptions = [...(formData.module_descriptions || [])];
+                newDescriptions[index] = e.target.value;
+                setFormData(prev => ({ ...prev, module_descriptions: newDescriptions }));
+              }}
+              placeholder={`Descripción del módulo ${index + 1}`}
+              rows={2}
+              style={{
+                width: '100%',
+                padding: '8px 12px',
+                border: '1px solid #d1d5db',
+                borderRadius: '6px',
+                fontSize: '13px',
+                boxSizing: 'border-box',
+                resize: 'vertical',
+                fontFamily: 'inherit'
               }}
             />
           </div>
