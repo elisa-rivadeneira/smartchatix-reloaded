@@ -56,19 +56,9 @@ export async function PUT(
       values.push(body.price_vivo);
     }
 
-    if (typeof body.price_vivo_usd === 'number') {
-      updates.push('price_vivo_usd = ?');
-      values.push(body.price_vivo_usd);
-    }
-
     if (typeof body.price_grabado === 'number') {
       updates.push('price_grabado = ?');
       values.push(body.price_grabado);
-    }
-
-    if (typeof body.price_grabado_usd === 'number') {
-      updates.push('price_grabado_usd = ?');
-      values.push(body.price_grabado_usd);
     }
 
     if (typeof body.is_active === 'boolean') {
@@ -185,19 +175,9 @@ export async function PATCH(
       values.push(body.price_vivo);
     }
 
-    if (typeof body.price_vivo_usd === 'number') {
-      updates.push('price_vivo_usd = ?');
-      values.push(body.price_vivo_usd);
-    }
-
     if (typeof body.price_grabado === 'number') {
       updates.push('price_grabado = ?');
       values.push(body.price_grabado);
-    }
-
-    if (typeof body.price_grabado_usd === 'number') {
-      updates.push('price_grabado_usd = ?');
-      values.push(body.price_grabado_usd);
     }
 
     if (typeof body.is_certification_enabled === 'boolean') {
