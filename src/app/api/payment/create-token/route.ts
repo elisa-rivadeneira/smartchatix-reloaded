@@ -13,14 +13,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const tokenData = {
-      card_number: card_number.replace(/\s/g, ''),
-      cvv,
-      expiration_month,
-      expiration_year,
-      email
-    };
-
     const publicKey = process.env.NEXT_PUBLIC_CULQI_PUBLIC_KEY;
 
     if (!publicKey) {
@@ -30,9 +22,17 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    console.log('Creating token with public key...');
+    const tokenData = {
+      card_number: card_number.replace(/\s/g, ''),
+      cvv,
+      expiration_month,
+      expiration_year,
+      email
+    };
 
-    const culqiResponse = await fetch('https://api.culqi.com/v2/tokens', {
+    console.log('Creating Culqi token...');
+
+    const culqiResponse = await fetch('https://secure.culqi.com/v2/tokens', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
