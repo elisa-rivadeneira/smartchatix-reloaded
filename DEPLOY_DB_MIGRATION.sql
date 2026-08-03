@@ -63,7 +63,19 @@ ALTER TABLE enrollments
 ADD COLUMN modality ENUM('vivo', 'grabado') NOT NULL DEFAULT 'grabado';
 
 -- =====================================================
--- 4. RESUMEN DE CAMBIOS
+-- 4. AGREGAR PRECIOS EN USD
+-- =====================================================
+-- NOTA: Si la columna ya existe, MySQL mostrará un error pero continuará.
+
+-- Precios en USD para modalidad en vivo y grabado
+ALTER TABLE courses
+ADD COLUMN price_vivo_usd DECIMAL(10, 2) NULL COMMENT 'Precio en USD para modalidad en vivo';
+
+ALTER TABLE courses
+ADD COLUMN price_grabado_usd DECIMAL(10, 2) NULL COMMENT 'Precio en USD para modalidad grabada';
+
+-- =====================================================
+-- 5. RESUMEN DE CAMBIOS
 -- =====================================================
 SELECT 'MIGRACIÓN COMPLETADA - VERIFICAR RESULTADOS' AS STATUS;
 
