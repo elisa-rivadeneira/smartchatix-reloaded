@@ -46,7 +46,7 @@ export default function CulqiPaymentForm({
         window.Culqi.init();
         window.Culqi.settings({
           currency: 'PEN',
-          amount: amount * 100
+          amount: Number(amount) * 100
         });
 
         console.log('Culqi initialized:', window.Culqi.publicKey);
@@ -380,7 +380,7 @@ export default function CulqiPaymentForm({
             boxShadow: '0 4px 12px rgba(255, 102, 0, 0.3)'
           }}
         >
-          {processing ? 'Procesando pago...' : `Pagar Ahora - S/ ${amount.toFixed(2)}`}
+          {processing ? 'Procesando pago...' : `Pagar Ahora - S/ ${Number(amount).toFixed(2)}`}
         </button>
 
         <div style={{
