@@ -41,6 +41,23 @@ export default function InstructorPanel() {
   const [selectedCourse, setSelectedCourse] = useState<Course | null>(null);
   const [showAssistant, setShowAssistant] = useState(true);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const [modal, setModal] = useState<{
+    show: boolean;
+    type: 'success' | 'error' | 'warning' | 'info';
+    message: string;
+    onClose?: () => void;
+  }>({ show: false, type: 'info', message: '' });
+
+  const showModal = (type: 'success' | 'error' | 'warning' | 'info', message: string, onClose?: () => void) => {
+    setModal({ show: true, type, message, onClose });
+  };
+
+  const closeModal = () => {
+    if (modal.onClose) {
+      modal.onClose();
+    }
+    setModal({ show: false, type: 'info', message: '' });
+  };
 
   useEffect(() => {
     checkAuth();
@@ -115,15 +132,51 @@ export default function InstructorPanel() {
       if (!response.ok) {
         const errorMsg = data.details || data.error || 'Error desconocido';
         console.error('❌ Error del servidor:', errorMsg);
-        alert(`Error al crear el curso: ${errorMsg}`);
+        showModal('error', `Error al crear el curso: ${errorMsg}`);
         return;
       }
 
-      alert('Curso creado exitosamente');
-      router.push(`/instructor/curso/${data.course.slug}`);
+      showModal('success', 'Curso creado exitosamente', () => {
+        router.push(`/instructor/curso/${data.course.slug}`);
+      });
     } catch (error: any) {
       console.error('❌ Error creating course:', error);
-      alert(`Error al crear el curso: ${error.message}`);
+      showModal('error', `Error al crear el curso: ${error.message}`);
+    }
+  };
+
+  const handleManualCreation = async (title: string, description: string) => {
+    try {
+      console.log('📤 Creando curso manual:', { title, description });
+
+      const response = await fetch('/api/instructor/courses', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title,
+          description,
+          price_vivo: 0,
+          price_grabado: 0,
+          modules: []
+        })
+      });
+
+      const data = await response.json();
+      console.log('📥 Respuesta de API:', data);
+
+      if (!response.ok) {
+        const errorMsg = data.details || data.error || 'Error desconocido';
+        console.error('❌ Error del servidor:', errorMsg);
+        showModal('error', `Error al crear el curso: ${errorMsg}`);
+        return;
+      }
+
+      showModal('success', 'Curso creado exitosamente. Ahora puedes configurar módulos y precios.', () => {
+        router.push(`/instructor/curso/${data.course.slug}`);
+      });
+    } catch (error: any) {
+      console.error('❌ Error creating course:', error);
+      showModal('error', `Error al crear el curso: ${error.message}`);
     }
   };
 
@@ -778,11 +831,91 @@ export default function InstructorPanel() {
             border: '1px solid #e5e7eb',
             padding: '32px'
           }}>
-            <CourseStructureAssistant onStructureCreated={handleStructureCreated} />
+            <CourseStructureAssistant
+              onStructureCreated={handleStructureCreated}
+              onManualCreation={handleManualCreation}
+            />
           </div>
         )}
         </div>
       </main>
+
+      {modal.show && (
+        <div
+          onClick={closeModal}
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: 'rgba(0, 0, 0, 0.5)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 9999,
+            padding: '1rem'
+          }}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              backgroundColor: 'white',
+              borderRadius: '12px',
+              maxWidth: '500px',
+              width: '100%',
+              padding: '2rem',
+              boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
+              textAlign: 'center'
+            }}
+          >
+            <div style={{
+              width: '64px',
+              height: '64px',
+              borderRadius: '50%',
+              margin: '0 auto 1.5rem',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: '32px',
+              background: modal.type === 'success' ? 'linear-gradient(135deg, #10b981 0%, #059669 100%)' :
+                         modal.type === 'error' ? 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)' :
+                         modal.type === 'warning' ? 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)' :
+                         'linear-gradient(135deg, #667eea 0%, #5a67d8 100%)'
+            }}>
+              {modal.type === 'success' ? '✓' : modal.type === 'error' ? '✕' : modal.type === 'warning' ? '⚠' : 'ℹ'}
+            </div>
+            <p style={{
+              fontSize: '18px',
+              fontWeight: '600',
+              color: '#1f2937',
+              marginBottom: '2rem',
+              lineHeight: '1.5'
+            }}>
+              {modal.message}
+            </p>
+            <button
+              onClick={closeModal}
+              style={{
+                padding: '0.75rem 2rem',
+                background: modal.type === 'success' ? 'linear-gradient(135deg, #10b981 0%, #059669 100%)' :
+                           modal.type === 'error' ? 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)' :
+                           modal.type === 'warning' ? 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)' :
+                           'linear-gradient(135deg, #667eea 0%, #5a67d8 100%)',
+                color: 'white',
+                border: 'none',
+                borderRadius: '8px',
+                fontSize: '14px',
+                fontWeight: '600',
+                cursor: 'pointer',
+                minWidth: '120px'
+              }}
+            >
+              Aceptar
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

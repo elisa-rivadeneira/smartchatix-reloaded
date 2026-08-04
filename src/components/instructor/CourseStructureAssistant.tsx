@@ -25,10 +25,11 @@ interface ParsedStructure {
 
 interface CourseStructureAssistantProps {
   onStructureCreated: (structure: ParsedStructure) => void;
+  onManualCreation?: (title: string, description: string) => void;
 }
 
-export default function CourseStructureAssistant({ onStructureCreated }: CourseStructureAssistantProps) {
-  const [mode, setMode] = useState<'select' | 'paste' | 'chat'>('select');
+export default function CourseStructureAssistant({ onStructureCreated, onManualCreation }: CourseStructureAssistantProps) {
+  const [mode, setMode] = useState<'select' | 'paste' | 'chat' | 'manual'>('select');
   const [pastedContent, setPastedContent] = useState('');
   const [chatMessages, setChatMessages] = useState<Message[]>([]);
   const [userMessage, setUserMessage] = useState('');
@@ -152,7 +153,7 @@ export default function CourseStructureAssistant({ onStructureCreated }: CourseS
           Elige cómo quieres crear la estructura de tu curso
         </p>
 
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '24px' }}>
           <button
             onClick={() => setMode('paste')}
             style={{
@@ -214,6 +215,35 @@ export default function CourseStructureAssistant({ onStructureCreated }: CourseS
             </h3>
             <p style={{ fontSize: '14px', color: '#6b7280', lineHeight: '1.5' }}>
               Aún no tengo estructura. Quiero que la IA me ayude conversando sobre el tema, duración y objetivos del curso.
+            </p>
+          </button>
+
+          <button
+            onClick={() => setMode('manual')}
+            style={{
+              padding: '32px 24px',
+              background: 'white',
+              border: '2px solid #e5e7eb',
+              borderRadius: '12px',
+              cursor: 'pointer',
+              transition: 'all 0.2s',
+              textAlign: 'left'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.borderColor = '#667eea';
+              e.currentTarget.style.transform = 'translateY(-2px)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.borderColor = '#e5e7eb';
+              e.currentTarget.style.transform = 'translateY(0)';
+            }}
+          >
+            <div style={{ fontSize: '48px', marginBottom: '16px' }}>✍️</div>
+            <h3 style={{ fontSize: '18px', fontWeight: '600', marginBottom: '8px', color: '#1a202c' }}>
+              Creación Manual
+            </h3>
+            <p style={{ fontSize: '14px', color: '#6b7280', lineHeight: '1.5' }}>
+              Quiero crear todo yo mismo. Solo necesito ingresar título y descripción, luego configuraré todo manualmente.
             </p>
           </button>
         </div>
@@ -431,6 +461,105 @@ Módulo 2: Funciones y Objetos
             </div>
           </div>
         )}
+      </div>
+    );
+  }
+
+  if (mode === 'manual') {
+    return (
+      <div style={{ maxWidth: '600px', margin: '0 auto' }}>
+        <button
+          onClick={() => setMode('select')}
+          style={{
+            marginBottom: '24px',
+            padding: '8px 16px',
+            background: 'white',
+            border: '1px solid #e5e7eb',
+            borderRadius: '6px',
+            cursor: 'pointer',
+            fontSize: '14px',
+            color: '#6b7280'
+          }}
+        >
+          ← Volver
+        </button>
+
+        <h2 style={{ fontSize: '24px', fontWeight: '600', marginBottom: '16px', color: '#1a202c' }}>
+          Creación Manual
+        </h2>
+        <p style={{ fontSize: '14px', color: '#6b7280', marginBottom: '24px' }}>
+          Ingresa solo el título y descripción. Podrás configurar módulos, lecciones y precios después.
+        </p>
+
+        <div style={{ marginBottom: '16px' }}>
+          <label style={{ display: 'block', fontSize: '14px', fontWeight: '500', marginBottom: '8px', color: '#374151' }}>
+            Título del curso *
+          </label>
+          <input
+            type="text"
+            value={courseTitle}
+            onChange={(e) => setCourseTitle(e.target.value)}
+            placeholder="Ej: Introducción a Python para Principiantes"
+            style={{
+              width: '100%',
+              padding: '10px 14px',
+              border: '1px solid #e5e7eb',
+              borderRadius: '6px',
+              fontSize: '14px'
+            }}
+          />
+        </div>
+
+        <div style={{ marginBottom: '24px' }}>
+          <label style={{ display: 'block', fontSize: '14px', fontWeight: '500', marginBottom: '8px', color: '#374151' }}>
+            Descripción del curso *
+          </label>
+          <textarea
+            value={pastedContent}
+            onChange={(e) => setPastedContent(e.target.value)}
+            placeholder="Describe brevemente de qué trata el curso, qué aprenderán los estudiantes, etc."
+            style={{
+              width: '100%',
+              minHeight: '120px',
+              padding: '10px 14px',
+              border: '1px solid #e5e7eb',
+              borderRadius: '6px',
+              fontSize: '14px',
+              fontFamily: 'inherit',
+              resize: 'vertical'
+            }}
+          />
+        </div>
+
+        <button
+          onClick={() => {
+            if (!courseTitle.trim()) {
+              showModal('warning', 'Por favor ingresa el título del curso');
+              return;
+            }
+            if (!pastedContent.trim()) {
+              showModal('warning', 'Por favor ingresa la descripción del curso');
+              return;
+            }
+            if (onManualCreation) {
+              onManualCreation(courseTitle, pastedContent);
+            }
+          }}
+          disabled={!courseTitle.trim() || !pastedContent.trim()}
+          style={{
+            padding: '12px 24px',
+            background: !courseTitle.trim() || !pastedContent.trim() ? '#e5e7eb' : '#667eea',
+            color: 'white',
+            border: 'none',
+            borderRadius: '8px',
+            cursor: !courseTitle.trim() || !pastedContent.trim() ? 'not-allowed' : 'pointer',
+            fontSize: '14px',
+            fontWeight: '500',
+            width: '100%'
+          }}
+        >
+          Crear Curso y Configurar Manualmente
+        </button>
       </div>
     );
   }
