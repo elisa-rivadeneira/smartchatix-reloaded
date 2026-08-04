@@ -1167,6 +1167,18 @@ function CourseConfigForm({ course, onUpdate }: { course: Course | null; onUpdat
   const [priceVivoUsdOldEdited, setPriceVivoUsdOldEdited] = useState(false);
   const [priceGrabadoUsdEdited, setPriceGrabadoUsdEdited] = useState(false);
   const [priceGrabadoUsdOldEdited, setPriceGrabadoUsdOldEdited] = useState(false);
+  const [exchangeRate, setExchangeRate] = useState(3.80);
+
+  useEffect(() => {
+    fetch('/api/public/settings/exchange-rate')
+      .then(res => res.json())
+      .then(data => {
+        if (data.exchangeRate) {
+          setExchangeRate(data.exchangeRate);
+        }
+      })
+      .catch(err => console.error('Error fetching exchange rate:', err));
+  }, []);
 
   useEffect(() => {
     if (course) {
@@ -1192,18 +1204,27 @@ function CourseConfigForm({ course, onUpdate }: { course: Course | null; onUpdat
         setDateDisplay('');
       }
 
+      const priceVivoUsdValue = (course as any).price_vivo_usd ||
+        (course.price_vivo ? Math.round((course.price_vivo / exchangeRate) * 100) / 100 : 0);
+      const priceVivoUsdOldValue = (course as any).price_vivo_usd_old ||
+        ((course as any).price_vivo_old ? Math.round(((course as any).price_vivo_old / exchangeRate) * 100) / 100 : null);
+      const priceGrabadoUsdValue = (course as any).price_grabado_usd ||
+        (course.price_grabado ? Math.round((course.price_grabado / exchangeRate) * 100) / 100 : 0);
+      const priceGrabadoUsdOldValue = (course as any).price_grabado_usd_old ||
+        ((course as any).price_grabado_old ? Math.round(((course as any).price_grabado_old / exchangeRate) * 100) / 100 : null);
+
       setFormData({
         title: course.title,
         description: course.description,
         thumbnail: course.thumbnail || '',
         price_vivo: course.price_vivo,
         price_vivo_old: (course as any).price_vivo_old || null,
-        price_vivo_usd: (course as any).price_vivo_usd || 0,
-        price_vivo_usd_old: (course as any).price_vivo_usd_old || null,
+        price_vivo_usd: priceVivoUsdValue,
+        price_vivo_usd_old: priceVivoUsdOldValue,
         price_grabado: course.price_grabado,
         price_grabado_old: (course as any).price_grabado_old || null,
-        price_grabado_usd: (course as any).price_grabado_usd || 0,
-        price_grabado_usd_old: (course as any).price_grabado_usd_old || null,
+        price_grabado_usd: priceGrabadoUsdValue,
+        price_grabado_usd_old: priceGrabadoUsdOldValue,
         is_active: course.is_active,
         has_live_mode: Boolean((course as any).has_live_mode),
         has_recorded_mode: Boolean((course as any).has_recorded_mode),
@@ -1227,7 +1248,7 @@ function CourseConfigForm({ course, onUpdate }: { course: Course | null; onUpdat
       setPriceGrabadoUsdEdited(Boolean((course as any).price_grabado_usd));
       setPriceGrabadoUsdOldEdited(Boolean((course as any).price_grabado_usd_old));
     }
-  }, [course]);
+  }, [course, exchangeRate]);
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -1452,7 +1473,7 @@ function CourseConfigForm({ course, onUpdate }: { course: Course | null; onUpdat
                 value={formData.price_vivo}
                 onChange={(e) => {
                   const pen = parseFloat(e.target.value) || 0;
-                  const usd = Math.round((pen / 3.8) * 100) / 100;
+                  const usd = Math.round((pen / exchangeRate) * 100) / 100;
                   setPriceVivoUsdEdited(false);
                   setFormData(prev => ({ ...prev, price_vivo: pen, price_vivo_usd: usd }));
                 }}
@@ -1489,7 +1510,7 @@ function CourseConfigForm({ course, onUpdate }: { course: Course | null; onUpdat
                     value={formData.price_vivo_old || 0}
                     onChange={(e) => {
                       const pen = parseFloat(e.target.value) || 0;
-                      const usd = Math.round((pen / 3.8) * 100) / 100;
+                      const usd = Math.round((pen / exchangeRate) * 100) / 100;
                       setPriceVivoUsdOldEdited(false);
                       setFormData(prev => ({ ...prev, price_vivo_old: pen, price_vivo_usd_old: usd }));
                     }}
@@ -1550,7 +1571,7 @@ function CourseConfigForm({ course, onUpdate }: { course: Course | null; onUpdat
                 value={formData.price_grabado}
                 onChange={(e) => {
                   const pen = parseFloat(e.target.value) || 0;
-                  const usd = Math.round((pen / 3.8) * 100) / 100;
+                  const usd = Math.round((pen / exchangeRate) * 100) / 100;
                   setPriceGrabadoUsdEdited(false);
                   setFormData(prev => ({ ...prev, price_grabado: pen, price_grabado_usd: usd }));
                 }}
@@ -1587,7 +1608,7 @@ function CourseConfigForm({ course, onUpdate }: { course: Course | null; onUpdat
                     value={formData.price_grabado_old || 0}
                     onChange={(e) => {
                       const pen = parseFloat(e.target.value) || 0;
-                      const usd = Math.round((pen / 3.8) * 100) / 100;
+                      const usd = Math.round((pen / exchangeRate) * 100) / 100;
                       setPriceGrabadoUsdOldEdited(false);
                       setFormData(prev => ({ ...prev, price_grabado_old: pen, price_grabado_usd_old: usd }));
                     }}
