@@ -2264,6 +2264,12 @@ export default function InstructorCourseEditPage() {
     loadUser();
   }, [slug]);
 
+  useEffect(() => {
+    if (activeTab === 'configuracion') {
+      loadCourse();
+    }
+  }, [activeTab]);
+
   const loadUser = async () => {
     try {
       const response = await fetch('/api/user/me');
