@@ -398,6 +398,12 @@ export default function StepsSection() {
             display: block !important;
           }
         }
+
+        @media (max-width: 768px) {
+          section > div > div:first-child h2 {
+            font-size: 38.4px !important;
+          }
+        }
       `}</style>
     </section>
   );

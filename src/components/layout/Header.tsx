@@ -34,9 +34,8 @@ const Header: React.FC<HeaderProps> = ({
     },
     {
       name: 'Cursos',
-      href: '#',
-      show: showCursos,
-      type: 'cursos'
+      href: '/#otros-programas',
+      show: showCursos
     },
     {
       name: 'Nosotros',
@@ -58,56 +57,6 @@ const Header: React.FC<HeaderProps> = ({
       position: 'relative',
       zIndex: 1000
     }}>
-      {/* Top Bar */}
-      <div style={{
-        background: '#003366',
-        padding: '0.5rem 0',
-        fontSize: '13px'
-      }}>
-        <div style={{
-          maxWidth: '1280px',
-          margin: '0 auto',
-          padding: '0 2rem'
-        }}>
-          <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            color: '#fff'
-          }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
-              <a href="mailto:admin@smartchatix.com" style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '0.5rem',
-                color: '#fff',
-                textDecoration: 'none'
-              }}>
-                <span>✉️</span>
-                <span>admin@smartchatix.com</span>
-              </a>
-              <a href="tel:+51967717179" style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '0.5rem',
-                color: '#fff',
-                textDecoration: 'none'
-              }}>
-                <span>📞</span>
-                <span>+51 967 717 179</span>
-              </a>
-            </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-              <span>🌐 ES</span>
-              <span>|</span>
-              <Link href="/login" style={{ color: '#fff', textDecoration: 'none' }}>
-                Ingresar
-              </Link>
-            </div>
-          </div>
-        </div>
-      </div>
-
       {/* Main Header */}
       <div style={{
         background: '#fff',
@@ -335,214 +284,252 @@ const Header: React.FC<HeaderProps> = ({
               </div>
             </div>
 
-            {/* CTA Button */}
+            {/* Ingresar Button */}
             <div style={{ display: 'none' }} className="desktop-nav">
-              <a
-                href="https://wa.me/51968374191?text=Hola,%20me%20gustaría%20conocer%20cómo%20SmartChatix%20puede%20ayudar%20a%20mi%20empresa.%20¿Podrían%20brindarme%20más%20información?"
-                target="_blank"
-                rel="noopener noreferrer"
-                style={{ textDecoration: 'none' }}
+              <Link
+                href="/login"
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '0.5rem',
+                  background: 'linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%)',
+                  color: '#fff',
+                  textDecoration: 'none',
+                  fontSize: '14px',
+                  fontWeight: '600',
+                  padding: '10px 20px',
+                  borderRadius: '8px',
+                  transition: 'all 0.2s',
+                  boxShadow: '0 2px 8px rgba(59, 130, 246, 0.25)'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = 'linear-gradient(135deg, #2563eb 0%, #3b82f6 100%)';
+                  e.currentTarget.style.boxShadow = '0 4px 12px rgba(59, 130, 246, 0.35)';
+                  e.currentTarget.style.transform = 'translateY(-1px)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = 'linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%)';
+                  e.currentTarget.style.boxShadow = '0 2px 8px rgba(59, 130, 246, 0.25)';
+                  e.currentTarget.style.transform = 'translateY(0)';
+                }}
               >
-                <button
-                  style={{
-                    background: '#FF6600',
-                    color: '#fff',
-                    border: 'none',
-                    padding: '10px 24px',
-                    borderRadius: '8px',
-                    fontSize: '14px',
-                    fontWeight: '600',
-                    cursor: 'pointer',
-                    transition: 'all 0.2s',
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.background = '#FF7722';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.background = '#FF6600';
-                  }}
-                >
-                  Conversemos
-                </button>
-              </a>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/>
+                  <polyline points="10 17 15 12 10 7"/>
+                  <line x1="15" y1="12" x2="3" y2="12"/>
+                </svg>
+                Ingresar
+              </Link>
             </div>
 
             {/* Mobile menu button */}
             <div className="mobile-menu-btn">
               <button
                 onClick={() => setIsOpen(!isOpen)}
+                className="hamburger-button"
                 style={{
+                  width: '45px',
+                  height: '45px',
+                  borderRadius: '8px',
+                  backgroundColor: '#FF6600',
+                  color: '#fff',
+                  border: 'none',
+                  boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
+                  cursor: 'pointer',
                   display: 'inline-flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  padding: '0.5rem',
-                  borderRadius: '0.375rem',
-                  color: '#374151',
-                  background: 'transparent',
-                  border: 'none',
-                  cursor: 'pointer'
+                  fontSize: '1.5rem',
+                  transition: 'all 0.3s ease'
                 }}
               >
-                <span style={{ fontSize: '24px' }}>{isOpen ? '✕' : '☰'}</span>
+                {isOpen ? '✕' : '☰'}
               </button>
             </div>
           </div>
 
-          {/* Mobile Navigation */}
+          {/* Mobile Navigation Overlay */}
           {isOpen && (
-            <div className="mobile-nav" style={{ paddingBottom: '1rem' }}>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
-                {navigation.map((item: any) => (
-                  <div key={item.name}>
-                    {item.type === 'cursos' ? (
-                      <div>
-                        <button
-                          onClick={() => setOpenDropdown(openDropdown === item.name ? null : item.name)}
-                          style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'space-between',
-                            width: '100%',
-                            padding: '0.5rem 0.75rem',
-                            fontSize: '16px',
-                            fontWeight: '500',
-                            color: '#374151',
-                            background: 'transparent',
-                            border: 'none',
-                            textAlign: 'left',
-                            cursor: 'pointer'
-                          }}
-                        >
-                          <span>{item.name}</span>
-                          <span style={{ fontSize: '12px' }}>{openDropdown === item.name ? '▲' : '▼'}</span>
-                        </button>
-                        {openDropdown === item.name && (
-                          <div style={{ paddingLeft: '1rem' }}>
-                            {courses.filter((course: any) => course.publication_status === 'published').map((course: any) => (
-                              <Link
-                                key={course.slug}
-                                href={`/cursos/${course.slug}`}
-                                style={{
-                                  display: 'block',
-                                  padding: '0.5rem 0.75rem',
-                                  fontSize: '14px',
-                                  color: '#6b7280',
-                                  textDecoration: 'none'
-                                }}
-                                onClick={() => setIsOpen(false)}
-                              >
-                                {course.title}
-                              </Link>
-                            ))}
-                          </div>
-                        )}
-                      </div>
-                    ) : item.children ? (
-                      <div>
-                        <button
-                          onClick={() => setOpenDropdown(openDropdown === item.name ? null : item.name)}
-                          style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'space-between',
-                            width: '100%',
-                            padding: '0.5rem 0.75rem',
-                            fontSize: '16px',
-                            fontWeight: '500',
-                            color: '#374151',
-                            background: 'transparent',
-                            border: 'none',
-                            textAlign: 'left',
-                            cursor: 'pointer'
-                          }}
-                        >
-                          <span>{item.name}</span>
-                          <span style={{ fontSize: '12px' }}>{openDropdown === item.name ? '▲' : '▼'}</span>
-                        </button>
-                        {openDropdown === item.name && (
-                          <div style={{ paddingLeft: '1rem' }}>
-                            {item.children.map((child: any) => (
-                              <Link
-                                key={child.name}
-                                href={child.href}
-                                style={{
-                                  display: 'block',
-                                  padding: '0.5rem 0.75rem',
-                                  fontSize: '14px',
-                                  color: '#6b7280',
-                                  textDecoration: 'none'
-                                }}
-                                onClick={() => setIsOpen(false)}
-                              >
-                                {child.name}
-                              </Link>
-                            ))}
-                          </div>
-                        )}
-                      </div>
-                    ) : item.external ? (
-                      <a
-                        href={item.href}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        style={{
-                          display: 'block',
-                          padding: '0.5rem 0.75rem',
-                          fontSize: '16px',
-                          fontWeight: '500',
-                          color: '#374151',
-                          textDecoration: 'none'
-                        }}
-                        onClick={() => setIsOpen(false)}
-                      >
-                        {item.name}
-                      </a>
-                    ) : (
-                      <Link
-                        href={item.href}
-                        style={{
-                          display: 'block',
-                          padding: '0.5rem 0.75rem',
-                          fontSize: '16px',
-                          fontWeight: '500',
-                          color: '#374151',
-                          textDecoration: 'none'
-                        }}
-                        onClick={() => setIsOpen(false)}
-                      >
-                        {item.name}
-                      </Link>
-                    )}
-                  </div>
-                ))}
+            <div
+              style={{
+                position: 'fixed',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                width: '100vw',
+                height: '100vh',
+                backgroundColor: 'rgba(0, 0, 0, 0.9)',
+                zIndex: 99998,
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '1.5rem',
+                padding: 0,
+                margin: 0,
+                overflow: 'hidden',
+                animation: 'fadeIn 0.3s ease'
+              }}
+              className="mobile-menu-overlay"
+              onClick={() => setIsOpen(false)}
+            >
+              <Link href="/login" onClick={() => setIsOpen(false)} style={{ color: '#fff', fontSize: '1.5rem', fontWeight: '600', textDecoration: 'none' }}>Ingresar</Link>
 
-                {/* Mobile CTA */}
-                <div style={{ paddingTop: '1rem' }}>
-                  <Link href="/register" style={{ display: 'block' }}>
-                    <button
-                      style={{
-                        background: '#FF6600',
-                        color: '#fff',
-                        border: 'none',
-                        padding: '10px 24px',
-                        borderRadius: '8px',
-                        fontSize: '14px',
-                        fontWeight: '600',
-                        width: '100%',
-                        cursor: 'pointer'
-                      }}
+              {navigation.map((item: any) => {
+                if (item.type === 'cursos') {
+                  return (
+                    <div key={item.name} style={{ textAlign: 'center' }}>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setOpenDropdown(openDropdown === item.name ? null : item.name);
+                        }}
+                        style={{
+                          color: '#fff',
+                          fontSize: '1.5rem',
+                          fontWeight: '600',
+                          background: 'transparent',
+                          border: 'none',
+                          cursor: 'pointer',
+                          padding: 0,
+                          marginBottom: openDropdown === item.name ? '0.5rem' : 0
+                        }}
+                      >
+                        {item.name} <span style={{ fontSize: '1rem', display: 'inline-block', transition: 'transform 0.3s ease', transform: openDropdown === item.name ? 'rotate(90deg)' : 'rotate(0deg)' }}>▶</span>
+                      </button>
+                      {openDropdown === item.name && (
+                        <div onClick={(e) => e.stopPropagation()} style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', marginTop: '0.5rem' }}>
+                          {courses.filter((course: any) => course.publication_status === 'published').map((course: any) => (
+                            <Link
+                              key={course.slug}
+                              href={`/cursos/${course.slug}`}
+                              onClick={() => setIsOpen(false)}
+                              style={{ color: 'rgba(255, 255, 255, 0.8)', fontSize: '1.1rem', fontWeight: '500', textDecoration: 'none' }}
+                            >
+                              {course.title}
+                            </Link>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  );
+                } else if (item.children) {
+                  return (
+                    <div key={item.name} style={{ textAlign: 'center' }}>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setOpenDropdown(openDropdown === item.name ? null : item.name);
+                        }}
+                        style={{
+                          color: '#fff',
+                          fontSize: '1.5rem',
+                          fontWeight: '600',
+                          background: 'transparent',
+                          border: 'none',
+                          cursor: 'pointer',
+                          padding: 0,
+                          marginBottom: openDropdown === item.name ? '0.5rem' : 0
+                        }}
+                      >
+                        {item.name} <span style={{ fontSize: '1rem', display: 'inline-block', transition: 'transform 0.3s ease', transform: openDropdown === item.name ? 'rotate(90deg)' : 'rotate(0deg)' }}>▶</span>
+                      </button>
+                      {openDropdown === item.name && (
+                        <div onClick={(e) => e.stopPropagation()} style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', marginTop: '0.5rem' }}>
+                          {item.children.map((child: any) => (
+                            <Link
+                              key={child.name}
+                              href={child.href}
+                              onClick={() => setIsOpen(false)}
+                              style={{ color: 'rgba(255, 255, 255, 0.8)', fontSize: '1.1rem', fontWeight: '500', textDecoration: 'none' }}
+                            >
+                              {child.name}
+                            </Link>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  );
+                } else if (item.external) {
+                  return (
+                    <a
+                      key={item.name}
+                      href={item.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={() => setIsOpen(false)}
+                      style={{ color: '#fff', fontSize: '1.5rem', fontWeight: '600', textDecoration: 'none' }}
                     >
-                      Solicitar demostración
-                    </button>
-                  </Link>
-                </div>
-              </div>
+                      {item.name}
+                    </a>
+                  );
+                } else {
+                  return (
+                    <Link
+                      key={item.name}
+                      href={item.href}
+                      onClick={(e) => {
+                        setIsOpen(false);
+                        if (item.href.startsWith('/#')) {
+                          e.preventDefault();
+                          const id = item.href.substring(2);
+                          setTimeout(() => {
+                            const element = document.getElementById(id);
+                            if (element) {
+                              element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                            }
+                          }, 100);
+                        }
+                      }}
+                      style={{ color: '#fff', fontSize: '1.5rem', fontWeight: '600', textDecoration: 'none' }}
+                    >
+                      {item.name}
+                    </Link>
+                  );
+                }
+              })}
             </div>
           )}
         </nav>
       </div>
 
       <style jsx>{`
+        @keyframes fadeIn {
+          from {
+            opacity: 0;
+          }
+          to {
+            opacity: 1;
+          }
+        }
+
+        @keyframes slideInRight {
+          from {
+            transform: translateX(100%);
+          }
+          to {
+            transform: translateX(0);
+          }
+        }
+
+        @keyframes slideDown {
+          from {
+            opacity: 0;
+            max-height: 0;
+            transform: translateY(-10px);
+          }
+          to {
+            opacity: 1;
+            max-height: 500px;
+            transform: translateY(0);
+          }
+        }
+
+        .mobile-menu-overlay {
+          display: none;
+        }
+
         @media (min-width: 1024px) {
           .desktop-nav {
             display: block !important;
@@ -558,6 +545,12 @@ const Header: React.FC<HeaderProps> = ({
         @media (max-width: 1023px) {
           .desktop-nav {
             display: none !important;
+          }
+          .mobile-menu-btn {
+            display: block !important;
+          }
+          .mobile-menu-overlay {
+            display: flex !important;
           }
         }
 

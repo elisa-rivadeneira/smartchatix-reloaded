@@ -201,24 +201,6 @@ export default function LoginPage() {
 
           <div style={{
             textAlign: 'center',
-            color: '#718096',
-            fontSize: '14px'
-          }}>
-            ¿No tienes una cuenta?{' '}
-            <Link
-              href="/register"
-              style={{
-                color: '#667eea',
-                textDecoration: 'none',
-                fontWeight: '600'
-              }}
-            >
-              Regístrate aquí
-            </Link>
-          </div>
-
-          <div style={{
-            textAlign: 'center',
             marginTop: '16px'
           }}>
             <Link

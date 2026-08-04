@@ -37,6 +37,177 @@ export default function AulasVirtualesPage() {
           .mobile-hidden { display: none !important; }
           .mobile-text-center { text-align: center !important; }
           .mobile-px-4 { padding-left: 1rem !important; padding-right: 1rem !important; }
+
+          /* HERO MOBILE REDESIGN V2 */
+          .hero-section {
+            padding: 3rem 1.5rem 2rem !important;
+            min-height: auto !important;
+          }
+
+          .laptop-container-desktop {
+            display: none !important;
+          }
+
+          .hero-container {
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: center !important;
+            text-align: center !important;
+          }
+
+          .hero-content {
+            max-width: 100% !important;
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: center !important;
+          }
+
+          /* Badge */
+          .hero-content > div:first-child {
+            margin-bottom: 1.25rem !important;
+          }
+
+          .hero-content > div:first-child span {
+            font-size: 0.438rem !important;
+            letter-spacing: 0.05em !important;
+          }
+
+          /* Título */
+          .hero-content h1 {
+            font-size: 26.4px !important;
+            line-height: 1.15 !important;
+            margin-bottom: 1rem !important;
+            max-width: 100% !important;
+            letter-spacing: -0.02em !important;
+          }
+
+          .hero-content h1 br {
+            display: none;
+          }
+
+          /* Descripción */
+          .hero-content > p {
+            font-size: 1rem !important;
+            margin-bottom: 1.75rem !important;
+            max-width: 100% !important;
+            line-height: 1.5 !important;
+            color: rgba(203, 213, 225, 0.9) !important;
+          }
+
+          .hero-content > p br {
+            display: none;
+          }
+
+          /* Contenedor de botones */
+          .hero-content > div:nth-child(4) {
+            flex-direction: column !important;
+            width: 100% !important;
+            gap: 0.875rem !important;
+            margin-bottom: 2rem !important;
+          }
+
+          .hero-content > div:nth-child(4) button {
+            width: 100% !important;
+            justify-content: center !important;
+            padding: 0.875rem 1.5rem !important;
+            font-size: 0.9375rem !important;
+          }
+
+          /* Laptop móvil */
+          .laptop-mobile-container {
+            display: block !important;
+            width: 75% !important;
+            max-width: 320px !important;
+            margin: 0 auto 0 !important;
+            padding: 0 !important;
+          }
+
+          .laptop-mobile-container img {
+            border-radius: 8px !important;
+            filter: drop-shadow(0 20px 40px rgba(0, 0, 0, 0.35)) !important;
+          }
+
+          /* Ocultar beneficios en móvil - el div después del laptop */
+          .hero-content > div:last-child {
+            display: none !important;
+          }
+
+          /* ORGANIZATIONS SECTION - MOBILE REDESIGN */
+          .organizations-section {
+            padding: 4rem 1.5rem !important;
+          }
+
+          .organizations-header {
+            margin-bottom: 3rem !important;
+            text-align: left !important;
+          }
+
+          .organizations-header h2 {
+            font-size: 32px !important;
+            margin-bottom: 0 !important;
+            text-align: left !important;
+          }
+
+          .organizations-subtitle {
+            display: none !important;
+          }
+
+          .organizations-grid {
+            display: flex !important;
+            flex-direction: column !important;
+            gap: 0 !important;
+            margin-bottom: 0 !important;
+          }
+
+          .organizations-grid > div {
+            border: none !important;
+            border-radius: 0 !important;
+            padding: 2rem 0 !important;
+            background: transparent !important;
+            border-bottom: 1px solid #e5e7eb !important;
+            box-shadow: none !important;
+            transform: none !important;
+          }
+
+          .organizations-grid > div:last-child {
+            border-bottom: none !important;
+          }
+
+          .organizations-grid > div > div:first-child {
+            flex-direction: row !important;
+            align-items: flex-start !important;
+            margin-bottom: 0 !important;
+          }
+
+          .organizations-grid > div > div:first-child > div:first-child {
+            width: 48px !important;
+            height: 48px !important;
+          }
+
+          .organizations-grid > div > div:first-child > div:first-child img {
+            width: 24px !important;
+            height: 24px !important;
+          }
+
+          .organizations-grid > div > div:first-child > div:last-child h3 {
+            font-size: 18px !important;
+            margin-bottom: 0.5rem !important;
+          }
+
+          .organizations-grid > div > div:first-child > div:last-child p {
+            font-size: 15px !important;
+            line-height: 1.6 !important;
+            color: #64748b !important;
+          }
+
+          .organizations-grid > div > ul {
+            display: none !important;
+          }
+
+          /* PLATFORM FEATURES SECTION - MOBILE */
+          .platform-features-header h2 {
+            font-size: 24px !important;
+          }
         }
       `}</style>
 
@@ -55,7 +226,7 @@ export default function AulasVirtualesPage() {
         position: 'relative',
         overflow: 'hidden',
         minHeight: '90vh'
-      }} className="fade-in-up">
+      }} className="fade-in-up hero-section">
         {/* Laptop Image - Background Layer */}
         <div style={{
           position: 'absolute',
@@ -66,7 +237,7 @@ export default function AulasVirtualesPage() {
           maxWidth: '960px',
           zIndex: 1,
           pointerEvents: 'none'
-        }}>
+        }} className="laptop-container-desktop">
           {/* Glow morado detrás */}
           <div style={{
             position: 'absolute',
@@ -121,9 +292,9 @@ export default function AulasVirtualesPage() {
           margin: '0 auto',
           position: 'relative',
           zIndex: 2
-        }}>
+        }} className="hero-container">
           {/* Left Column - Content */}
-          <div style={{ maxWidth: '600px' }}>
+          <div style={{ maxWidth: '600px' }} className="hero-content">
             <div style={{
               display: 'inline-block',
               background: 'transparent',
@@ -166,6 +337,21 @@ export default function AulasVirtualesPage() {
               Nuestra IA diseña, estructura y genera contenidos listos para<br/>
               enseñar.
             </p>
+
+            {/* Laptop Image - MOBILE ONLY - Aparece después de descripción */}
+            <div style={{ display: 'none' }} className="laptop-mobile-container">
+              <Image
+                src="/images/laptop.png"
+                alt="SmartChatix Platform"
+                width={1400}
+                height={1050}
+                style={{
+                  width: '100%',
+                  height: 'auto',
+                  filter: 'drop-shadow(0 20px 60px rgba(0, 0, 0, 0.4))'
+                }}
+              />
+            </div>
 
             <div style={{ display: 'flex', gap: '1rem', marginBottom: '3rem' }}>
               <button
@@ -298,16 +484,16 @@ export default function AulasVirtualesPage() {
       <section style={{
         padding: '0rem 3rem 6rem',
         background: '#fafafa'
-      }}>
+      }} className="organizations-section">
         <div style={{
           maxWidth: '1280px',
           margin: '0 auto'
-        }}>
+        }} className="organizations-container">
           {/* Header */}
           <div style={{
             textAlign: 'center',
             marginBottom: '6rem'
-          }}>
+          }} className="organizations-header">
             <h2 style={{
               fontSize: '48px',
               fontWeight: '400',
@@ -331,7 +517,7 @@ export default function AulasVirtualesPage() {
               maxWidth: '600px',
               margin: '0 auto',
               fontWeight: '400'
-            }}>
+            }} className="organizations-subtitle">
               No todas las organizaciones enseñan de la misma manera.<br/>
               SmartChatix Academy se adapta a tus necesidades y procesos.
             </p>
@@ -343,7 +529,7 @@ export default function AulasVirtualesPage() {
             gridTemplateColumns: 'repeat(3, 1fr)',
             gap: '3rem',
             marginBottom: '5rem'
-          }}>
+          }} className="organizations-grid">
             {[
               {
                 iconSrc: '/icons/org-empresas.svg',
@@ -575,7 +761,7 @@ export default function AulasVirtualesPage() {
       <section style={{
         padding: '3.5rem 3rem 6rem',
         background: '#fafafa'
-      }}>
+      }} className="platform-features-section">
         <div style={{
           maxWidth: '1280px',
           margin: '0 auto'
@@ -584,7 +770,7 @@ export default function AulasVirtualesPage() {
           <div style={{
             textAlign: 'center',
             marginBottom: '6rem'
-          }}>
+          }} className="platform-features-header">
             <h2 style={{
               fontSize: '48px',
               fontWeight: '400',

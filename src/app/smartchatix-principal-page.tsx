@@ -12,7 +12,6 @@ export default function SmartChatixPrincipalPage() {
 
   const [courses, setCourses] = React.useState<any[]>([]);
   const [showModal, setShowModal] = React.useState(false);
-  const [showMobileMenu, setShowMobileMenu] = React.useState(false);
   const [videoOpacity1, setVideoOpacity1] = React.useState(1);
   const [videoOpacity2, setVideoOpacity2] = React.useState(0);
   const video1Ref = React.useRef<HTMLVideoElement>(null);
@@ -279,7 +278,7 @@ export default function SmartChatixPrincipalPage() {
           .mobile-gap-sm { gap: 0.5rem !important; }
           .mobile-gap-md { gap: 1rem !important; }
           .mobile-grid-1 { grid-template-columns: 1fr !important; }
-          .mobile-w-full { width: 70% !important; max-width: 70% !important; margin: 0 auto !important; display: block !important; font-size: 1.05rem !important; padding: 0.65rem 1.25rem !important; }
+          .mobile-w-full { width: 80% !important; max-width: 80% !important; margin: 0 auto !important; display: flex !important; justify-content: center !important; align-items: center !important; font-size: 0.72rem !important; padding: 0.75rem 1.5rem !important; }
           .mobile-text-center { text-align: center !important; }
           .mobile-h-auto { height: auto !important; }
           .mobile-min-h-auto { min-height: auto !important; }
@@ -533,7 +532,7 @@ export default function SmartChatixPrincipalPage() {
               justifyContent: 'center'
             }}>
               <a href="#otros-programas" style={{ textDecoration: 'none' }}>
-                <button className="mobile-w-full mobile-text-base hypnotic-button" style={{
+                <button className="mobile-w-full mobile-text-sm hypnotic-button" style={{
                   background: 'linear-gradient(135deg, #FF6600 0%, #FF8533 100%)',
                   backgroundSize: '200% 200%',
                   color: colors.white,
@@ -559,7 +558,7 @@ export default function SmartChatixPrincipalPage() {
                   e.currentTarget.style.transform = 'translateY(0) scale(1)';
                   e.currentTarget.style.boxShadow = '0 0 20px rgba(255, 102, 0, 0.5), 0 4px 15px rgba(255, 255, 255, 0.3)';
                 }}>
-                  <span style={{ position: 'relative', zIndex: 2 }}>Explorar Cursos  →</span>
+                  <span style={{ position: 'relative', zIndex: 2 }}>Explorar Cursos<span className="mobile-hidden">  →</span></span>
                 </button>
               </a>
             </div>
@@ -919,241 +918,6 @@ export default function SmartChatixPrincipalPage() {
         </div>
       </section>
 
-      {/* MOBILE HAMBURGER MENU BUTTON */}
-      <button
-        onClick={() => setShowMobileMenu(!showMobileMenu)}
-        className="mobile-hamburger"
-        style={{
-          position: 'fixed',
-          top: '15px',
-          right: '15px',
-          width: '45px',
-          height: '45px',
-          borderRadius: '8px',
-          backgroundColor: colors.accent,
-          color: colors.white,
-          border: 'none',
-          boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
-          cursor: 'pointer',
-          zIndex: 999999,
-          display: 'none',
-          alignItems: 'center',
-          justifyContent: 'center',
-          fontSize: '1.5rem',
-          transition: 'all 0.3s ease'
-        }}
-      >
-        {showMobileMenu ? '✕' : '☰'}
-      </button>
-
-      {/* MOBILE MENU OVERLAY */}
-      {showMobileMenu && (
-        <div
-          style={{
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            width: '100%',
-            height: '100%',
-            backgroundColor: 'rgba(0, 0, 0, 0.5)',
-            zIndex: 9997,
-            display: 'none'
-          }}
-          className="mobile-menu-overlay"
-          onClick={() => setShowMobileMenu(false)}
-        >
-          <div
-            style={{
-              position: 'absolute',
-              top: 0,
-              right: 0,
-              width: '80%',
-              maxWidth: '300px',
-              height: '100%',
-              backgroundColor: colors.white,
-              boxShadow: '-4px 0 12px rgba(0,0,0,0.2)',
-              padding: spacing.lg,
-              overflowY: 'auto'
-            }}
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div style={{ marginBottom: spacing.lg, textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.1rem' }}>
-              <img
-                src="/images/smartchatix_logov3.png"
-                alt="SMARTCHATIX"
-                style={{
-                  height: '43px',
-                  width: 'auto',
-                  objectFit: 'contain'
-                }}
-              />
-              <div style={{
-                fontSize: '9px',
-                fontWeight: '600',
-                letterSpacing: '0.15em',
-                color: '#64748b',
-                textAlign: 'center',
-                textTransform: 'uppercase',
-                marginTop: '-0.25rem'
-              }}>
-                Interactúa <span style={{ margin: '0 0.35rem', color: '#8b5cf6' }}>•</span> Automatiza <span style={{ margin: '0 0.35rem', color: '#8b5cf6' }}>•</span> Evoluciona
-              </div>
-            </div>
-
-            <nav style={{ display: 'flex', flexDirection: 'column', gap: spacing.sm }}>
-              <a
-                href="#"
-                style={{
-                  textDecoration: 'none',
-                  color: colors.gray[700],
-                  fontWeight: '500',
-                  padding: spacing.md,
-                  borderRadius: '6px',
-                  backgroundColor: colors.gray[50],
-                  border: `2px solid ${colors.accent}`,
-                  textAlign: 'center'
-                }}
-                onClick={() => setShowMobileMenu(false)}
-              >
-                Inicio
-              </a>
-
-              <Link
-                href="/programas"
-                style={{
-                  textDecoration: 'none',
-                  color: colors.gray[700],
-                  fontWeight: '500',
-                  padding: spacing.md,
-                  borderRadius: '6px',
-                  backgroundColor: colors.gray[50],
-                  textAlign: 'center'
-                }}
-                onClick={() => setShowMobileMenu(false)}
-              >
-                Programas
-              </Link>
-
-              <Link
-                href="/cursos"
-                style={{
-                  textDecoration: 'none',
-                  color: colors.gray[700],
-                  fontWeight: '500',
-                  padding: spacing.md,
-                  borderRadius: '6px',
-                  backgroundColor: colors.gray[50],
-                  textAlign: 'center'
-                }}
-                onClick={() => setShowMobileMenu(false)}
-              >
-                Cursos
-              </Link>
-
-              <Link
-                href="/capacitacion"
-                style={{
-                  textDecoration: 'none',
-                  color: colors.gray[700],
-                  fontWeight: '500',
-                  padding: spacing.md,
-                  borderRadius: '6px',
-                  backgroundColor: colors.gray[50],
-                  textAlign: 'center'
-                }}
-                onClick={() => setShowMobileMenu(false)}
-              >
-                Capacitación Empresarial
-              </Link>
-
-              <Link
-                href="/mentorias"
-                style={{
-                  textDecoration: 'none',
-                  color: colors.gray[700],
-                  fontWeight: '500',
-                  padding: spacing.md,
-                  borderRadius: '6px',
-                  backgroundColor: colors.gray[50],
-                  textAlign: 'center'
-                }}
-                onClick={() => setShowMobileMenu(false)}
-              >
-                Mentorías
-              </Link>
-
-              <Link
-                href="/blog"
-                style={{
-                  textDecoration: 'none',
-                  color: colors.gray[700],
-                  fontWeight: '500',
-                  padding: spacing.md,
-                  borderRadius: '6px',
-                  backgroundColor: colors.gray[50],
-                  textAlign: 'center'
-                }}
-                onClick={() => setShowMobileMenu(false)}
-              >
-                Blog
-              </Link>
-
-              <Link
-                href="/contacto"
-                style={{
-                  textDecoration: 'none',
-                  color: colors.gray[700],
-                  fontWeight: '500',
-                  padding: spacing.md,
-                  borderRadius: '6px',
-                  backgroundColor: colors.gray[50],
-                  textAlign: 'center'
-                }}
-                onClick={() => setShowMobileMenu(false)}
-              >
-                Contacto
-              </Link>
-
-              <Link
-                href="/masterclass"
-                style={{
-                  textDecoration: 'none'
-                }}
-                onClick={() => setShowMobileMenu(false)}
-              >
-                <button
-                  style={{
-                    backgroundColor: colors.accent,
-                    color: colors.white,
-                    border: 'none',
-                    padding: spacing.md,
-                    borderRadius: '6px',
-                    fontWeight: '600',
-                    cursor: 'pointer',
-                    fontSize: '1rem',
-                    marginTop: spacing.md,
-                    width: '100%'
-                  }}
-                >
-                  Masterclass Gratuita
-                </button>
-              </Link>
-            </nav>
-
-            <div style={{
-              marginTop: spacing.xl,
-              paddingTop: spacing.lg,
-              borderTop: `1px solid ${colors.gray[200]}`,
-              fontSize: '0.85rem',
-              color: colors.gray[600],
-              textAlign: 'center'
-            }}>
-              <div style={{ marginBottom: spacing.xs }}>📧 admin@smartchatix.com</div>
-              <div>📞 +51 967 717 179</div>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* MODAL */}
       {showModal && (

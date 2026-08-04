@@ -505,13 +505,6 @@ export default function SmartChatixBusiness() {
               align-items: center !important;
             }
 
-            .business-content > div[style*="grid-template-columns"] > div[style*="display: flex"] > div:last-child::before {
-              content: '✓ ' !important;
-              color: #10B981 !important;
-              font-weight: 700 !important;
-              font-size: 1rem !important;
-            }
-
             .business-content > div[style*="grid-template-columns"] > div[style*="display: flex"] h3::before {
               content: '✓ ' !important;
               color: #10B981 !important;

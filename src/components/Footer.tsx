@@ -394,13 +394,35 @@ export default function Footer() {
               grid-template-columns: 1fr !important;
               gap: 2.5rem !important;
             }
+            footer > div > div:first-child > div:first-child {
+              text-align: center !important;
+              max-width: 100% !important;
+            }
+            footer > div > div:first-child > div:first-child > div:first-child {
+              display: flex !important;
+              justify-content: center !important;
+            }
+            footer > div > div:first-child > div:first-child > div:nth-child(2) {
+              justify-content: center !important;
+            }
+            footer > div > div:first-child > div:not(:first-child) {
+              text-align: center !important;
+            }
+            footer > div > div:first-child > div:not(:first-child) ul {
+              align-items: center !important;
+            }
+            footer > div > div:first-child > div:last-child > div {
+              align-items: center !important;
+            }
             footer > div > div:nth-child(3) {
               flex-direction: column !important;
-              align-items: flex-start !important;
+              align-items: center !important;
+              text-align: center !important;
             }
             footer > div > div:nth-child(3) > div:last-child {
               flex-direction: column !important;
               gap: 1rem !important;
+              align-items: center !important;
             }
           }
         `}</style>
