@@ -811,7 +811,17 @@ export default function SmartChatixPrincipalPage() {
             gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
             gap: spacing.lg
           }}>
-            {courses.map((course, index) => (
+            {courses
+              .sort((a, b) => {
+                // Publicados primero (los que NO son coming_soon ni unpublished)
+                const aIsPublished = a.publication_status !== 'coming_soon' && a.publication_status !== 'unpublished';
+                const bIsPublished = b.publication_status !== 'coming_soon' && b.publication_status !== 'unpublished';
+
+                if (aIsPublished && !bIsPublished) return -1;
+                if (!aIsPublished && bIsPublished) return 1;
+                return 0;
+              })
+              .map((course, index) => (
               <div key={index} onClick={() => {
                 if (course.publication_status !== 'coming_soon' && course.publication_status !== 'unpublished') {
                   window.location.href = `/cursos/${course.slug}`;
