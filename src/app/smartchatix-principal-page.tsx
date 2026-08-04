@@ -885,22 +885,28 @@ export default function SmartChatixPrincipalPage() {
                       }}>
                         ⏳ Próximamente
                       </span>
-                    ) : course.priceGrabado ? (
+                    ) : (parseFloat(course.priceGrabado) > 0 || parseFloat(course.priceVivo) > 0) ? (
                       <>
                         <span style={{
                           fontWeight: '700',
                           fontSize: '1.2rem',
                           color: colors.accent
                         }}>
-                          {loading ? 'S/ ' + course.priceGrabado : symbol + ' ' + convertPrice(parseFloat(course.priceGrabado) || 0)}
+                          {loading
+                            ? 'S/ ' + (parseFloat(course.priceGrabado) > 0 ? course.priceGrabado : course.priceVivo)
+                            : symbol + ' ' + convertPrice(parseFloat(course.priceGrabado) > 0 ? parseFloat(course.priceGrabado) : parseFloat(course.priceVivo) || 0)}
                         </span>
-                        <span style={{
-                          fontSize: '0.9rem',
-                          color: colors.gray[400],
-                          textDecoration: 'line-through'
-                        }}>
-                          {loading ? 'S/ ' + course.oldPriceGrabado : symbol + ' ' + convertPrice(parseFloat(course.oldPriceGrabado) || 0)}
-                        </span>
+                        {(parseFloat(course.priceGrabado) > 0 ? course.priceGrabadoOld : course.priceVivoOld) && (
+                          <span style={{
+                            fontSize: '0.9rem',
+                            color: colors.gray[400],
+                            textDecoration: 'line-through'
+                          }}>
+                            {loading
+                              ? 'S/ ' + (parseFloat(course.priceGrabado) > 0 ? course.priceGrabadoOld : course.priceVivoOld)
+                              : symbol + ' ' + convertPrice(parseFloat(parseFloat(course.priceGrabado) > 0 ? course.priceGrabadoOld : course.priceVivoOld) || 0)}
+                          </span>
+                        )}
                       </>
                     ) : null}
                   </div>
