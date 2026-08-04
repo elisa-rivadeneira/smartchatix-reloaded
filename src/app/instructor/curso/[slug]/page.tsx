@@ -1182,8 +1182,12 @@ function CourseConfigForm({ course, onUpdate }: { course: Course | null; onUpdat
 
   useEffect(() => {
     if (course) {
-      const moduleTitles = (course as any).module_titles || (course.modules?.map((m: any) => m.title) || []);
-      const moduleDescriptions = (course as any).module_descriptions || (course.modules?.map((m: any) => m.description || '') || []);
+      const moduleTitles = ((course as any).module_titles && (course as any).module_titles.length > 0)
+        ? (course as any).module_titles
+        : (course.modules?.map((m: any) => m.title) || []);
+      const moduleDescriptions = ((course as any).module_descriptions && (course as any).module_descriptions.length > 0)
+        ? (course as any).module_descriptions
+        : (course.modules?.map((m: any) => m.description || '') || []);
       console.log('📚 Course modules:', course.modules);
       console.log('📋 Module titles:', moduleTitles);
       console.log('📝 Module descriptions:', moduleDescriptions);

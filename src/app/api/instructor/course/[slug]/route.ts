@@ -36,9 +36,13 @@ export async function GET(
 
     const course = courseData[0];
 
+    console.log('🔍 API - module_titles antes de parsear:', course.module_titles, typeof course.module_titles);
+
     if (typeof course.module_titles === 'string') {
       course.module_titles = JSON.parse(course.module_titles);
     }
+
+    console.log('✅ API - module_titles después de parsear:', course.module_titles);
     if (typeof course.module_descriptions === 'string') {
       course.module_descriptions = JSON.parse(course.module_descriptions);
     }
