@@ -39,6 +39,9 @@ export async function GET(
     if (typeof course.module_titles === 'string') {
       course.module_titles = JSON.parse(course.module_titles);
     }
+    if (typeof course.module_descriptions === 'string') {
+      course.module_descriptions = JSON.parse(course.module_descriptions);
+    }
     if (typeof course.learning_outcomes === 'string') {
       course.learning_outcomes = JSON.parse(course.learning_outcomes);
     }
