@@ -50,17 +50,21 @@ function InscripcionVivoContent() {
   const getPrice = () => {
     if (!curso) return 0;
     if (currency === 'USD') {
-      return curso.priceVivoUsd || convertPrice(curso.priceVivo || 0);
+      const usdPrice = curso.priceVivoUsd || convertPrice(curso.priceVivo || 0);
+      return typeof usdPrice === 'number' ? usdPrice : parseFloat(usdPrice) || 0;
     }
-    return curso.priceVivo || 0;
+    const penPrice = curso.priceVivo || 0;
+    return typeof penPrice === 'number' ? penPrice : parseFloat(penPrice) || 0;
   };
 
   const getOldPrice = () => {
     if (!curso) return 0;
     if (currency === 'USD') {
-      return curso.priceVivoUsdOld || convertPrice(curso.priceVivoOld || 0);
+      const usdPrice = curso.priceVivoUsdOld || convertPrice(curso.priceVivoOld || 0);
+      return typeof usdPrice === 'number' ? usdPrice : parseFloat(usdPrice) || 0;
     }
-    return curso.priceVivoOld || 0;
+    const penPrice = curso.priceVivoOld || 0;
+    return typeof penPrice === 'number' ? penPrice : parseFloat(penPrice) || 0;
   };
 
   const colors = {

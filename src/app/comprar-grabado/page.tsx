@@ -50,17 +50,21 @@ function ComprarGrabadoContent() {
   const getPrice = () => {
     if (!curso) return 0;
     if (currency === 'USD') {
-      return curso.priceGrabadoUsd || convertPrice(curso.priceGrabado || 0);
+      const usdPrice = curso.priceGrabadoUsd || convertPrice(curso.priceGrabado || 0);
+      return typeof usdPrice === 'number' ? usdPrice : parseFloat(usdPrice) || 0;
     }
-    return curso.priceGrabado || 0;
+    const penPrice = curso.priceGrabado || 0;
+    return typeof penPrice === 'number' ? penPrice : parseFloat(penPrice) || 0;
   };
 
   const getOldPrice = () => {
     if (!curso) return 0;
     if (currency === 'USD') {
-      return curso.priceGrabadoUsdOld || convertPrice(curso.priceGrabadoOld || 0);
+      const usdPrice = curso.priceGrabadoUsdOld || convertPrice(curso.priceGrabadoOld || 0);
+      return typeof usdPrice === 'number' ? usdPrice : parseFloat(usdPrice) || 0;
     }
-    return curso.priceGrabadoOld || 0;
+    const penPrice = curso.priceGrabadoOld || 0;
+    return typeof penPrice === 'number' ? penPrice : parseFloat(penPrice) || 0;
   };
 
   const colors = {
