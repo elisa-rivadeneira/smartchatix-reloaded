@@ -892,14 +892,14 @@ export default function SmartChatixPrincipalPage() {
                           fontSize: '1.2rem',
                           color: colors.accent
                         }}>
-                          {loading ? 'S/ ' + course.priceGrabado : symbol + ' ' + convertPrice(course.priceGrabado)}
+                          {loading ? 'S/ ' + course.priceGrabado : symbol + ' ' + convertPrice(parseFloat(course.priceGrabado) || 0)}
                         </span>
                         <span style={{
                           fontSize: '0.9rem',
                           color: colors.gray[400],
                           textDecoration: 'line-through'
                         }}>
-                          {loading ? 'S/ ' + course.oldPriceGrabado : symbol + ' ' + convertPrice(course.oldPriceGrabado || 0)}
+                          {loading ? 'S/ ' + course.oldPriceGrabado : symbol + ' ' + convertPrice(parseFloat(course.oldPriceGrabado) || 0)}
                         </span>
                       </>
                     ) : null}

@@ -22,13 +22,16 @@ export default function CursoPage({ params }: { params: Promise<{ slug: string }
   const [showCarousel, setShowCarousel] = React.useState(true);
   const [sidebarZIndex, setSidebarZIndex] = React.useState(999);
 
-  const getPrice = (penPrice: number, usdPrice?: number | null): number => {
+  const getPrice = (penPrice: number | string, usdPrice?: number | string | null): number => {
+    const pen = typeof penPrice === 'number' ? penPrice : parseFloat(penPrice) || 0;
+    const usd = typeof usdPrice === 'number' ? usdPrice : parseFloat(usdPrice as string) || null;
+
     if (currency === 'USD') {
-      return usdPrice !== null && usdPrice !== undefined
-        ? usdPrice
-        : Math.round((penPrice / exchangeRate) * 100) / 100;
+      return usd !== null && usd !== undefined
+        ? usd
+        : Math.round((pen / exchangeRate) * 100) / 100;
     }
-    return penPrice;
+    return pen;
   };
 
   const formatPrice = (price: number): string => {
