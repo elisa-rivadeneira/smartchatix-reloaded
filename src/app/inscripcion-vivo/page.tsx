@@ -725,6 +725,7 @@ function InscripcionVivoContent() {
                       email={email}
                       fullName={fullName}
                       phone={phone}
+                      currency={currency}
                       onSuccess={(data) => {
                         setPaymentSuccess(true);
                         setEnrollment(data.enrollment);

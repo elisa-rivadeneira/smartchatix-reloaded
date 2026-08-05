@@ -17,6 +17,7 @@ interface CulqiPaymentFormProps {
   email: string;
   fullName: string;
   phone: string;
+  currency?: 'PEN' | 'USD';
   onSuccess: (data?: any) => void;
   onError: (error: string) => void;
 }
@@ -29,6 +30,7 @@ export default function CulqiPaymentForm({
   email,
   fullName,
   phone,
+  currency = 'PEN',
   onSuccess,
   onError
 }: CulqiPaymentFormProps) {
@@ -176,7 +178,7 @@ export default function CulqiPaymentForm({
     try {
       window.Culqi.settings({
         title: 'SmartChatix',
-        currency: 'PEN',
+        currency: currency,
         amount: Math.round(Number(amount) * 100),
         description: `${courseTitle} - ${modality}`
       });
