@@ -11,13 +11,23 @@ export interface CurrencyData {
   exchangeRate: number;
   convertPrice: (priceInPEN: number) => number;
   formatPrice: (priceInPEN: number) => string;
+  setCurrency: (currency: Currency) => void;
 }
 
 export function useCurrency(): CurrencyData {
-  const [currency, setCurrency] = useState<Currency>('USD');
+  const [currency, setCurrencyState] = useState<Currency>('USD');
   const [symbol, setSymbol] = useState('US$');
   const [loading, setLoading] = useState(true);
   const [exchangeRate, setExchangeRate] = useState(3.80);
+
+  const changeCurrency = (newCurrency: Currency) => {
+    setCurrencyState(newCurrency);
+    setSymbol(newCurrency === 'USD' ? 'US$' : 'S/');
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('preferred_currency', newCurrency);
+    }
+    console.log('💰 Moneda cambiada a:', newCurrency);
+  };
 
   useEffect(() => {
     async function init() {
@@ -30,6 +40,16 @@ export function useCurrency(): CurrencyData {
           const rateData = await rateResponse.json();
           setExchangeRate(rateData.exchangeRate || 3.80);
           console.log('💱 Tipo de cambio:', rateData.exchangeRate);
+        }
+
+        const preferredCurrency = typeof window !== 'undefined' ? localStorage.getItem('preferred_currency') as Currency : null;
+
+        if (preferredCurrency) {
+          setCurrencyState(preferredCurrency);
+          setSymbol(preferredCurrency === 'USD' ? 'US$' : 'S/');
+          console.log('💰 Moneda guardada:', preferredCurrency);
+          setLoading(false);
+          return;
         }
 
         const testCountry = typeof window !== 'undefined' ? localStorage.getItem('test_country') : null;
@@ -60,17 +80,17 @@ export function useCurrency(): CurrencyData {
         }
 
         if (countryCode === 'PE') {
-          setCurrency('PEN');
+          setCurrencyState('PEN');
           setSymbol('S/');
           console.log('💰 Mostrando precios en Soles (S/)');
         } else {
-          setCurrency('USD');
+          setCurrencyState('USD');
           setSymbol('US$');
           console.log('💰 Mostrando precios en Dólares (US$)');
         }
       } catch (error) {
         console.error('Error initializing currency:', error);
-        setCurrency('USD');
+        setCurrencyState('USD');
         setSymbol('US$');
       } finally {
         setLoading(false);
@@ -98,6 +118,7 @@ export function useCurrency(): CurrencyData {
     exchangeRate,
     convertPrice,
     formatPrice,
+    setCurrency: changeCurrency,
     loading
   };
 }

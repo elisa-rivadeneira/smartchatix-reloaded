@@ -75,6 +75,11 @@ export default function AdminPanel() {
     role: 'student' as 'student' | 'instructor' | 'admin',
     is_active: true
   });
+  const [settings, setSettings] = useState({
+    show_courses_carousel: true,
+    show_currency_selector: true,
+    exchange_rate: '3.80'
+  });
 
   useEffect(() => {
     checkAuth();
@@ -101,11 +106,12 @@ export default function AdminPanel() {
 
   const loadData = async () => {
     try {
-      const [usersRes, coursesRes, statsRes, enrollmentsRes] = await Promise.all([
+      const [usersRes, coursesRes, statsRes, enrollmentsRes, settingsRes] = await Promise.all([
         fetch('/api/admin/users'),
         fetch('/api/admin/courses'),
         fetch('/api/admin/stats'),
-        fetch('/api/admin/enrollments')
+        fetch('/api/admin/enrollments'),
+        fetch('/api/admin/settings')
       ]);
 
       if (usersRes.ok) {
@@ -126,6 +132,11 @@ export default function AdminPanel() {
       if (enrollmentsRes.ok) {
         const enrollmentsData = await enrollmentsRes.json();
         setEnrollments(enrollmentsData.enrollments || []);
+      }
+
+      if (settingsRes.ok) {
+        const settingsData = await settingsRes.json();
+        setSettings(settingsData.settings || settings);
       }
     } catch (error) {
       console.error('Error loading data:', error);
@@ -1393,8 +1404,190 @@ export default function AdminPanel() {
           </div>
         )}
 
+        {/* Settings Tab */}
+        {activeTab === 'settings' && (
+          <div style={{ padding: '2rem' }}>
+            <div style={{
+              background: '#fff',
+              borderRadius: '12px',
+              border: '1px solid #e5e7eb',
+              padding: '2rem'
+            }}>
+              <h2 style={{ fontSize: '1.25rem', fontWeight: '700', color: '#111827', marginBottom: '1.5rem' }}>
+                ⚙️ Configuración del Sitio
+              </h2>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+                <div style={{
+                  padding: '1.5rem',
+                  background: '#f9fafb',
+                  borderRadius: '8px',
+                  border: '1px solid #e5e7eb'
+                }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <div>
+                      <h3 style={{ fontSize: '15px', fontWeight: '600', color: '#111827', marginBottom: '0.25rem' }}>
+                        Mostrar carrusel de cursos
+                      </h3>
+                      <p style={{ fontSize: '13px', color: '#6b7280' }}>
+                        Muestra el carrusel "Explora más cursos" en la página principal
+                      </p>
+                    </div>
+                    <label style={{ position: 'relative', display: 'inline-block', width: '52px', height: '28px' }}>
+                      <input
+                        type="checkbox"
+                        checked={settings.show_courses_carousel}
+                        onChange={async (e) => {
+                          const newValue = e.target.checked;
+                          setSettings({ ...settings, show_courses_carousel: newValue });
+                          await fetch('/api/admin/settings', {
+                            method: 'PUT',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ setting_key: 'show_courses_carousel', setting_value: newValue })
+                          });
+                        }}
+                        style={{ opacity: 0, width: 0, height: 0 }}
+                      />
+                      <span style={{
+                        position: 'absolute',
+                        cursor: 'pointer',
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                        background: settings.show_courses_carousel ? '#8b5cf6' : '#d1d5db',
+                        borderRadius: '28px',
+                        transition: '0.3s'
+                      }}>
+                        <span style={{
+                          position: 'absolute',
+                          content: '""',
+                          height: '20px',
+                          width: '20px',
+                          left: settings.show_courses_carousel ? '28px' : '4px',
+                          bottom: '4px',
+                          background: '#fff',
+                          borderRadius: '50%',
+                          transition: '0.3s'
+                        }}></span>
+                      </span>
+                    </label>
+                  </div>
+                </div>
+
+                <div style={{
+                  padding: '1.5rem',
+                  background: '#f9fafb',
+                  borderRadius: '8px',
+                  border: '1px solid #e5e7eb'
+                }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <div>
+                      <h3 style={{ fontSize: '15px', fontWeight: '600', color: '#111827', marginBottom: '0.25rem' }}>
+                        Selector de moneda (USD/PEN)
+                      </h3>
+                      <p style={{ fontSize: '13px', color: '#6b7280' }}>
+                        Muestra botones en el header para cambiar entre dólares y soles manualmente
+                      </p>
+                    </div>
+                    <label style={{ position: 'relative', display: 'inline-block', width: '52px', height: '28px' }}>
+                      <input
+                        type="checkbox"
+                        checked={settings.show_currency_selector}
+                        onChange={async (e) => {
+                          const newValue = e.target.checked;
+                          setSettings({ ...settings, show_currency_selector: newValue });
+                          await fetch('/api/admin/settings', {
+                            method: 'PUT',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ setting_key: 'show_currency_selector', setting_value: newValue })
+                          });
+                        }}
+                        style={{ opacity: 0, width: 0, height: 0 }}
+                      />
+                      <span style={{
+                        position: 'absolute',
+                        cursor: 'pointer',
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                        background: settings.show_currency_selector ? '#8b5cf6' : '#d1d5db',
+                        borderRadius: '28px',
+                        transition: '0.3s'
+                      }}>
+                        <span style={{
+                          position: 'absolute',
+                          content: '""',
+                          height: '20px',
+                          width: '20px',
+                          left: settings.show_currency_selector ? '28px' : '4px',
+                          bottom: '4px',
+                          background: '#fff',
+                          borderRadius: '50%',
+                          transition: '0.3s'
+                        }}></span>
+                      </span>
+                    </label>
+                  </div>
+                </div>
+
+                <div style={{
+                  padding: '1.5rem',
+                  background: '#f9fafb',
+                  borderRadius: '8px',
+                  border: '1px solid #e5e7eb'
+                }}>
+                  <h3 style={{ fontSize: '15px', fontWeight: '600', color: '#111827', marginBottom: '1rem' }}>
+                    Tipo de cambio USD → PEN
+                  </h3>
+                  <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+                    <input
+                      type="number"
+                      step="0.01"
+                      value={settings.exchange_rate}
+                      onChange={(e) => setSettings({ ...settings, exchange_rate: e.target.value })}
+                      style={{
+                        padding: '0.75rem',
+                        borderRadius: '8px',
+                        border: '1px solid #d1d5db',
+                        fontSize: '14px',
+                        width: '120px'
+                      }}
+                    />
+                    <button
+                      onClick={async () => {
+                        await fetch('/api/admin/settings', {
+                          method: 'PUT',
+                          headers: { 'Content-Type': 'application/json' },
+                          body: JSON.stringify({ setting_key: 'exchange_rate', setting_value: settings.exchange_rate })
+                        });
+                        alert('✅ Tipo de cambio actualizado');
+                      }}
+                      style={{
+                        padding: '0.75rem 1.5rem',
+                        background: '#8b5cf6',
+                        color: '#fff',
+                        border: 'none',
+                        borderRadius: '8px',
+                        fontSize: '14px',
+                        fontWeight: '600',
+                        cursor: 'pointer'
+                      }}
+                    >
+                      Guardar
+                    </button>
+                  </div>
+                  <p style={{ fontSize: '12px', color: '#6b7280', marginTop: '0.5rem' }}>
+                    1 USD = {settings.exchange_rate} PEN
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Other Tabs - Placeholder */}
-        {!['dashboard', 'users', 'courses', 'instructors', 'enrollments'].includes(activeTab) && (
+        {!['dashboard', 'users', 'courses', 'instructors', 'enrollments', 'settings'].includes(activeTab) && (
           <div style={{
             padding: '2rem',
             display: 'flex',

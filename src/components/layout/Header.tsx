@@ -1,8 +1,9 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { useCurrency, Currency } from '@/hooks/useCurrency';
 
 interface HeaderProps {
   showCursos?: boolean;
@@ -17,6 +18,19 @@ const Header: React.FC<HeaderProps> = ({
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
+  const { currency, setCurrency } = useCurrency();
+  const [showCurrencySelector, setShowCurrencySelector] = useState(false);
+
+  useEffect(() => {
+    fetch('/api/public/settings')
+      .then(res => res.json())
+      .then(data => {
+        if (data.settings && data.settings.show_currency_selector !== undefined) {
+          setShowCurrencySelector(data.settings.show_currency_selector === true || data.settings.show_currency_selector === 'true');
+        }
+      })
+      .catch(err => console.error('Error fetching currency selector setting:', err));
+  }, []);
 
   const navigationItems = [
     {
@@ -284,8 +298,70 @@ const Header: React.FC<HeaderProps> = ({
               </div>
             </div>
 
-            {/* Ingresar Button */}
-            <div style={{ display: 'none' }} className="desktop-nav">
+            {/* Currency Selector + Ingresar Button */}
+            <div style={{ display: 'none', gap: '1rem', alignItems: 'center' }} className="desktop-nav">
+              {showCurrencySelector && (
+                <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                <button
+                  onClick={() => setCurrency('USD')}
+                  style={{
+                    padding: '6px 12px',
+                    fontSize: '13px',
+                    fontWeight: currency === 'USD' ? '600' : '500',
+                    background: currency === 'USD' ? '#3b82f6' : 'transparent',
+                    color: currency === 'USD' ? '#fff' : '#64748b',
+                    border: '1px solid',
+                    borderColor: currency === 'USD' ? '#3b82f6' : '#e2e8f0',
+                    borderRadius: '6px',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s'
+                  }}
+                  onMouseEnter={(e) => {
+                    if (currency !== 'USD') {
+                      e.currentTarget.style.borderColor = '#cbd5e1';
+                      e.currentTarget.style.color = '#475569';
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (currency !== 'USD') {
+                      e.currentTarget.style.borderColor = '#e2e8f0';
+                      e.currentTarget.style.color = '#64748b';
+                    }
+                  }}
+                >
+                  USD
+                </button>
+                <button
+                  onClick={() => setCurrency('PEN')}
+                  style={{
+                    padding: '6px 12px',
+                    fontSize: '13px',
+                    fontWeight: currency === 'PEN' ? '600' : '500',
+                    background: currency === 'PEN' ? '#3b82f6' : 'transparent',
+                    color: currency === 'PEN' ? '#fff' : '#64748b',
+                    border: '1px solid',
+                    borderColor: currency === 'PEN' ? '#3b82f6' : '#e2e8f0',
+                    borderRadius: '6px',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s'
+                  }}
+                  onMouseEnter={(e) => {
+                    if (currency !== 'PEN') {
+                      e.currentTarget.style.borderColor = '#cbd5e1';
+                      e.currentTarget.style.color = '#475569';
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (currency !== 'PEN') {
+                      e.currentTarget.style.borderColor = '#e2e8f0';
+                      e.currentTarget.style.color = '#64748b';
+                    }
+                  }}
+                >
+                  PEN
+                </button>
+              </div>
+              )}
               <Link
                 href="/login"
                 style={{
@@ -374,6 +450,49 @@ const Header: React.FC<HeaderProps> = ({
               className="mobile-menu-overlay"
               onClick={() => setIsOpen(false)}
             >
+              {showCurrencySelector && (
+                <div style={{ display: 'flex', gap: '0.75rem', marginBottom: '1rem' }}>
+                  <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setCurrency('USD');
+                  }}
+                  style={{
+                    padding: '8px 16px',
+                    fontSize: '1rem',
+                    fontWeight: currency === 'USD' ? '600' : '500',
+                    background: currency === 'USD' ? '#3b82f6' : 'transparent',
+                    color: '#fff',
+                    border: '1px solid',
+                    borderColor: currency === 'USD' ? '#3b82f6' : 'rgba(255,255,255,0.3)',
+                    borderRadius: '6px',
+                    cursor: 'pointer'
+                  }}
+                >
+                  USD
+                </button>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setCurrency('PEN');
+                  }}
+                  style={{
+                    padding: '8px 16px',
+                    fontSize: '1rem',
+                    fontWeight: currency === 'PEN' ? '600' : '500',
+                    background: currency === 'PEN' ? '#3b82f6' : 'transparent',
+                    color: '#fff',
+                    border: '1px solid',
+                    borderColor: currency === 'PEN' ? '#3b82f6' : 'rgba(255,255,255,0.3)',
+                    borderRadius: '6px',
+                    cursor: 'pointer'
+                  }}
+                >
+                  PEN
+                </button>
+              </div>
+              )}
+
               <Link href="/login" onClick={() => setIsOpen(false)} style={{ color: '#fff', fontSize: '1.5rem', fontWeight: '600', textDecoration: 'none' }}>Ingresar</Link>
 
               {navigation.map((item: any) => {
