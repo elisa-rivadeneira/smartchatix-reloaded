@@ -55,6 +55,7 @@ export default function CulqiPaymentForm({
             token: token,
             amount: amount,
             email: email,
+            currency: currency,
             description: `${courseTitle} - ${modality}`,
             metadata: {
               course_slug: courseSlug,

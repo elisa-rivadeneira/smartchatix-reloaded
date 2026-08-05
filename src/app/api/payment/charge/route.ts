@@ -16,11 +16,12 @@ export async function POST(request: NextRequest) {
       token,
       amount,
       email,
+      currency = 'PEN',
       description,
       metadata
     } = body;
 
-    console.log('🔵 Processing charge:', { token, amount, email });
+    console.log('🔵 Processing charge:', { token, amount, email, currency });
 
     if (!token || !amount || !email) {
       return NextResponse.json(
@@ -91,7 +92,7 @@ export async function POST(request: NextRequest) {
       charge = {
         id: 'demo_charge_' + Date.now(),
         amount: Math.round(amount * 100),
-        currency_code: 'PEN',
+        currency_code: currency,
         email: email,
         outcome: {
           type: 'venta_exitosa',
@@ -102,7 +103,7 @@ export async function POST(request: NextRequest) {
     } else {
       const chargeData = {
         amount: Math.round(amount * 100),
-        currency_code: 'PEN',
+        currency_code: currency,
         email,
         source_id: token,
         description: description || 'Compra de curso',
