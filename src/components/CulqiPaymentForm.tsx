@@ -37,6 +37,8 @@ export default function CulqiPaymentForm({
   const [processing, setProcessing] = useState(false);
   const [culqiLoaded, setCulqiLoaded] = useState(false);
 
+  const currencySymbol = currency === 'USD' ? 'US$' : 'S/';
+
   const handlePayment = useCallback(async () => {
     const Culqi = window.Culqi;
 
@@ -236,7 +238,7 @@ export default function CulqiPaymentForm({
           color: '#FF6600',
           marginBottom: '0.5rem'
         }}>
-          S/ {Number(amount).toFixed(2)}
+          {currencySymbol} {Number(amount).toFixed(2)}
         </div>
       </div>
 
