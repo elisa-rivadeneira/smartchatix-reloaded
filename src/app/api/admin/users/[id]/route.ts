@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { query } from '@/lib/db';
 import { verifyToken } from '@/lib/auth';
+import bcrypt from 'bcrypt';
 
 export async function PATCH(
   request: NextRequest,
@@ -54,6 +55,18 @@ export async function PATCH(
     if (typeof body.is_active === 'boolean') {
       updates.push('is_active = ?');
       values.push(body.is_active);
+    }
+
+    if (body.password && body.password.trim() !== '') {
+      if (body.password.length < 6) {
+        return NextResponse.json(
+          { error: 'La contraseña debe tener al menos 6 caracteres' },
+          { status: 400 }
+        );
+      }
+      const hashedPassword = await bcrypt.hash(body.password, 10);
+      updates.push('password_hash = ?');
+      values.push(hashedPassword);
     }
 
     if (updates.length === 0) {

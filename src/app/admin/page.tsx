@@ -63,7 +63,8 @@ export default function AdminPanel() {
     name: '',
     email: '',
     role: 'student' as 'student' | 'instructor' | 'admin',
-    is_active: true
+    is_active: true,
+    password: ''
   });
   const [userEnrollments, setUserEnrollments] = useState<number[]>([]);
   const [selectedCourseToAdd, setSelectedCourseToAdd] = useState<number | null>(null);
@@ -156,7 +157,8 @@ export default function AdminPanel() {
       name: user.name,
       email: user.email,
       role: user.role,
-      is_active: user.is_active
+      is_active: user.is_active,
+      password: ''
     });
 
     const userCourses = enrollments
@@ -1723,6 +1725,40 @@ export default function AdminPanel() {
                   <option value="instructor">Instructor</option>
                   <option value="admin">Administrador</option>
                 </select>
+              </div>
+
+              <div>
+                <label style={{
+                  display: 'block',
+                  fontSize: '13px',
+                  fontWeight: '600',
+                  color: '#374151',
+                  marginBottom: '0.5rem'
+                }}>
+                  Nueva Contraseña (opcional)
+                </label>
+                <input
+                  type="password"
+                  value={editFormData.password}
+                  onChange={(e) => setEditFormData(prev => ({ ...prev, password: e.target.value }))}
+                  placeholder="Dejar vacío para mantener contraseña actual"
+                  style={{
+                    width: '100%',
+                    padding: '0.75rem',
+                    border: '2px solid #e5e7eb',
+                    borderRadius: '8px',
+                    fontSize: '14px',
+                    boxSizing: 'border-box'
+                  }}
+                />
+                <p style={{
+                  fontSize: '12px',
+                  color: '#6b7280',
+                  marginTop: '0.5rem',
+                  marginBottom: 0
+                }}>
+                  Solo completa este campo si deseas cambiar la contraseña del usuario
+                </p>
               </div>
 
               <div>
