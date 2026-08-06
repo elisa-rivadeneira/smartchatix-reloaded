@@ -26,11 +26,22 @@ const Header: React.FC<HeaderProps> = ({
       .then(res => res.json())
       .then(data => {
         if (data.settings && data.settings.show_currency_selector !== undefined) {
-          setShowCurrencySelector(data.settings.show_currency_selector === true || data.settings.show_currency_selector === 'true');
+          const newValue = data.settings.show_currency_selector === true || data.settings.show_currency_selector === 'true';
+          const previousValue = showCurrencySelector;
+
+          setShowCurrencySelector(newValue);
+
+          if (previousValue === true && newValue === false) {
+            console.log('🔄 Selector de moneda desactivado - Limpiando preferencia manual');
+            if (typeof window !== 'undefined') {
+              localStorage.removeItem('preferred_currency');
+            }
+            window.location.reload();
+          }
         }
       })
       .catch(err => console.error('Error fetching currency selector setting:', err));
-  }, []);
+  }, [showCurrencySelector]);
 
   const navigationItems = [
     {
