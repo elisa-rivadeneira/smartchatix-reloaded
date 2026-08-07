@@ -24,6 +24,8 @@ interface Course {
   is_active: boolean;
   instructor_name: string;
   instructor_id: number | null;
+  thumbnail?: string;
+  markdown_image?: string;
 }
 
 interface Enrollment {
@@ -57,6 +59,8 @@ export default function AdminPanel() {
   });
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
   const [editingUser, setEditingUser] = useState<User | null>(null);
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [editFormData, setEditFormData] = useState({
@@ -338,25 +342,63 @@ export default function AdminPanel() {
       display: 'flex',
       height: '100vh',
       background: '#f9fafb',
-      fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif'
+      fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif',
+      overflow: 'hidden'
     }}>
       <style>{`
         @keyframes spin {
           to { transform: rotate(360deg); }
         }
+        @media (max-width: 768px) {
+          .mobile-overlay {
+            display: ${mobileMenuOpen ? 'block' : 'none'};
+          }
+          .mobile-sidebar {
+            transform: translateX(${mobileMenuOpen ? '0' : '-100%'});
+          }
+        }
       `}</style>
 
+      {/* Mobile Overlay */}
+      <div
+        className="mobile-overlay"
+        onClick={() => setMobileMenuOpen(false)}
+        style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'rgba(0, 0, 0, 0.5)',
+          zIndex: 999,
+          display: 'none'
+        }}
+      />
+
       {/* Sidebar */}
-      <aside style={{
-        width: sidebarCollapsed ? '80px' : '280px',
-        background: '#ffffff',
-        borderRight: '1px solid #e5e7eb',
-        display: 'flex',
-        flexDirection: 'column',
-        transition: 'width 0.3s ease',
-        position: 'relative',
-        zIndex: 100
-      }}>
+      <aside
+        className="mobile-sidebar"
+        style={{
+          width: sidebarCollapsed ? '80px' : '280px',
+          background: '#ffffff',
+          borderRight: '1px solid #e5e7eb',
+          display: 'flex',
+          flexDirection: 'column',
+          transition: 'all 0.3s ease',
+          position: 'fixed',
+          left: 0,
+          top: 0,
+          bottom: 0,
+          zIndex: 1000,
+        }}
+      >
+        <style>{`
+          @media (min-width: 769px) {
+            .mobile-sidebar {
+              position: relative !important;
+            }
+          }
+        `}</style>
         {/* Logo */}
         <div style={{
           padding: sidebarCollapsed ? '1.5rem 0' : '1.5rem',
@@ -397,7 +439,10 @@ export default function AdminPanel() {
           {menuItems.map((item) => (
             <button
               key={item.id}
-              onClick={() => setActiveTab(item.id)}
+              onClick={() => {
+                setActiveTab(item.id);
+                setMobileMenuOpen(false);
+              }}
               style={{
                 width: '100%',
                 display: 'flex',
@@ -555,19 +600,37 @@ export default function AdminPanel() {
       </aside>
 
       {/* Main Content */}
-      <main style={{ flex: 1, overflow: 'auto', background: '#f9fafb' }}>
+      <main style={{
+        flex: 1,
+        overflow: 'auto',
+        background: '#f9fafb',
+        marginLeft: 0,
+      }}>
+        <style>{`
+          @media (min-width: 769px) {
+            main {
+              margin-left: ${sidebarCollapsed ? '80px' : '280px'} !important;
+            }
+          }
+        `}</style>
+
         {/* Header */}
         <header style={{
           background: '#fff',
           borderBottom: '1px solid #e5e7eb',
-          padding: '1.5rem 2rem',
+          padding: '1rem',
           display: 'flex',
           justifyContent: 'space-between',
-          alignItems: 'center'
+          alignItems: 'center',
+          position: 'sticky',
+          top: 0,
+          zIndex: 100
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+            {/* Botón Hamburguesa (Mobile) */}
             <button
-              onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
+              className="mobile-hamburger"
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               style={{
                 background: '#f9fafb',
                 border: '1px solid #e5e7eb',
@@ -579,7 +642,8 @@ export default function AdminPanel() {
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                transition: 'all 0.2s'
+                transition: 'all 0.2s',
+                flexShrink: 0
               }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.background = '#f3f4f6';
@@ -590,10 +654,62 @@ export default function AdminPanel() {
                 e.currentTarget.style.borderColor = '#e5e7eb';
               }}
             >
+              <style>{`
+                @media (min-width: 769px) {
+                  .mobile-hamburger {
+                    display: none !important;
+                  }
+                }
+              `}</style>
+              ☰
+            </button>
+
+            {/* Botón Collapse Desktop */}
+            <button
+              onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
+              className="desktop-collapse-btn"
+              style={{
+                background: '#f9fafb',
+                border: '1px solid #e5e7eb',
+                cursor: 'pointer',
+                fontSize: '20px',
+                width: '40px',
+                height: '40px',
+                borderRadius: '8px',
+                display: 'none',
+                alignItems: 'center',
+                justifyContent: 'center',
+                transition: 'all 0.2s',
+                flexShrink: 0
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = '#f3f4f6';
+                e.currentTarget.style.borderColor = '#d1d5db';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = '#f9fafb';
+                e.currentTarget.style.borderColor = '#e5e7eb';
+              }}
+            >
+              <style>{`
+                @media (min-width: 769px) {
+                  .desktop-collapse-btn {
+                    display: flex !important;
+                  }
+                }
+              `}</style>
               {sidebarCollapsed ? '→' : '←'}
             </button>
-            <div>
-              <h1 style={{ fontSize: '1.875rem', fontWeight: '700', color: '#111827', marginBottom: '0.25rem' }}>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <h1 style={{
+                fontSize: 'clamp(1.25rem, 4vw, 1.875rem)',
+                fontWeight: '700',
+                color: '#111827',
+                marginBottom: '0.25rem',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap'
+              }}>
                 {activeTab === 'dashboard' ? 'Dashboard' :
                  activeTab === 'users' ? 'Usuarios' :
                  activeTab === 'courses' ? 'Cursos' :
@@ -602,14 +718,58 @@ export default function AdminPanel() {
                  activeTab === 'reports' ? 'Reportes' :
                  'Configuración'}
               </h1>
-              <p style={{ fontSize: '14px', color: '#6b7280' }}>
+              <p style={{
+                fontSize: '14px',
+                color: '#6b7280',
+                display: 'none'
+              }}>
+                <style>{`
+                  @media (min-width: 640px) {
+                    p {
+                      display: block !important;
+                    }
+                  }
+                `}</style>
                 Bienvenido de nuevo, {currentUser?.name}
               </p>
             </div>
           </div>
-          <div style={{ display: 'flex', gap: '0.75rem' }}>
+
+          <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', flexShrink: 0 }}>
+            {/* Notificaciones */}
             <button style={{
-              padding: '0.625rem 1.25rem',
+              position: 'relative',
+              background: 'transparent',
+              border: 'none',
+              cursor: 'pointer',
+              fontSize: '20px',
+              width: '40px',
+              height: '40px',
+              borderRadius: '8px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              transition: 'background 0.2s'
+            }}
+            onMouseEnter={(e) => e.currentTarget.style.background = '#f3f4f6'}
+            onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
+            >
+              🔔
+              <span style={{
+                position: 'absolute',
+                top: '8px',
+                right: '8px',
+                width: '8px',
+                height: '8px',
+                background: '#ef4444',
+                borderRadius: '50%',
+                border: '2px solid #fff'
+              }}></span>
+            </button>
+
+            {/* Botón Exportar - Solo desktop */}
+            <button className="export-btn" style={{
+              padding: '0.625rem 1rem',
               background: '#fff',
               border: '1px solid #e5e7eb',
               borderRadius: '8px',
@@ -617,12 +777,22 @@ export default function AdminPanel() {
               fontWeight: '500',
               color: '#374151',
               cursor: 'pointer',
-              display: 'flex',
+              display: 'none',
               alignItems: 'center',
-              gap: '0.5rem'
+              gap: '0.5rem',
+              whiteSpace: 'nowrap'
             }}>
-              <span>📥</span> Exportar
+              <style>{`
+                @media (min-width: 640px) {
+                  .export-btn {
+                    display: flex !important;
+                  }
+                }
+              `}</style>
+              <span>📥</span> <span className="export-text">Exportar</span>
             </button>
+
+            {/* Botón Principal - Responsive */}
             <button
               onClick={() => {
                 if (activeTab === 'users') {
@@ -637,7 +807,7 @@ export default function AdminPanel() {
                 }
               }}
               style={{
-                padding: '0.625rem 1.25rem',
+                padding: '0.625rem 1rem',
                 background: 'linear-gradient(135deg, #8b5cf6 0%, #d946ef 100%)',
                 border: 'none',
                 borderRadius: '8px',
@@ -648,24 +818,55 @@ export default function AdminPanel() {
                 display: 'flex',
                 alignItems: 'center',
                 gap: '0.5rem',
-                boxShadow: '0 4px 12px rgba(139, 92, 246, 0.3)'
+                boxShadow: '0 4px 12px rgba(139, 92, 246, 0.3)',
+                whiteSpace: 'nowrap'
               }}
             >
-              <span>➕</span> {activeTab === 'users' ? 'Nuevo Usuario' : 'Nuevo Curso'}
+              <span>➕</span>
+              <span className="btn-text" style={{ display: 'none' }}>
+                <style>{`
+                  @media (min-width: 640px) {
+                    .btn-text {
+                      display: inline !important;
+                    }
+                  }
+                `}</style>
+                {activeTab === 'users' ? 'Nuevo Usuario' : 'Nuevo Curso'}
+              </span>
             </button>
           </div>
         </header>
 
         {/* Dashboard Content */}
         {activeTab === 'dashboard' && (
-          <div style={{ padding: '2rem' }}>
+          <div style={{ padding: '1rem' }}>
+            <style>{`
+              @media (min-width: 640px) {
+                .dashboard-content {
+                  padding: 2rem !important;
+                }
+              }
+            `}</style>
             {/* KPI Cards */}
-            <div style={{
+            <div className="kpi-grid" style={{
               display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
-              gap: '1.5rem',
-              marginBottom: '2rem'
+              gridTemplateColumns: 'repeat(2, 1fr)',
+              gap: '1rem',
+              marginBottom: '1.5rem'
             }}>
+              <style>{`
+                @media (min-width: 768px) {
+                  .kpi-grid {
+                    grid-template-columns: repeat(4, 1fr) !important;
+                  }
+                }
+                @media (min-width: 640px) {
+                  .kpi-grid {
+                    gap: 1.5rem !important;
+                    margin-bottom: 2rem !important;
+                  }
+                }
+              `}</style>
               {[
                 {
                   title: 'Total Usuarios',
@@ -700,55 +901,123 @@ export default function AdminPanel() {
                   color: '#f59e0b'
                 }
               ].map((kpi, idx) => (
-                <div key={idx} style={{
+                <div key={idx} className="kpi-card" style={{
                   background: '#fff',
                   borderRadius: '12px',
-                  padding: '1.5rem',
+                  padding: '1rem',
                   border: '1px solid #e5e7eb'
                 }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem' }}>
-                    <div style={{
-                      width: '48px',
-                      height: '48px',
+                  <style>{`
+                    @media (min-width: 640px) {
+                      .kpi-card {
+                        padding: 1.5rem !important;
+                      }
+                    }
+                  `}</style>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.75rem' }}>
+                    <div className="kpi-icon" style={{
+                      width: '40px',
+                      height: '40px',
                       borderRadius: '10px',
                       background: `${kpi.color}15`,
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      fontSize: '24px'
+                      fontSize: '20px',
+                      flexShrink: 0
                     }}>
+                      <style>{`
+                        @media (min-width: 640px) {
+                          .kpi-icon {
+                            width: 48px !important;
+                            height: 48px !important;
+                            font-size: 24px !important;
+                          }
+                        }
+                      `}</style>
                       {kpi.icon}
                     </div>
                     <div style={{
-                      padding: '0.25rem 0.625rem',
+                      padding: '0.25rem 0.5rem',
                       background: '#dcfce7',
                       color: '#16a34a',
                       borderRadius: '12px',
-                      fontSize: '12px',
+                      fontSize: '11px',
                       fontWeight: '600',
                       height: 'fit-content'
                     }}>
+                      <style>{`
+                        @media (min-width: 640px) {
+                          .kpi-badge {
+                            font-size: 12px !important;
+                            padding: 0.25rem 0.625rem !important;
+                          }
+                        }
+                      `}</style>
                       {kpi.change}
                     </div>
                   </div>
-                  <div style={{ fontSize: '14px', color: '#6b7280', marginBottom: '0.5rem' }}>
+                  <div style={{ fontSize: '13px', color: '#6b7280', marginBottom: '0.5rem' }}>
+                    <style>{`
+                      @media (min-width: 640px) {
+                        .kpi-title {
+                          font-size: 14px !important;
+                        }
+                      }
+                    `}</style>
                     {kpi.title}
                   </div>
-                  <div style={{ fontSize: '2rem', fontWeight: '700', color: '#111827' }}>
+                  <div className="kpi-value" style={{ fontSize: '1.75rem', fontWeight: '700', color: '#111827', marginBottom: '0.25rem' }}>
+                    <style>{`
+                      @media (min-width: 640px) {
+                        .kpi-value {
+                          font-size: 2rem !important;
+                        }
+                      }
+                    `}</style>
                     {kpi.value}
+                  </div>
+                  <div style={{ fontSize: '12px', color: '#9ca3af' }}>
+                    <style>{`
+                      @media (min-width: 640px) {
+                        .kpi-subtitle {
+                          font-size: 13px !important;
+                        }
+                      }
+                    `}</style>
+                    vs mes anterior
                   </div>
                 </div>
               ))}
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '1.5rem' }}>
+            <div className="charts-grid" style={{
+              display: 'grid',
+              gridTemplateColumns: '1fr',
+              gap: '1rem'
+            }}>
+              <style>{`
+                @media (min-width: 1024px) {
+                  .charts-grid {
+                    grid-template-columns: 2fr 1fr !important;
+                    gap: 1.5rem !important;
+                  }
+                }
+              `}</style>
               {/* Chart */}
               <div style={{
                 background: '#fff',
                 borderRadius: '12px',
-                padding: '1.5rem',
+                padding: '1rem',
                 border: '1px solid #e5e7eb'
               }}>
+                <style>{`
+                  @media (min-width: 640px) {
+                    .chart-container {
+                      padding: 1.5rem !important;
+                    }
+                  }
+                `}</style>
                 <div style={{ marginBottom: '1.5rem' }}>
                   <h3 style={{ fontSize: '1.125rem', fontWeight: '700', color: '#111827', marginBottom: '0.25rem' }}>
                     Progreso de Aprendizaje
@@ -1067,14 +1336,272 @@ export default function AdminPanel() {
 
         {/* Users Tab */}
         {activeTab === 'users' && (
-          <div style={{ padding: '2rem' }}>
+          <div style={{ padding: '1rem' }}>
+            <style>{`
+              @media (min-width: 640px) {
+                .users-content {
+                  padding: 2rem !important;
+                }
+              }
+              @media (max-width: 768px) {
+                .users-table {
+                  display: none !important;
+                }
+              }
+              @media (min-width: 769px) {
+                .users-cards {
+                  display: none !important;
+                }
+              }
+            `}</style>
+
+            {/* Barra de búsqueda y filtros */}
             <div style={{
+              display: 'flex',
+              gap: '0.75rem',
+              marginBottom: '1rem'
+            }}>
+              <div style={{
+                flex: 1,
+                position: 'relative'
+              }}>
+                <input
+                  type="text"
+                  placeholder="Buscar usuarios..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  style={{
+                    width: '100%',
+                    padding: '0.75rem 1rem 0.75rem 2.5rem',
+                    border: '1px solid #e5e7eb',
+                    borderRadius: '8px',
+                    fontSize: '14px',
+                    outline: 'none',
+                    boxSizing: 'border-box'
+                  }}
+                  onFocus={(e) => e.currentTarget.style.borderColor = '#8b5cf6'}
+                  onBlur={(e) => e.currentTarget.style.borderColor = '#e5e7eb'}
+                />
+                <span style={{
+                  position: 'absolute',
+                  left: '1rem',
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  color: '#9ca3af',
+                  fontSize: '16px'
+                }}>
+                  🔍
+                </span>
+              </div>
+              <button style={{
+                padding: '0.75rem',
+                background: '#fff',
+                border: '1px solid #e5e7eb',
+                borderRadius: '8px',
+                cursor: 'pointer',
+                fontSize: '18px',
+                width: '44px',
+                height: '44px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                flexShrink: 0
+              }}
+              onMouseEnter={(e) => e.currentTarget.style.background = '#f9fafb'}
+              onMouseLeave={(e) => e.currentTarget.style.background = '#fff'}
+              >
+                ⚙️
+              </button>
+            </div>
+
+            {/* Contador de usuarios */}
+            <div style={{
+              fontSize: '13px',
+              color: '#6b7280',
+              marginBottom: '1rem'
+            }}>
+              {(() => {
+                const filteredUsers = users.filter(user =>
+                  user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                  user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                  user.role.toLowerCase().includes(searchTerm.toLowerCase())
+                );
+                return `${filteredUsers.length} usuario${filteredUsers.length !== 1 ? 's' : ''} encontrado${filteredUsers.length !== 1 ? 's' : ''}`;
+              })()}
+            </div>
+
+            {/* Vista de tarjetas (Mobile) */}
+            <div className="users-cards" style={{
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '1rem'
+            }}>
+              {users.filter(user =>
+                user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                user.role.toLowerCase().includes(searchTerm.toLowerCase())
+              ).map((user) => (
+                <div
+                  key={user.id}
+                  onClick={() => handleEditUser(user)}
+                  style={{
+                    background: '#fff',
+                    border: '1px solid #e5e7eb',
+                    borderRadius: '12px',
+                    padding: '1rem',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.1)';
+                    e.currentTarget.style.borderColor = '#d1d5db';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.boxShadow = 'none';
+                    e.currentTarget.style.borderColor = '#e5e7eb';
+                  }}
+                >
+                  <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.75rem' }}>
+                    {/* Avatar */}
+                    <div style={{
+                      width: '48px',
+                      height: '48px',
+                      borderRadius: '50%',
+                      background: user.role === 'admin' ? '#fef3c7' : user.role === 'instructor' ? '#dbeafe' : '#dcfce7',
+                      color: user.role === 'admin' ? '#92400e' : user.role === 'instructor' ? '#1e40af' : '#166534',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontSize: '18px',
+                      fontWeight: '700',
+                      flexShrink: 0
+                    }}>
+                      {user.name.charAt(0).toUpperCase()}
+                    </div>
+
+                    {/* Info */}
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{
+                        fontSize: '15px',
+                        fontWeight: '600',
+                        color: '#111827',
+                        marginBottom: '0.25rem',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        whiteSpace: 'nowrap'
+                      }}>
+                        {user.name}
+                      </div>
+                      <div style={{
+                        fontSize: '13px',
+                        color: '#6b7280',
+                        marginBottom: '0.75rem',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        whiteSpace: 'nowrap'
+                      }}>
+                        {user.email}
+                      </div>
+
+                      {/* Badges */}
+                      <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.5rem', flexWrap: 'wrap' }}>
+                        <span style={{
+                          padding: '0.25rem 0.75rem',
+                          borderRadius: '12px',
+                          fontSize: '12px',
+                          fontWeight: '600',
+                          background: user.role === 'admin' ? '#fef3c7' : user.role === 'instructor' ? '#dbeafe' : '#dcfce7',
+                          color: user.role === 'admin' ? '#92400e' : user.role === 'instructor' ? '#1e40af' : '#166534'
+                        }}>
+                          {user.role === 'admin' ? 'Administrador' : user.role === 'instructor' ? 'Instructor' : 'Estudiante'}
+                        </span>
+                        <span style={{
+                          padding: '0.25rem 0.75rem',
+                          borderRadius: '12px',
+                          fontSize: '12px',
+                          fontWeight: '600',
+                          background: user.is_active ? '#dcfce7' : '#fee2e2',
+                          color: user.is_active ? '#166534' : '#991b1b'
+                        }}>
+                          {user.is_active ? 'Activo' : 'Inactivo'}
+                        </span>
+                      </div>
+
+                      {/* Fecha */}
+                      <div style={{
+                        fontSize: '12px',
+                        color: '#9ca3af',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '0.25rem'
+                      }}>
+                        📅 {new Date(user.created_at).toLocaleDateString('es-PE')}
+                      </div>
+                    </div>
+
+                    {/* Botón menú y flecha */}
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem' }}>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleEditUser(user);
+                        }}
+                        style={{
+                          background: 'transparent',
+                          border: 'none',
+                          cursor: 'pointer',
+                          fontSize: '20px',
+                          color: '#9ca3af',
+                          padding: '0.25rem',
+                          flexShrink: 0
+                        }}
+                      >
+                        ⋮
+                      </button>
+                      <div style={{
+                        color: '#9ca3af',
+                        fontSize: '18px'
+                      }}>
+                        ›
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+
+              {/* Mensaje sin resultados */}
+              {users.filter(user =>
+                user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                user.role.toLowerCase().includes(searchTerm.toLowerCase())
+              ).length === 0 && (
+                <div style={{
+                  padding: '3rem 1rem',
+                  textAlign: 'center',
+                  color: '#6b7280',
+                  background: '#fff',
+                  borderRadius: '12px',
+                  border: '1px solid #e5e7eb'
+                }}>
+                  <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>🔍</div>
+                  <p style={{ fontSize: '14px', fontWeight: '600', color: '#111827', marginBottom: '0.5rem' }}>
+                    No se encontraron usuarios
+                  </p>
+                  <p style={{ fontSize: '13px', color: '#6b7280' }}>
+                    Intenta con otro término de búsqueda
+                  </p>
+                </div>
+              )}
+            </div>
+
+            {/* Vista de tabla (Desktop) */}
+            <div className="users-table" style={{
               background: '#fff',
               borderRadius: '12px',
               border: '1px solid #e5e7eb',
               overflow: 'hidden'
             }}>
-              <div style={{ overflowX: 'auto' }}>
+              <div style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
                 <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                   <thead>
                     <tr style={{ background: '#f9fafb', borderBottom: '1px solid #e5e7eb' }}>
@@ -1088,7 +1615,11 @@ export default function AdminPanel() {
                     </tr>
                   </thead>
                   <tbody>
-                    {users.map((user) => (
+                    {users.filter(user =>
+                      user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                      user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                      user.role.toLowerCase().includes(searchTerm.toLowerCase())
+                    ).map((user) => (
                       <tr key={user.id} style={{ borderBottom: '1px solid #e5e7eb' }}>
                         <td style={{ padding: '1rem', fontSize: '14px', color: '#111827' }}>#{user.id}</td>
                         <td style={{ padding: '1rem', fontSize: '14px', fontWeight: '600', color: '#111827' }}>{user.name}</td>
@@ -1142,124 +1673,392 @@ export default function AdminPanel() {
                   </tbody>
                 </table>
               </div>
+
+              {/* Mensaje sin resultados - Desktop */}
+              {users.filter(user =>
+                user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                user.role.toLowerCase().includes(searchTerm.toLowerCase())
+              ).length === 0 && (
+                <div style={{
+                  padding: '3rem',
+                  textAlign: 'center',
+                  color: '#6b7280'
+                }}>
+                  <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>🔍</div>
+                  <p style={{ fontSize: '14px', fontWeight: '600', color: '#111827', marginBottom: '0.5rem' }}>
+                    No se encontraron usuarios
+                  </p>
+                  <p style={{ fontSize: '13px', color: '#6b7280' }}>
+                    Intenta con otro término de búsqueda
+                  </p>
+                </div>
+              )}
             </div>
           </div>
         )}
 
         {/* Courses Tab */}
         {activeTab === 'courses' && (
-          <div style={{ padding: '2rem' }}>
+          <div style={{ padding: '1rem' }}>
+            <style>{`
+              @media (min-width: 640px) {
+                .courses-content {
+                  padding: 2rem !important;
+                }
+              }
+            `}</style>
+
+            {/* Barra de búsqueda y filtros */}
             <div style={{
-              background: '#fff',
-              borderRadius: '12px',
-              border: '1px solid #e5e7eb',
-              overflow: 'hidden'
+              display: 'flex',
+              gap: '0.75rem',
+              marginBottom: '1rem'
             }}>
-              <div style={{ overflowX: 'auto' }}>
-                <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-                  <thead>
-                    <tr style={{ background: '#f9fafb', borderBottom: '1px solid #e5e7eb' }}>
-                      <th style={{ padding: '1rem', textAlign: 'left', fontSize: '13px', fontWeight: '600', color: '#6b7280' }}>ID</th>
-                      <th style={{ padding: '1rem', textAlign: 'left', fontSize: '13px', fontWeight: '600', color: '#6b7280' }}>Título</th>
-                      <th style={{ padding: '1rem', textAlign: 'left', fontSize: '13px', fontWeight: '600', color: '#6b7280' }}>Instructor</th>
-                      <th style={{ padding: '1rem', textAlign: 'left', fontSize: '13px', fontWeight: '600', color: '#6b7280' }}>Estudiantes</th>
-                      <th style={{ padding: '1rem', textAlign: 'left', fontSize: '13px', fontWeight: '600', color: '#6b7280' }}>Precio Vivo</th>
-                      <th style={{ padding: '1rem', textAlign: 'left', fontSize: '13px', fontWeight: '600', color: '#6b7280' }}>Precio Grabado</th>
-                      <th style={{ padding: '1rem', textAlign: 'left', fontSize: '13px', fontWeight: '600', color: '#6b7280' }}>Estado</th>
-                      <th style={{ padding: '1rem', textAlign: 'left', fontSize: '13px', fontWeight: '600', color: '#6b7280' }}>Acciones</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {courses.map((course) => {
-                      const studentsCount = enrollments.filter(e => e.course_id === course.id).length;
-                      return (
-                        <tr key={course.id} style={{ borderBottom: '1px solid #e5e7eb' }}>
-                          <td style={{ padding: '1rem', fontSize: '14px', color: '#111827' }}>#{course.id}</td>
-                          <td style={{ padding: '1rem', fontSize: '14px', fontWeight: '600', color: '#111827' }}>{course.title}</td>
-                          <td style={{ padding: '1rem', fontSize: '14px', color: '#6b7280' }}>
-                            {course.instructor_name || 'Sin asignar'}
-                          </td>
-                          <td style={{ padding: '1rem' }}>
-                            <span style={{
-                              padding: '0.25rem 0.75rem',
-                              borderRadius: '12px',
-                              fontSize: '12px',
-                              fontWeight: '600',
-                              background: studentsCount > 0 ? '#dbeafe' : '#f3f4f6',
-                              color: studentsCount > 0 ? '#1e40af' : '#6b7280'
-                            }}>
-                              {studentsCount}
-                            </span>
-                          </td>
-                          <td style={{ padding: '1rem', fontSize: '14px', color: '#111827', fontWeight: '600' }}>
-                            S/ {course.price_vivo || 0}
-                          </td>
-                          <td style={{ padding: '1rem', fontSize: '14px', color: '#111827', fontWeight: '600' }}>
-                            S/ {course.price_grabado || 0}
-                          </td>
-                          <td style={{ padding: '1rem' }}>
-                            <span style={{
-                              padding: '0.25rem 0.75rem',
-                              borderRadius: '12px',
-                              fontSize: '12px',
-                              fontWeight: '600',
-                              background: course.is_active ? '#dcfce7' : '#fee2e2',
-                              color: course.is_active ? '#166534' : '#991b1b'
-                            }}>
-                              {course.is_active ? 'Activo' : 'Inactivo'}
-                            </span>
-                          </td>
-                          <td style={{ padding: '1rem', display: 'flex', gap: '0.5rem' }}>
-                            <Link href={`/instructor/curso/${course.slug}`}>
-                              <button style={{
-                                padding: '0.5rem 1rem',
-                                background: '#8b5cf6',
-                                color: '#fff',
-                                border: 'none',
-                                borderRadius: '6px',
-                                fontSize: '13px',
-                                fontWeight: '600',
-                                cursor: 'pointer'
-                              }}>
-                                📝 Contenido
-                              </button>
-                            </Link>
-                            <Link href={`/admin/curso/${course.slug}/config`}>
-                              <button style={{
-                                padding: '0.5rem 1rem',
-                                background: '#10b981',
-                                color: '#fff',
-                                border: 'none',
-                                borderRadius: '6px',
-                                fontSize: '13px',
-                                fontWeight: '600',
-                                cursor: 'pointer'
-                              }}>
-                                ⚙️ Config
-                              </button>
-                            </Link>
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
+              <div style={{
+                flex: 1,
+                position: 'relative'
+              }}>
+                <input
+                  type="text"
+                  placeholder="Buscar cursos..."
+                  style={{
+                    width: '100%',
+                    padding: '0.75rem 1rem 0.75rem 2.5rem',
+                    border: '1px solid #e5e7eb',
+                    borderRadius: '8px',
+                    fontSize: '14px',
+                    outline: 'none',
+                    boxSizing: 'border-box'
+                  }}
+                  onFocus={(e) => e.currentTarget.style.borderColor = '#8b5cf6'}
+                  onBlur={(e) => e.currentTarget.style.borderColor = '#e5e7eb'}
+                />
+                <span style={{
+                  position: 'absolute',
+                  left: '1rem',
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  color: '#9ca3af',
+                  fontSize: '16px'
+                }}>
+                  🔍
+                </span>
               </div>
+              <button style={{
+                padding: '0.75rem',
+                background: '#fff',
+                border: '1px solid #e5e7eb',
+                borderRadius: '8px',
+                cursor: 'pointer',
+                fontSize: '14px',
+                minWidth: '100px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '0.5rem',
+                flexShrink: 0
+              }}
+              onMouseEnter={(e) => e.currentTarget.style.background = '#f9fafb'}
+              onMouseLeave={(e) => e.currentTarget.style.background = '#fff'}
+              >
+                ⚙️ Filtros
+              </button>
             </div>
+
+            {/* Tarjetas de estadísticas */}
+            <div className="kpi-grid" style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(2, 1fr)',
+              gap: '1rem',
+              marginBottom: '1.5rem'
+            }}>
+              <style>{`
+                @media (min-width: 768px) {
+                  .courses-kpi-grid {
+                    grid-template-columns: repeat(4, 1fr) !important;
+                  }
+                }
+              `}</style>
+              {[
+                {
+                  title: 'Total Cursos',
+                  value: courses.length,
+                  change: '+8.2%',
+                  icon: '📚',
+                  color: '#8b5cf6'
+                },
+                {
+                  title: 'Cursos Activos',
+                  value: courses.filter(c => c.is_active).length,
+                  change: '+12.5%',
+                  icon: '✅',
+                  color: '#10b981'
+                },
+                {
+                  title: 'En Borrador',
+                  value: courses.filter(c => !c.is_active).length,
+                  change: '+5.4%',
+                  icon: '🕐',
+                  color: '#f59e0b'
+                },
+                {
+                  title: 'Total Estudiantes',
+                  value: enrollments.length,
+                  change: '+18.7%',
+                  icon: '👥',
+                  color: '#3b82f6'
+                }
+              ].map((kpi, idx) => (
+                <div key={idx} className="kpi-card" style={{
+                  background: '#fff',
+                  borderRadius: '12px',
+                  padding: '1rem',
+                  border: '1px solid #e5e7eb'
+                }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.75rem' }}>
+                    <div className="kpi-icon" style={{
+                      width: '40px',
+                      height: '40px',
+                      borderRadius: '10px',
+                      background: `${kpi.color}15`,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontSize: '20px',
+                      flexShrink: 0
+                    }}>
+                      {kpi.icon}
+                    </div>
+                    <div style={{
+                      padding: '0.25rem 0.5rem',
+                      background: '#dcfce7',
+                      color: '#16a34a',
+                      borderRadius: '12px',
+                      fontSize: '11px',
+                      fontWeight: '600',
+                      height: 'fit-content'
+                    }}>
+                      {kpi.change}
+                    </div>
+                  </div>
+                  <div style={{ fontSize: '13px', color: '#6b7280', marginBottom: '0.5rem' }}>
+                    {kpi.title}
+                  </div>
+                  <div className="kpi-value" style={{ fontSize: '1.75rem', fontWeight: '700', color: '#111827' }}>
+                    {kpi.value}
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Header de lista */}
+            <div style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              marginBottom: '1rem'
+            }}>
+              <h3 style={{ fontSize: '1.125rem', fontWeight: '700', color: '#111827', margin: 0 }}>
+                Lista de Cursos
+              </h3>
+              <select style={{
+                padding: '0.5rem 2rem 0.5rem 0.75rem',
+                border: '1px solid #e5e7eb',
+                borderRadius: '8px',
+                fontSize: '14px',
+                color: '#6b7280',
+                cursor: 'pointer',
+                background: '#fff',
+                backgroundImage: 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'12\' height=\'12\' viewBox=\'0 0 12 12\'%3E%3Cpath fill=\'%236b7280\' d=\'M6 9L1 4h10z\'/%3E%3C/svg%3E")',
+                backgroundRepeat: 'no-repeat',
+                backgroundPosition: 'right 0.75rem center',
+                appearance: 'none'
+              }}>
+                <option>Más recientes</option>
+                <option>Más antiguos</option>
+                <option>Más estudiantes</option>
+              </select>
+            </div>
+
+            {/* Vista de tarjetas (Mobile y Desktop) */}
+            <div className="courses-cards" style={{
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '1rem'
+            }}>
+              {courses.map((course) => {
+                const studentsCount = enrollments.filter(e => e.course_id === course.id).length;
+                const completionPercentage = Math.floor(Math.random() * 100);
+
+                return (
+                  <div
+                    key={course.id}
+                    style={{
+                      background: '#fff',
+                      border: '1px solid #e5e7eb',
+                      borderRadius: '12px',
+                      padding: '1rem',
+                      cursor: 'pointer',
+                      transition: 'all 0.2s'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.1)';
+                      e.currentTarget.style.borderColor = '#d1d5db';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.boxShadow = 'none';
+                      e.currentTarget.style.borderColor = '#e5e7eb';
+                    }}
+                  >
+                    <div style={{ display: 'flex', gap: '1rem' }}>
+                      {/* Imagen del curso */}
+                      <div style={{
+                        width: '80px',
+                        height: '80px',
+                        borderRadius: '12px',
+                        background: course.thumbnail || course.markdown_image ? '#f3f4f6' : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        fontSize: '32px',
+                        flexShrink: 0,
+                        overflow: 'hidden',
+                        position: 'relative'
+                      }}>
+                        {course.thumbnail || course.markdown_image ? (
+                          <Image
+                            src={course.thumbnail || course.markdown_image || ''}
+                            alt={course.title}
+                            fill
+                            style={{ objectFit: 'cover' }}
+                            unoptimized
+                          />
+                        ) : (
+                          '📚'
+                        )}
+                      </div>
+
+                      {/* Info del curso */}
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.5rem' }}>
+                          <div style={{ flex: 1, minWidth: 0 }}>
+                            <h4 style={{
+                              fontSize: '15px',
+                              fontWeight: '600',
+                              color: '#111827',
+                              margin: '0 0 0.25rem 0',
+                              overflow: 'hidden',
+                              textOverflow: 'ellipsis',
+                              whiteSpace: 'nowrap'
+                            }}>
+                              {course.title}
+                            </h4>
+                            <span style={{
+                              padding: '0.25rem 0.75rem',
+                              borderRadius: '12px',
+                              fontSize: '12px',
+                              fontWeight: '600',
+                              background: course.is_active ? '#dcfce7' : '#fef3c7',
+                              color: course.is_active ? '#166534' : '#92400e'
+                            }}>
+                              {course.is_active ? 'Activo' : 'Borrador'}
+                            </span>
+                          </div>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                            }}
+                            style={{
+                              background: 'transparent',
+                              border: 'none',
+                              cursor: 'pointer',
+                              fontSize: '20px',
+                              color: '#9ca3af',
+                              padding: '0.25rem',
+                              flexShrink: 0,
+                              marginLeft: '0.5rem'
+                            }}
+                          >
+                            ⋮
+                          </button>
+                        </div>
+
+                        {/* Estadísticas */}
+                        <div style={{
+                          display: 'flex',
+                          gap: '1rem',
+                          fontSize: '13px',
+                          color: '#6b7280',
+                          marginBottom: '0.75rem',
+                          flexWrap: 'wrap'
+                        }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+                            📄 {Math.floor(Math.random() * 30) + 10} lecciones
+                          </div>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+                            ⏱️ {Math.floor(Math.random() * 5) + 1}h {Math.floor(Math.random() * 60)}m
+                          </div>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+                            👥 {studentsCount} estudiantes
+                          </div>
+                        </div>
+
+                        {/* Barra de progreso */}
+                        <div>
+                          <div style={{
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            fontSize: '12px',
+                            color: '#6b7280',
+                            marginBottom: '0.25rem'
+                          }}>
+                            <span>{completionPercentage}% completado</span>
+                          </div>
+                          <div style={{
+                            width: '100%',
+                            height: '6px',
+                            background: '#e5e7eb',
+                            borderRadius: '3px',
+                            overflow: 'hidden'
+                          }}>
+                            <div style={{
+                              width: `${completionPercentage}%`,
+                              height: '100%',
+                              background: course.is_active ? '#8b5cf6' : '#f59e0b',
+                              borderRadius: '3px',
+                              transition: 'width 0.3s'
+                            }}></div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
           </div>
         )}
 
         {/* Instructors Tab */}
         {activeTab === 'instructors' && (
-          <div style={{ padding: '2rem' }}>
+          <div style={{ padding: '1rem' }}>
+            <style>{`
+              @media (min-width: 640px) {
+                .instructors-content {
+                  padding: 2rem !important;
+                }
+              }
+            `}</style>
             <div style={{
               background: '#fff',
               borderRadius: '12px',
               border: '1px solid #e5e7eb',
               overflow: 'hidden'
             }}>
-              <div style={{ overflowX: 'auto' }}>
-                <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+              <div style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
+                <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: '600px' }}>
                   <thead>
                     <tr style={{ background: '#f9fafb', borderBottom: '1px solid #e5e7eb' }}>
                       <th style={{ padding: '1rem', textAlign: 'left', fontSize: '13px', fontWeight: '600', color: '#6b7280' }}>ID</th>
@@ -1317,15 +2116,218 @@ export default function AdminPanel() {
 
         {/* Enrollments Tab */}
         {activeTab === 'enrollments' && (
-          <div style={{ padding: '2rem' }}>
+          <div style={{ padding: '1rem' }}>
+            <style>{`
+              @media (min-width: 640px) {
+                .enrollments-content {
+                  padding: 2rem !important;
+                }
+              }
+              @media (max-width: 768px) {
+                .enrollments-table {
+                  display: none !important;
+                }
+              }
+              @media (min-width: 769px) {
+                .enrollments-cards {
+                  display: none !important;
+                }
+              }
+            `}</style>
+
+            {/* Barra de búsqueda */}
             <div style={{
+              display: 'flex',
+              gap: '0.75rem',
+              marginBottom: '1rem'
+            }}>
+              <div style={{
+                flex: 1,
+                position: 'relative'
+              }}>
+                <input
+                  type="text"
+                  placeholder="Buscar inscripciones..."
+                  style={{
+                    width: '100%',
+                    padding: '0.75rem 1rem 0.75rem 2.5rem',
+                    border: '1px solid #e5e7eb',
+                    borderRadius: '8px',
+                    fontSize: '14px',
+                    outline: 'none',
+                    boxSizing: 'border-box'
+                  }}
+                  onFocus={(e) => e.currentTarget.style.borderColor = '#8b5cf6'}
+                  onBlur={(e) => e.currentTarget.style.borderColor = '#e5e7eb'}
+                />
+                <span style={{
+                  position: 'absolute',
+                  left: '1rem',
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  color: '#9ca3af',
+                  fontSize: '16px'
+                }}>
+                  🔍
+                </span>
+              </div>
+            </div>
+
+            {/* Contador */}
+            <div style={{
+              fontSize: '13px',
+              color: '#6b7280',
+              marginBottom: '1rem'
+            }}>
+              {enrollments.length} inscripción{enrollments.length !== 1 ? 'es' : ''} encontrada{enrollments.length !== 1 ? 's' : ''}
+            </div>
+
+            {/* Vista de tarjetas (Mobile) */}
+            <div className="enrollments-cards" style={{
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '1rem'
+            }}>
+              {enrollments.map((enrollment) => (
+                <div
+                  key={enrollment.id}
+                  style={{
+                    background: '#fff',
+                    border: '1px solid #e5e7eb',
+                    borderRadius: '12px',
+                    padding: '1rem',
+                    transition: 'all 0.2s'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.1)';
+                    e.currentTarget.style.borderColor = '#d1d5db';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.boxShadow = 'none';
+                    e.currentTarget.style.borderColor = '#e5e7eb';
+                  }}
+                >
+                  {/* Header: Estudiante y monto */}
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.75rem' }}>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{
+                        fontSize: '15px',
+                        fontWeight: '600',
+                        color: '#111827',
+                        marginBottom: '0.25rem',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        whiteSpace: 'nowrap'
+                      }}>
+                        {enrollment.student_name}
+                      </div>
+                      <div style={{
+                        fontSize: '13px',
+                        color: '#6b7280',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        whiteSpace: 'nowrap'
+                      }}>
+                        {enrollment.student_email}
+                      </div>
+                    </div>
+                    <div style={{
+                      fontSize: '18px',
+                      fontWeight: '700',
+                      color: '#111827',
+                      marginLeft: '1rem',
+                      flexShrink: 0
+                    }}>
+                      S/ {enrollment.payment_amount}
+                    </div>
+                  </div>
+
+                  {/* Curso */}
+                  <div style={{
+                    fontSize: '14px',
+                    fontWeight: '500',
+                    color: '#374151',
+                    marginBottom: '0.75rem',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap'
+                  }}>
+                    📚 {enrollment.course_title}
+                  </div>
+
+                  {/* Badges */}
+                  <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.75rem', flexWrap: 'wrap' }}>
+                    <span style={{
+                      padding: '0.25rem 0.75rem',
+                      borderRadius: '12px',
+                      fontSize: '12px',
+                      fontWeight: '600',
+                      background: enrollment.modality === 'vivo' ? '#fef3c7' : '#dbeafe',
+                      color: enrollment.modality === 'vivo' ? '#92400e' : '#1e40af'
+                    }}>
+                      {enrollment.modality === 'vivo' ? '🎥 En Vivo' : '📹 Grabado'}
+                    </span>
+                    <span style={{
+                      padding: '0.25rem 0.75rem',
+                      borderRadius: '12px',
+                      fontSize: '12px',
+                      fontWeight: '600',
+                      background: enrollment.payment_status === 'completed' ? '#dcfce7' : enrollment.payment_status === 'pending' ? '#fef3c7' : '#fee2e2',
+                      color: enrollment.payment_status === 'completed' ? '#166534' : enrollment.payment_status === 'pending' ? '#92400e' : '#991b1b'
+                    }}>
+                      {enrollment.payment_status === 'completed' ? '✅ Pagado' : enrollment.payment_status === 'pending' ? '⏳ Pendiente' : '❌ Fallido'}
+                    </span>
+                  </div>
+
+                  {/* Fecha */}
+                  <div style={{
+                    fontSize: '12px',
+                    color: '#9ca3af',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.25rem'
+                  }}>
+                    📅 {new Date(enrollment.enrolled_at).toLocaleDateString('es-PE', {
+                      year: 'numeric',
+                      month: 'short',
+                      day: 'numeric',
+                      hour: '2-digit',
+                      minute: '2-digit'
+                    })}
+                  </div>
+                </div>
+              ))}
+
+              {/* Mensaje sin inscripciones */}
+              {enrollments.length === 0 && (
+                <div style={{
+                  padding: '3rem 1rem',
+                  textAlign: 'center',
+                  color: '#6b7280',
+                  background: '#fff',
+                  borderRadius: '12px',
+                  border: '1px solid #e5e7eb'
+                }}>
+                  <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>📋</div>
+                  <p style={{ fontSize: '14px', fontWeight: '600', color: '#111827', marginBottom: '0.5rem' }}>
+                    No hay inscripciones
+                  </p>
+                  <p style={{ fontSize: '13px', color: '#6b7280' }}>
+                    Las inscripciones aparecerán aquí
+                  </p>
+                </div>
+              )}
+            </div>
+
+            {/* Vista de tabla (Desktop) */}
+            <div className="enrollments-table" style={{
               background: '#fff',
               borderRadius: '12px',
               border: '1px solid #e5e7eb',
               overflow: 'hidden'
             }}>
-              <div style={{ overflowX: 'auto' }}>
-                <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+              <div style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
+                <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: '600px' }}>
                   <thead>
                     <tr style={{ background: '#f9fafb', borderBottom: '1px solid #e5e7eb' }}>
                       <th style={{ padding: '1rem', textAlign: 'left', fontSize: '13px', fontWeight: '600', color: '#6b7280' }}>ID</th>
@@ -1408,7 +2410,14 @@ export default function AdminPanel() {
 
         {/* Settings Tab */}
         {activeTab === 'settings' && (
-          <div style={{ padding: '2rem' }}>
+          <div style={{ padding: '1rem' }}>
+            <style>{`
+              @media (min-width: 640px) {
+                .settings-content {
+                  padding: 2rem !important;
+                }
+              }
+            `}</style>
             <div style={{
               background: '#fff',
               borderRadius: '12px',
@@ -1627,27 +2636,44 @@ export default function AdminPanel() {
         onClick={() => setEditModalOpen(false)}
         >
           <div
+            className="modal-inner"
             style={{
               background: '#fff',
               borderRadius: '12px',
-              padding: '2rem',
+              padding: '1rem',
               maxWidth: '500px',
               width: '90%',
               maxHeight: '90vh',
-              overflowY: 'auto'
+              overflowY: 'auto',
+              boxSizing: 'border-box'
             }}
             onClick={(e) => e.stopPropagation()}
           >
+            <style>{`
+              @media (min-width: 640px) {
+                .modal-inner {
+                  padding: 1.5rem !important;
+                }
+              }
+            `}</style>
             <h2 style={{
-              fontSize: '1.5rem',
+              fontSize: '1.25rem',
               fontWeight: '700',
               color: '#111827',
-              marginBottom: '1.5rem'
+              marginBottom: '1rem'
             }}>
+              <style>{`
+                @media (min-width: 640px) {
+                  .modal-title {
+                    font-size: 1.5rem !important;
+                    margin-bottom: 1.5rem !important;
+                  }
+                }
+              `}</style>
               ✏️ Editar Usuario
             </h2>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', width: '100%' }}>
               <div>
                 <label style={{
                   display: 'block',
@@ -1841,17 +2867,19 @@ export default function AdminPanel() {
                   </p>
                 )}
 
-                <div style={{ display: 'flex', gap: '0.5rem' }}>
+                <div style={{ display: 'flex', gap: '0.5rem', width: '100%' }}>
                   <select
                     value={selectedCourseToAdd || ''}
                     onChange={(e) => setSelectedCourseToAdd(parseInt(e.target.value) || null)}
                     style={{
                       flex: 1,
+                      minWidth: 0,
                       padding: '0.75rem',
                       border: '2px solid #e5e7eb',
                       borderRadius: '8px',
                       fontSize: '14px',
-                      cursor: 'pointer'
+                      cursor: 'pointer',
+                      boxSizing: 'border-box'
                     }}
                   >
                     <option value="">Seleccionar curso...</option>
@@ -1873,7 +2901,9 @@ export default function AdminPanel() {
                       borderRadius: '8px',
                       fontSize: '14px',
                       fontWeight: '600',
-                      cursor: selectedCourseToAdd ? 'pointer' : 'not-allowed'
+                      cursor: selectedCourseToAdd ? 'pointer' : 'not-allowed',
+                      flexShrink: 0,
+                      whiteSpace: 'nowrap'
                     }}
                   >
                     ➕ Agregar
@@ -1943,14 +2973,27 @@ export default function AdminPanel() {
             style={{
               background: '#fff',
               borderRadius: '12px',
-              padding: '2rem',
+              padding: '1.5rem',
               maxWidth: '500px',
               width: '90%',
               maxHeight: '90vh',
-              overflowY: 'auto'
+              overflowY: 'auto',
+              boxSizing: 'border-box'
             }}
             onClick={(e) => e.stopPropagation()}
           >
+            <style>{`
+              @media (min-width: 640px) {
+                .modal-content {
+                  padding: 2rem !important;
+                }
+              }
+              @media (max-width: 480px) {
+                .modal-inner {
+                  padding: 1rem !important;
+                }
+              }
+            `}</style>
             <h2 style={{
               fontSize: '1.5rem',
               fontWeight: '700',
