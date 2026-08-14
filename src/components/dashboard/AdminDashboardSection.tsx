@@ -62,11 +62,6 @@ export default function AdminDashboardSection() {
 
   return (
     <div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-        <h2 style={{ fontSize: '1.5rem', fontWeight: '600', color: '#111827', margin: 0 }}>
-          📊 Dashboard
-        </h2>
-      </div>
 
       <div className="kpi-grid" style={{
         display: 'grid',
@@ -134,7 +129,7 @@ export default function AdminDashboardSection() {
                 }
               }
             `}</style>
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.75rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.75rem' }}>
               <div className="kpi-icon" style={{
                 width: '40px',
                 height: '40px',
@@ -148,26 +143,12 @@ export default function AdminDashboardSection() {
               }}>
                 {kpi.icon}
               </div>
-              <div style={{
-                padding: '0.25rem 0.5rem',
-                background: '#dcfce7',
-                color: '#16a34a',
-                borderRadius: '12px',
-                fontSize: '11px',
-                fontWeight: '600',
-                height: 'fit-content'
-              }}>
-                {kpi.change}
+              <div className="kpi-value" style={{ fontSize: '1.75rem', fontWeight: '700', color: '#111827' }}>
+                {kpi.value}
               </div>
             </div>
-            <div style={{ fontSize: '13px', color: '#6b7280', marginBottom: '0.5rem' }}>
+            <div style={{ fontSize: '13px', color: '#6b7280' }}>
               {kpi.title}
-            </div>
-            <div className="kpi-value" style={{ fontSize: '1.75rem', fontWeight: '700', color: '#111827', marginBottom: '0.25rem' }}>
-              {kpi.value}
-            </div>
-            <div style={{ fontSize: '12px', color: '#9ca3af' }}>
-              vs mes anterior
             </div>
           </div>
         ))}

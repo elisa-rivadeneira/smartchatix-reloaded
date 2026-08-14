@@ -529,7 +529,7 @@ export default function AdminPanel() {
                 textOverflow: 'ellipsis',
                 whiteSpace: 'nowrap'
               }}>
-                {activeTab === 'dashboard' ? 'Dashboard' :
+                {activeTab === 'dashboard' ? `Bienvenido, Administrador ${currentUser?.name || 'Fluideka'}` :
                  activeTab === 'users' ? 'Usuarios' :
                  activeTab === 'courses' ? 'Cursos' :
                  activeTab === 'enrollments' ? 'Inscripciones' :
@@ -537,20 +537,6 @@ export default function AdminPanel() {
                  activeTab === 'reports' ? 'Reportes' :
                  'Configuración'}
               </h1>
-              <p style={{
-                fontSize: '14px',
-                color: '#6b7280',
-                display: 'none'
-              }}>
-                <style>{`
-                  @media (min-width: 640px) {
-                    p {
-                      display: block !important;
-                    }
-                  }
-                `}</style>
-                Bienvenido de nuevo, {currentUser?.name}
-              </p>
             </div>
           </div>
 
@@ -756,25 +742,6 @@ export default function AdminPanel() {
                       `}</style>
                       {kpi.icon}
                     </div>
-                    <div style={{
-                      padding: '0.25rem 0.5rem',
-                      background: '#dcfce7',
-                      color: '#16a34a',
-                      borderRadius: '12px',
-                      fontSize: '11px',
-                      fontWeight: '600',
-                      height: 'fit-content'
-                    }}>
-                      <style>{`
-                        @media (min-width: 640px) {
-                          .kpi-badge {
-                            font-size: 12px !important;
-                            padding: 0.25rem 0.625rem !important;
-                          }
-                        }
-                      `}</style>
-                      {kpi.change}
-                    </div>
                   </div>
                   <div style={{ fontSize: '13px', color: '#6b7280', marginBottom: '0.5rem' }}>
                     <style>{`
@@ -795,16 +762,6 @@ export default function AdminPanel() {
                       }
                     `}</style>
                     {kpi.value}
-                  </div>
-                  <div style={{ fontSize: '12px', color: '#9ca3af' }}>
-                    <style>{`
-                      @media (min-width: 640px) {
-                        .kpi-subtitle {
-                          font-size: 13px !important;
-                        }
-                      }
-                    `}</style>
-                    vs mes anterior
                   </div>
                 </div>
               ))}

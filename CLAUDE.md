@@ -11,6 +11,26 @@ SmartChatix
 
 Rediseñar completamente la web.
 
+## 🔴 REGLA DE COMUNICACIÓN
+
+**SIEMPRE después de cada modificación de código:**
+
+1. **Confirmar qué se hizo** - Explicar brevemente los cambios realizados
+2. **Mostrar el resultado** - Decir qué archivos se modificaron y qué líneas
+3. **Dar señales de vida** - Indicar que el cambio está completo y listo
+
+**Ejemplo:**
+```
+✅ Cambios aplicados en src/app/admin/page.tsx:
+- Línea 532: Título cambiado de "Dashboard" a "Bienvenido, Administrador"
+- Líneas 759-777: Eliminados badges de porcentaje
+- Líneas 799-808: Eliminado texto "vs mes anterior"
+
+Listo para probar. Haz Ctrl+Shift+R en el navegador.
+```
+
+**NUNCA dejar al usuario sin respuesta después de ejecutar cambios.**
+
 ## Nunca hacer
 
 - No utilizar lenguaje técnico.
