@@ -137,39 +137,6 @@ export default function UnifiedSidebar({
           overflowX: 'hidden',
           minHeight: 0
         }}>
-          <Link
-            href="/dashboard"
-            style={{
-              width: '100%',
-              padding: '0.75rem 1.5rem',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.75rem',
-              background: 'transparent',
-              border: 'none',
-              borderLeft: '3px solid transparent',
-              cursor: 'pointer',
-              transition: 'all 0.2s',
-              fontSize: '14px',
-              fontWeight: '500',
-              color: '#6b7280',
-              textAlign: 'left',
-              textDecoration: 'none',
-              marginBottom: '0.5rem'
-            }}
-            onClick={() => setMobileMenuOpen?.(false)}
-            onMouseEnter={(e) => e.currentTarget.style.background = '#f9fafb'}
-            onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
-          >
-            <span style={{ fontSize: '18px', flexShrink: 0 }}>←</span>
-            <span style={{ flex: 1 }}>Volver al Panel Principal</span>
-          </Link>
-
-          <div style={{
-            height: '1px',
-            background: '#e5e7eb',
-            margin: '0.5rem 1.5rem 1rem 1.5rem'
-          }} />
 
           {menuItems.map((item) => {
             const isActive = activeItem === item.id;

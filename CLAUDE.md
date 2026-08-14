@@ -11,6 +11,39 @@ SmartChatix
 
 Rediseñar completamente la web.
 
+## 🚨 ARQUITECTURA DEL DASHBOARD UNIFICADO
+
+**IMPORTANTE:** Estamos en proceso de **MIGRACIÓN** hacia un dashboard unificado.
+
+### Estado Actual (2026-08-14)
+
+**Dashboard ACTIVO (usar este):**
+- **Ruta:** `/dashboard` → `/src/app/dashboard/page.tsx`
+- **Componentes:** `/src/components/dashboard/*`
+- **Usuarios:** Admin, Instructor, Student (TODOS usan la misma ruta)
+- **Diferenciación:** Por permisos y módulos cargados según rol
+
+**Dashboards LEGACY (NO tocar, solo migrar desde aquí):**
+- `/admin` → `/src/app/admin/page.tsx` ⚠️ En desuso
+- `/instructor` → `/src/app/instructor/page.tsx` ⚠️ En desuso
+- `/aula-virtual` → Para estudiantes ⚠️ En desuso
+
+### Regla de Trabajo
+
+**SIEMPRE editar en:**
+- `/src/app/dashboard/page.tsx` (página principal)
+- `/src/components/dashboard/*` (secciones modulares)
+
+**NUNCA editar:**
+- `/src/app/admin/page.tsx` (excepto para copiar código durante migración)
+
+### Ejemplo de Migración
+
+Si el usuario reporta un problema en el dashboard:
+1. ✅ Revisar `/src/app/dashboard/page.tsx` y componentes
+2. ❌ NO editar `/src/app/admin/page.tsx`
+3. Si el componente está en legacy, migrarlo a `/src/components/dashboard/`
+
 ## 🔴 REGLA DE COMUNICACIÓN
 
 **SIEMPRE después de cada modificación de código:**

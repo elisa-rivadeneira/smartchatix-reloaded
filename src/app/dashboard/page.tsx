@@ -115,7 +115,6 @@ export default function DashboardPage() {
         onLogout={handleLogout}
         mobileMenuOpen={mobileMenuOpen}
         setMobileMenuOpen={setMobileMenuOpen}
-        title={currentUser.role === 'admin' ? 'Panel Administrador' : currentUser.role === 'instructor' ? 'Panel Instructor' : 'Mis Cursos'}
         subtitle={currentUser.nombre || currentUser.name || 'Usuario'}
         showLegacyLink={true}
       />

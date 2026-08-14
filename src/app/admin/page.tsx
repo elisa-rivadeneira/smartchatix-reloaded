@@ -801,200 +801,177 @@ export default function AdminPanel() {
                   <p style={{ fontSize: '14px', color: '#6b7280' }}>Inscripciones en los últimos 6 meses</p>
                 </div>
 
-                {/* Line Chart */}
-                <div style={{ position: 'relative', height: '338px', padding: '1rem 0.5rem' }}>
-                  {/* Legend */}
-                  <div style={{
-                    display: 'flex',
-                    gap: '1.5rem',
-                    marginBottom: '1rem',
-                    justifyContent: 'center'
-                  }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                {(() => {
+                  const now = new Date();
+                  const monthsData = [];
+
+                  for (let i = 5; i >= 0; i--) {
+                    const date = new Date(now.getFullYear(), now.getMonth() - i, 1);
+                    const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+                    const monthName = date.toLocaleDateString('es', { month: 'short' });
+
+                    const count = enrollments.filter(e => {
+                      const enrollDate = new Date(e.enrolled_at);
+                      return enrollDate.getFullYear() === date.getFullYear() &&
+                             enrollDate.getMonth() === date.getMonth();
+                    }).length;
+
+                    monthsData.push({ monthName, count });
+                  }
+
+                  const maxCount = Math.max(...monthsData.map(m => m.count), 10);
+                  const yAxisMax = Math.ceil(maxCount / 10) * 10;
+                  const yAxisSteps = [yAxisMax, yAxisMax * 0.75, yAxisMax * 0.5, yAxisMax * 0.25, 0];
+
+                  const chartWidth = 700;
+                  const chartHeight = 160;
+                  const xStep = chartWidth / (monthsData.length - 1 || 1);
+
+                  const points = monthsData.map((m, i) => {
+                    const x = i * xStep;
+                    const y = yAxisMax > 0 ? chartHeight - (m.count / yAxisMax) * chartHeight : chartHeight;
+                    return { x, y, count: m.count };
+                  });
+
+                  const pathD = points.length > 0
+                    ? `M ${points.map(p => `${p.x},${p.y}`).join(' L ')}`
+                    : '';
+
+                  const areaD = points.length > 0
+                    ? `${pathD} L ${chartWidth},${chartHeight} L 0,${chartHeight} Z`
+                    : '';
+
+                  return (
+                    <div style={{ position: 'relative', height: '338px', padding: '1rem 0.5rem' }}>
                       <div style={{
-                        width: '12px',
-                        height: '12px',
-                        borderRadius: '50%',
-                        background: '#3b82f6'
-                      }}></div>
-                      <span style={{ fontSize: '13px', color: '#6b7280', fontWeight: '500' }}>📈 Estudiantes inscritos</span>
-                    </div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                      <div style={{
-                        width: '12px',
-                        height: '12px',
-                        borderRadius: '50%',
-                        background: '#8b5cf6'
-                      }}></div>
-                      <span style={{ fontSize: '13px', color: '#6b7280', fontWeight: '500' }}>📊 Cursos completados</span>
-                    </div>
-                  </div>
-
-                  <div style={{ display: 'flex', gap: '0' }}>
-                    {/* Eje Y izquierdo (Estudiantes) */}
-                    <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', paddingTop: '0.5rem', paddingBottom: '1.5rem', paddingRight: '0.25rem' }}>
-                      {[200, 150, 100, 50, 0].map((val, idx) => (
-                        <div key={idx} style={{ fontSize: '11px', color: '#3b82f6', fontWeight: '500', textAlign: 'right', width: '30px' }}>
-                          {val}
-                        </div>
-                      ))}
-                    </div>
-
-                    {/* SVG Chart */}
-                    <div style={{ flex: 1, position: 'relative' }}>
-                      <svg width="100%" height="200" viewBox="0 0 700 180" preserveAspectRatio="none" style={{ display: 'block' }}>
-                    {/* Grid lines */}
-                    {[0, 1, 2, 3, 4].map((i) => (
-                      <line
-                        key={i}
-                        x1="0"
-                        y1={i * 40}
-                        x2="700"
-                        y2={i * 40}
-                        stroke="#f3f4f6"
-                        strokeWidth="1"
-                        vectorEffect="non-scaling-stroke"
-                      />
-                    ))}
-
-                    {/* Area bajo línea azul (Estudiantes) - Quincenal Ene-Jul */}
-                    <defs>
-                      <linearGradient id="blueGradient" x1="0%" y1="0%" x2="0%" y2="100%">
-                        <stop offset="0%" style={{ stopColor: '#3b82f6', stopOpacity: 0.15 }} />
-                        <stop offset="100%" style={{ stopColor: '#3b82f6', stopOpacity: 0.02 }} />
-                      </linearGradient>
-                    </defs>
-                    <path
-                      d="M 0,120 L 50,110 L 100,115 L 150,100 L 200,95 L 250,105 L 300,90 L 350,85 L 400,95 L 450,80 L 500,75 L 550,85 L 600,70 L 650,75 L 700,60 L 700,160 L 0,160 Z"
-                      fill="url(#blueGradient)"
-                    />
-
-                    {/* Línea Azul (Estudiantes inscritos) */}
-                    <path
-                      d="M 0,120 L 50,110 L 100,115 L 150,100 L 200,95 L 250,105 L 300,90 L 350,85 L 400,95 L 450,80 L 500,75 L 550,85 L 600,70 L 650,75 L 700,60"
-                      fill="none"
-                      stroke="#3b82f6"
-                      strokeWidth="2.5"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      vectorEffect="non-scaling-stroke"
-                    />
-
-                    {/* Puntos línea azul - Quincenal (2 por mes, 7 meses = 15 puntos) */}
-                    {[
-                      { x: 0, y: 120 },    // Ene 1
-                      { x: 50, y: 110 },   // Ene 15 - sube
-                      { x: 100, y: 115 },  // Feb 1 - baja leve
-                      { x: 150, y: 100 },  // Feb 15 - sube fuerte
-                      { x: 200, y: 95 },   // Mar 1 - sube
-                      { x: 250, y: 105 },  // Mar 15 - baja
-                      { x: 300, y: 90 },   // Abr 1 - sube fuerte
-                      { x: 350, y: 85 },   // Abr 15 - sube
-                      { x: 400, y: 95 },   // May 1 - baja
-                      { x: 450, y: 80 },   // May 15 - sube fuerte
-                      { x: 500, y: 75 },   // Jun 1 - sube
-                      { x: 550, y: 85 },   // Jun 15 - baja
-                      { x: 600, y: 70 },   // Jul 1 - sube fuerte
-                      { x: 650, y: 75 },   // Jul 15 - baja leve
-                      { x: 700, y: 60 }    // Jul 31 - sube fuerte (tendencia positiva)
-                    ].map((point, idx) => (
-                      <g key={`blue-${idx}`}>
-                        <circle
-                          cx={point.x}
-                          cy={point.y}
-                          r="2"
-                          fill="#fff"
-                          stroke="#3b82f6"
-                          strokeWidth="1.5"
-                          vectorEffect="non-scaling-stroke"
-                        />
-                      </g>
-                    ))}
-
-                    {/* Area bajo línea morada (Cursos completados) */}
-                    <defs>
-                      <linearGradient id="purpleGradient" x1="0%" y1="0%" x2="0%" y2="100%">
-                        <stop offset="0%" style={{ stopColor: '#8b5cf6', stopOpacity: 0.15 }} />
-                        <stop offset="100%" style={{ stopColor: '#8b5cf6', stopOpacity: 0.02 }} />
-                      </linearGradient>
-                    </defs>
-                    <path
-                      d="M 0,135 L 50,140 L 100,130 L 150,135 L 200,125 L 250,130 L 300,120 L 350,125 L 400,115 L 450,120 L 500,110 L 550,108 L 600,105 L 650,100 L 700,95 L 700,160 L 0,160 Z"
-                      fill="url(#purpleGradient)"
-                    />
-
-                    {/* Línea Morada (Cursos completados) */}
-                    <path
-                      d="M 0,135 L 50,140 L 100,130 L 150,135 L 200,125 L 250,130 L 300,120 L 350,125 L 400,115 L 450,120 L 500,110 L 550,108 L 600,105 L 650,100 L 700,95"
-                      fill="none"
-                      stroke="#8b5cf6"
-                      strokeWidth="2.5"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      vectorEffect="non-scaling-stroke"
-                    />
-
-                    {/* Puntos línea morada - Quincenal */}
-                    {[
-                      { x: 0, y: 135 },    // Ene 1
-                      { x: 50, y: 140 },   // Ene 15 - baja
-                      { x: 100, y: 130 },  // Feb 1 - sube
-                      { x: 150, y: 135 },  // Feb 15 - baja
-                      { x: 200, y: 125 },  // Mar 1 - sube
-                      { x: 250, y: 130 },  // Mar 15 - baja
-                      { x: 300, y: 120 },  // Abr 1 - sube
-                      { x: 350, y: 125 },  // Abr 15 - baja
-                      { x: 400, y: 115 },  // May 1 - sube
-                      { x: 450, y: 120 },  // May 15 - baja
-                      { x: 500, y: 110 },  // Jun 1 - sube
-                      { x: 550, y: 108 },  // Jun 15 - sube leve
-                      { x: 600, y: 105 },  // Jul 1 - sube
-                      { x: 650, y: 100 },  // Jul 15 - sube
-                      { x: 700, y: 95 }    // Jul 31 - sube (tendencia positiva más suave)
-                    ].map((point, idx) => (
-                      <g key={`purple-${idx}`}>
-                        <circle
-                          cx={point.x}
-                          cy={point.y}
-                          r="2"
-                          fill="#fff"
-                          stroke="#8b5cf6"
-                          strokeWidth="1.5"
-                          vectorEffect="non-scaling-stroke"
-                        />
-                      </g>
-                    ))}
-                      </svg>
-
-                      {/* Labels de meses - Alineados al centro de cada mes */}
-                      <div style={{
-                        display: 'grid',
-                        gridTemplateColumns: 'repeat(7, 1fr)',
-                        marginTop: '0.5rem'
+                        display: 'flex',
+                        gap: '1.5rem',
+                        marginBottom: '1rem',
+                        justifyContent: 'center'
                       }}>
-                        {['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul'].map((month, idx) => (
-                          <div key={idx} style={{
-                            fontSize: '11px',
-                            color: '#9ca3af',
-                            fontWeight: '500',
-                            textAlign: 'center'
-                          }}>
-                            {month}
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-
-                    {/* Eje Y derecho (Cursos completados) */}
-                    <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', paddingTop: '0.5rem', paddingBottom: '1.5rem' }}>
-                      {[100, 75, 50, 25, 0].map((val, idx) => (
-                        <div key={idx} style={{ fontSize: '11px', color: '#8b5cf6', fontWeight: '500', textAlign: 'left', width: '30px' }}>
-                          {val}
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                          <div style={{
+                            width: '12px',
+                            height: '12px',
+                            borderRadius: '50%',
+                            background: '#3b82f6'
+                          }}></div>
+                          <span style={{ fontSize: '13px', color: '#6b7280', fontWeight: '500' }}>📈 Inscripciones</span>
                         </div>
-                      ))}
+                      </div>
+
+                      {enrollments.length === 0 ? (
+                        <div style={{
+                          height: '250px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          color: '#9ca3af',
+                          fontSize: '14px'
+                        }}>
+                          No hay inscripciones todavía
+                        </div>
+                      ) : (
+                        <div style={{ display: 'flex', gap: '0' }}>
+                          <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', paddingTop: '0.5rem', paddingBottom: '1.5rem', paddingRight: '0.25rem' }}>
+                            {yAxisSteps.map((val, idx) => (
+                              <div key={idx} style={{ fontSize: '11px', color: '#3b82f6', fontWeight: '500', textAlign: 'right', width: '30px' }}>
+                                {Math.round(val)}
+                              </div>
+                            ))}
+                          </div>
+
+                          <div style={{ flex: 1, position: 'relative' }}>
+                            <svg width="100%" height="200" viewBox={`0 0 ${chartWidth} 180`} preserveAspectRatio="none" style={{ display: 'block' }}>
+                              {[0, 1, 2, 3, 4].map((i) => (
+                                <line
+                                  key={i}
+                                  x1="0"
+                                  y1={i * 40}
+                                  x2={chartWidth}
+                                  y2={i * 40}
+                                  stroke="#f3f4f6"
+                                  strokeWidth="1"
+                                  vectorEffect="non-scaling-stroke"
+                                />
+                              ))}
+
+                              <defs>
+                                <linearGradient id="blueGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                                  <stop offset="0%" style={{ stopColor: '#3b82f6', stopOpacity: 0.15 }} />
+                                  <stop offset="100%" style={{ stopColor: '#3b82f6', stopOpacity: 0.02 }} />
+                                </linearGradient>
+                              </defs>
+
+                              {areaD && (
+                                <path
+                                  d={areaD}
+                                  fill="url(#blueGradient)"
+                                />
+                              )}
+
+                              {pathD && (
+                                <path
+                                  d={pathD}
+                                  fill="none"
+                                  stroke="#3b82f6"
+                                  strokeWidth="2.5"
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  vectorEffect="non-scaling-stroke"
+                                />
+                              )}
+
+                              {points.map((point, idx) => (
+                                <g key={`point-${idx}`}>
+                                  <circle
+                                    cx={point.x}
+                                    cy={point.y}
+                                    r="4"
+                                    fill="#fff"
+                                    stroke="#3b82f6"
+                                    strokeWidth="2"
+                                    vectorEffect="non-scaling-stroke"
+                                  />
+                                  {point.count > 0 && (
+                                    <text
+                                      x={point.x}
+                                      y={point.y - 10}
+                                      textAnchor="middle"
+                                      fill="#3b82f6"
+                                      fontSize="12"
+                                      fontWeight="600"
+                                    >
+                                      {point.count}
+                                    </text>
+                                  )}
+                                </g>
+                              ))}
+                            </svg>
+
+                            <div style={{
+                              display: 'grid',
+                              gridTemplateColumns: `repeat(${monthsData.length}, 1fr)`,
+                              marginTop: '0.5rem'
+                            }}>
+                              {monthsData.map((m, idx) => (
+                                <div key={idx} style={{
+                                  fontSize: '11px',
+                                  color: '#9ca3af',
+                                  fontWeight: '500',
+                                  textAlign: 'center',
+                                  textTransform: 'capitalize'
+                                }}>
+                                  {m.monthName}
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        </div>
+                      )}
                     </div>
-                  </div>
-                </div>
+                  );
+                })()}
               </div>
 
               {/* Recent Activity */}
