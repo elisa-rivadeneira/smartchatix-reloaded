@@ -152,8 +152,8 @@ export default function DashboardPage() {
         <Image
           src="/images/logo_smartchatix_horiz.png"
           alt="SmartChatix"
-          width={100}
-          height={30}
+          width={200}
+          height={60}
           style={{ objectFit: 'contain' }}
         />
 
