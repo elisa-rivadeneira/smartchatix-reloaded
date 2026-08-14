@@ -304,6 +304,19 @@ export default function AulaVirtualPage() {
         </div>
       </header>
 
+      <div style={{
+        background: 'linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%)',
+        padding: '1rem',
+        textAlign: 'center',
+        borderBottom: '2px solid #d97706'
+      }}>
+        <p style={{ margin: 0, color: '#78350f', fontSize: '14px', fontWeight: '600' }}>
+          ⚠️ <strong>Vista Legacy:</strong> Esta página se está migrando a{' '}
+          <a href="/dashboard" style={{ color: '#78350f', textDecoration: 'underline' }}>/dashboard</a>.
+          Pronto solo existirá el dashboard unificado.
+        </p>
+      </div>
+
       <Breadcrumb
         items={[
           { label: 'Inicio', href: '/' },

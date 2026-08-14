@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
+import AdminSidebar from '@/components/AdminSidebar';
 
 interface User {
   id: number;
@@ -57,7 +58,6 @@ export default function AdminPanel() {
     totalEnrollments: 0,
     activeStudents: 0
   });
-  const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
@@ -85,6 +85,16 @@ export default function AdminPanel() {
     show_currency_selector: true,
     exchange_rate: '3.80'
   });
+  const [confirmDeleteModal, setConfirmDeleteModal] = useState<{
+    open: boolean;
+    userId: number | null;
+    userName: string;
+  }>({ open: false, userId: null, userName: '' });
+  const [messageModal, setMessageModal] = useState<{
+    open: boolean;
+    type: 'success' | 'error';
+    message: string;
+  }>({ open: false, type: 'success', message: '' });
 
   useEffect(() => {
     checkAuth();
@@ -187,13 +197,34 @@ export default function AdminPanel() {
         setEditModalOpen(false);
         setEditingUser(null);
         loadData();
-        alert('✅ Usuario actualizado correctamente');
+        setMessageModal({ open: true, type: 'success', message: 'Usuario actualizado correctamente' });
       } else {
-        alert('❌ Error al actualizar usuario');
+        setMessageModal({ open: true, type: 'error', message: 'Error al actualizar usuario' });
       }
     } catch (error) {
       console.error('Error updating user:', error);
-      alert('❌ Error al actualizar usuario');
+      setMessageModal({ open: true, type: 'error', message: 'Error al actualizar usuario' });
+    }
+  };
+
+  const handleDeleteUser = async (userId: number) => {
+    try {
+      const response = await fetch(`/api/admin/users/${userId}`, {
+        method: 'DELETE'
+      });
+
+      if (response.ok) {
+        setEditModalOpen(false);
+        setEditingUser(null);
+        setConfirmDeleteModal({ open: false, userId: null, userName: '' });
+        loadData();
+        setMessageModal({ open: true, type: 'success', message: 'Usuario eliminado correctamente' });
+      } else {
+        setMessageModal({ open: true, type: 'error', message: 'Error al eliminar usuario' });
+      }
+    } catch (error) {
+      console.error('Error deleting user:', error);
+      setMessageModal({ open: true, type: 'error', message: 'Error al eliminar usuario' });
     }
   };
 
@@ -359,245 +390,17 @@ export default function AdminPanel() {
         }
       `}</style>
 
-      {/* Mobile Overlay */}
-      <div
-        className="mobile-overlay"
-        onClick={() => setMobileMenuOpen(false)}
-        style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          background: 'rgba(0, 0, 0, 0.5)',
-          zIndex: 999,
-          display: 'none'
-        }}
+      <AdminSidebar
+        menuItems={menuItems}
+        activeTab={activeTab}
+        setActiveTab={setActiveTab}
+        currentUser={currentUser}
+        onLogout={handleLogout}
+        sidebarCollapsed={sidebarCollapsed}
+        setSidebarCollapsed={setSidebarCollapsed}
+        mobileMenuOpen={mobileMenuOpen}
+        setMobileMenuOpen={setMobileMenuOpen}
       />
-
-      {/* Sidebar */}
-      <aside
-        className="mobile-sidebar"
-        style={{
-          width: sidebarCollapsed ? '80px' : '280px',
-          background: '#ffffff',
-          borderRight: '1px solid #e5e7eb',
-          display: 'flex',
-          flexDirection: 'column',
-          transition: 'all 0.3s ease',
-          position: 'fixed',
-          left: 0,
-          top: 0,
-          bottom: 0,
-          zIndex: 1000,
-        }}
-      >
-        <style>{`
-          @media (min-width: 769px) {
-            .mobile-sidebar {
-              position: relative !important;
-            }
-          }
-        `}</style>
-        {/* Logo */}
-        <div style={{
-          padding: sidebarCollapsed ? '1.5rem 0' : '1.5rem',
-          borderBottom: '1px solid #e5e7eb',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center'
-        }}>
-          {!sidebarCollapsed ? (
-            <Link href="/">
-              <Image
-                src="/images/logo_smartchatix_horiz.png"
-                alt="SmartChatix"
-                width={200}
-                height={34}
-                style={{ cursor: 'pointer' }}
-              />
-            </Link>
-          ) : (
-            <Link href="/">
-              <div style={{
-                fontSize: '24px',
-                fontWeight: '700',
-                background: 'linear-gradient(135deg, #8b5cf6 0%, #d946ef 100%)',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-                backgroundClip: 'text',
-                cursor: 'pointer'
-              }}>
-                S
-              </div>
-            </Link>
-          )}
-        </div>
-
-        {/* Menu Items */}
-        <nav style={{ flex: 1, padding: '1rem', overflowY: 'auto' }}>
-          {menuItems.map((item) => (
-            <button
-              key={item.id}
-              onClick={() => {
-                setActiveTab(item.id);
-                setMobileMenuOpen(false);
-              }}
-              style={{
-                width: '100%',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: sidebarCollapsed ? 'center' : 'space-between',
-                padding: sidebarCollapsed ? '1rem 0.5rem' : '0.875rem 1rem',
-                marginBottom: '0.25rem',
-                background: activeTab === item.id ? '#f3f4f6' : 'transparent',
-                border: 'none',
-                borderRadius: '8px',
-                cursor: 'pointer',
-                fontSize: '14px',
-                fontWeight: '500',
-                color: activeTab === item.id ? '#111827' : '#6b7280',
-                transition: 'all 0.2s',
-                textAlign: 'left'
-              }}
-              onMouseEnter={(e) => {
-                if (activeTab !== item.id) {
-                  e.currentTarget.style.background = '#f9fafb';
-                }
-              }}
-              onMouseLeave={(e) => {
-                if (activeTab !== item.id) {
-                  e.currentTarget.style.background = 'transparent';
-                }
-              }}
-            >
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                <span style={{ fontSize: '18px' }}>{item.icon}</span>
-                {!sidebarCollapsed && <span>{item.label}</span>}
-              </div>
-              {!sidebarCollapsed && item.badge !== null && (
-                <span style={{
-                  background: activeTab === item.id ? '#8b5cf6' : '#e5e7eb',
-                  color: activeTab === item.id ? '#fff' : '#6b7280',
-                  padding: '0.125rem 0.5rem',
-                  borderRadius: '12px',
-                  fontSize: '12px',
-                  fontWeight: '600'
-                }}>
-                  {item.badge}
-                </span>
-              )}
-            </button>
-          ))}
-        </nav>
-
-        {/* User Profile */}
-        <div style={{
-          padding: '1rem',
-          borderTop: '1px solid #e5e7eb',
-          position: 'relative'
-        }}>
-          <button
-            onClick={() => setUserMenuOpen(!userMenuOpen)}
-            style={{
-              width: '100%',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: sidebarCollapsed ? 'center' : 'flex-start',
-              gap: '0.75rem',
-              padding: '0.75rem',
-              background: 'transparent',
-              border: 'none',
-              borderRadius: '8px',
-              cursor: 'pointer',
-              transition: 'background 0.2s'
-            }}
-            onMouseEnter={(e) => e.currentTarget.style.background = '#f3f4f6'}
-            onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
-          >
-            <div style={{
-              width: '36px',
-              height: '36px',
-              borderRadius: '50%',
-              background: 'linear-gradient(135deg, #8b5cf6 0%, #d946ef 100%)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              color: '#fff',
-              fontSize: '16px',
-              fontWeight: '600',
-              flexShrink: 0
-            }}>
-              {currentUser?.name?.charAt(0).toUpperCase() || 'A'}
-            </div>
-            {!sidebarCollapsed && (
-              <div style={{ flex: 1, textAlign: 'left' }}>
-                <div style={{ fontSize: '14px', fontWeight: '600', color: '#111827' }}>
-                  {currentUser?.name || 'Admin'}
-                </div>
-                <div style={{ fontSize: '12px', color: '#6b7280' }}>Administrador</div>
-              </div>
-            )}
-          </button>
-
-          {userMenuOpen && (
-            <div style={{
-              position: 'absolute',
-              bottom: '100%',
-              left: '1rem',
-              right: '1rem',
-              marginBottom: '0.5rem',
-              background: '#fff',
-              border: '1px solid #e5e7eb',
-              borderRadius: '8px',
-              boxShadow: '0 10px 25px rgba(0, 0, 0, 0.1)',
-              overflow: 'hidden'
-            }}>
-              <button
-                onClick={() => router.push('/perfil')}
-                style={{
-                  width: '100%',
-                  padding: '0.75rem 1rem',
-                  background: 'transparent',
-                  border: 'none',
-                  textAlign: 'left',
-                  fontSize: '14px',
-                  color: '#374151',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '0.5rem'
-                }}
-                onMouseEnter={(e) => e.currentTarget.style.background = '#f3f4f6'}
-                onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
-              >
-                <span>👤</span> Mi perfil
-              </button>
-              <button
-                onClick={handleLogout}
-                style={{
-                  width: '100%',
-                  padding: '0.75rem 1rem',
-                  background: 'transparent',
-                  border: 'none',
-                  borderTop: '1px solid #e5e7eb',
-                  textAlign: 'left',
-                  fontSize: '14px',
-                  color: '#dc2626',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '0.5rem'
-                }}
-                onMouseEnter={(e) => e.currentTarget.style.background = '#fef2f2'}
-                onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
-              >
-                <span>🚪</span> Cerrar sesión
-              </button>
-            </div>
-          )}
-        </div>
-      </aside>
 
       {/* Main Content */}
       <main style={{
@@ -613,6 +416,22 @@ export default function AdminPanel() {
             }
           }
         `}</style>
+
+        <div style={{
+          background: 'linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%)',
+          padding: '1rem',
+          textAlign: 'center',
+          borderBottom: '2px solid #d97706',
+          position: 'sticky',
+          top: 0,
+          zIndex: 101
+        }}>
+          <p style={{ margin: 0, color: '#78350f', fontSize: '14px', fontWeight: '600' }}>
+            ⚠️ <strong>Vista Legacy:</strong> Esta página se está migrando a{' '}
+            <a href="/dashboard" style={{ color: '#78350f', textDecoration: 'underline' }}>/dashboard</a>.
+            Pronto solo existirá el dashboard unificado.
+          </p>
+        </div>
 
         {/* Header */}
         <header style={{
@@ -2051,6 +1870,34 @@ export default function AdminPanel() {
                 }
               }
             `}</style>
+
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+              <h2 style={{ fontSize: '1.25rem', fontWeight: '600', color: '#111827', margin: 0 }}>
+                Gestión de Instructores
+              </h2>
+              <button
+                onClick={() => {
+                  setNewUserFormData({ name: '', email: '', password: '', role: 'instructor', is_active: true });
+                  setNewUserModalOpen(true);
+                }}
+                style={{
+                  padding: '0.75rem 1.5rem',
+                  background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '8px',
+                  fontWeight: '600',
+                  fontSize: '14px',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.5rem'
+                }}
+              >
+                <span>+</span> Nuevo Instructor
+              </button>
+            </div>
+
             <div style={{
               background: '#fff',
               borderRadius: '12px',
@@ -2058,15 +1905,16 @@ export default function AdminPanel() {
               overflow: 'hidden'
             }}>
               <div style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
-                <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: '600px' }}>
+                <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: '700px' }}>
                   <thead>
                     <tr style={{ background: '#f9fafb', borderBottom: '1px solid #e5e7eb' }}>
                       <th style={{ padding: '1rem', textAlign: 'left', fontSize: '13px', fontWeight: '600', color: '#6b7280' }}>ID</th>
                       <th style={{ padding: '1rem', textAlign: 'left', fontSize: '13px', fontWeight: '600', color: '#6b7280' }}>Nombre</th>
                       <th style={{ padding: '1rem', textAlign: 'left', fontSize: '13px', fontWeight: '600', color: '#6b7280' }}>Email</th>
-                      <th style={{ padding: '1rem', textAlign: 'left', fontSize: '13px', fontWeight: '600', color: '#6b7280' }}>Cursos Asignados</th>
-                      <th style={{ padding: '1rem', textAlign: 'left', fontSize: '13px', fontWeight: '600', color: '#6b7280' }}>Estado</th>
-                      <th style={{ padding: '1rem', textAlign: 'left', fontSize: '13px', fontWeight: '600', color: '#6b7280' }}>Fecha Registro</th>
+                      <th style={{ padding: '1rem', textAlign: 'center', fontSize: '13px', fontWeight: '600', color: '#6b7280' }}>Cursos Asignados</th>
+                      <th style={{ padding: '1rem', textAlign: 'center', fontSize: '13px', fontWeight: '600', color: '#6b7280' }}>Estado</th>
+                      <th style={{ padding: '1rem', textAlign: 'center', fontSize: '13px', fontWeight: '600', color: '#6b7280' }}>Fecha Registro</th>
+                      <th style={{ padding: '1rem', textAlign: 'center', fontSize: '13px', fontWeight: '600', color: '#6b7280' }}>Acciones</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -2077,7 +1925,7 @@ export default function AdminPanel() {
                           <td style={{ padding: '1rem', fontSize: '14px', color: '#111827' }}>#{instructor.id}</td>
                           <td style={{ padding: '1rem', fontSize: '14px', fontWeight: '600', color: '#111827' }}>{instructor.name}</td>
                           <td style={{ padding: '1rem', fontSize: '14px', color: '#6b7280' }}>{instructor.email}</td>
-                          <td style={{ padding: '1rem' }}>
+                          <td style={{ padding: '1rem', textAlign: 'center' }}>
                             <span style={{
                               padding: '0.25rem 0.75rem',
                               borderRadius: '12px',
@@ -2089,7 +1937,7 @@ export default function AdminPanel() {
                               {coursesCount} {coursesCount === 1 ? 'curso' : 'cursos'}
                             </span>
                           </td>
-                          <td style={{ padding: '1rem' }}>
+                          <td style={{ padding: '1rem', textAlign: 'center' }}>
                             <span style={{
                               padding: '0.25rem 0.75rem',
                               borderRadius: '12px',
@@ -2101,8 +1949,25 @@ export default function AdminPanel() {
                               {instructor.is_active ? 'Activo' : 'Inactivo'}
                             </span>
                           </td>
-                          <td style={{ padding: '1rem', fontSize: '14px', color: '#6b7280' }}>
+                          <td style={{ padding: '1rem', fontSize: '14px', color: '#6b7280', textAlign: 'center' }}>
                             {new Date(instructor.created_at).toLocaleDateString('es-PE')}
+                          </td>
+                          <td style={{ padding: '1rem', textAlign: 'center' }}>
+                            <button
+                              onClick={() => handleEditUser(instructor)}
+                              style={{
+                                padding: '0.5rem 1rem',
+                                backgroundColor: '#667eea',
+                                color: 'white',
+                                border: 'none',
+                                borderRadius: '6px',
+                                cursor: 'pointer',
+                                fontSize: '0.875rem',
+                                fontWeight: '500'
+                              }}
+                            >
+                              Editar
+                            </button>
                           </td>
                         </tr>
                       );
@@ -2110,6 +1975,14 @@ export default function AdminPanel() {
                   </tbody>
                 </table>
               </div>
+
+              {users.filter(u => u.role === 'instructor').length === 0 && (
+                <div style={{ padding: '3rem', textAlign: 'center', color: '#6b7280' }}>
+                  <div style={{ fontSize: '48px', marginBottom: '1rem' }}>👨‍🏫</div>
+                  <p>No hay instructores registrados.</p>
+                  <p style={{ fontSize: '14px' }}>Haz click en "Nuevo Instructor" para agregar uno.</p>
+                </div>
+              )}
             </div>
           </div>
         )}
@@ -2915,28 +2788,21 @@ export default function AdminPanel() {
                 display: 'flex',
                 gap: '1rem',
                 marginTop: '1rem',
-                justifyContent: 'flex-end'
+                justifyContent: 'space-between'
               }}>
                 <button
-                  onClick={() => setEditModalOpen(false)}
-                  style={{
-                    padding: '0.75rem 1.5rem',
-                    background: '#fff',
-                    color: '#374151',
-                    border: '2px solid #e5e7eb',
-                    borderRadius: '8px',
-                    fontSize: '14px',
-                    fontWeight: '600',
-                    cursor: 'pointer'
+                  onClick={() => {
+                    if (editingUser) {
+                      setConfirmDeleteModal({
+                        open: true,
+                        userId: editingUser.id,
+                        userName: editingUser.name
+                      });
+                    }
                   }}
-                >
-                  Cancelar
-                </button>
-                <button
-                  onClick={handleUpdateUser}
                   style={{
                     padding: '0.75rem 1.5rem',
-                    background: '#8b5cf6',
+                    background: '#ef4444',
                     color: '#fff',
                     border: 'none',
                     borderRadius: '8px',
@@ -2945,8 +2811,40 @@ export default function AdminPanel() {
                     cursor: 'pointer'
                   }}
                 >
+                  🗑️ Eliminar
+                </button>
+                <div style={{ display: 'flex', gap: '1rem' }}>
+                  <button
+                    onClick={() => setEditModalOpen(false)}
+                    style={{
+                      padding: '0.75rem 1.5rem',
+                      background: '#fff',
+                      color: '#374151',
+                      border: '2px solid #e5e7eb',
+                      borderRadius: '8px',
+                      fontSize: '14px',
+                      fontWeight: '600',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    Cancelar
+                  </button>
+                  <button
+                    onClick={handleUpdateUser}
+                    style={{
+                      padding: '0.75rem 1.5rem',
+                      background: '#8b5cf6',
+                      color: '#fff',
+                      border: 'none',
+                      borderRadius: '8px',
+                    fontSize: '14px',
+                    fontWeight: '600',
+                    cursor: 'pointer'
+                  }}
+                >
                   💾 Guardar Cambios
                 </button>
+                </div>
               </div>
             </div>
           </div>
@@ -3173,6 +3071,184 @@ export default function AdminPanel() {
                 </button>
               </div>
             </div>
+          </div>
+        </div>
+      )}
+
+      {confirmDeleteModal.open && (
+        <div
+          onClick={() => setConfirmDeleteModal({ open: false, userId: null, userName: '' })}
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: 'rgba(0, 0, 0, 0.6)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 2000
+          }}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              background: '#fff',
+              borderRadius: '16px',
+              padding: '2rem',
+              maxWidth: '450px',
+              width: '90%',
+              textAlign: 'center',
+              boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)'
+            }}
+          >
+            <div style={{
+              width: '64px',
+              height: '64px',
+              background: '#fee2e2',
+              borderRadius: '50%',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              margin: '0 auto 1.5rem',
+              fontSize: '32px'
+            }}>
+              ⚠️
+            </div>
+
+            <h3 style={{
+              fontSize: '1.5rem',
+              fontWeight: '700',
+              color: '#111827',
+              marginBottom: '0.75rem'
+            }}>
+              ¿Eliminar usuario?
+            </h3>
+
+            <p style={{
+              fontSize: '14px',
+              color: '#6b7280',
+              marginBottom: '2rem'
+            }}>
+              ¿Estás seguro de que deseas eliminar a <strong>{confirmDeleteModal.userName}</strong>?<br/>
+              Esta acción no se puede deshacer.
+            </p>
+
+            <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
+              <button
+                onClick={() => setConfirmDeleteModal({ open: false, userId: null, userName: '' })}
+                style={{
+                  padding: '0.75rem 1.5rem',
+                  background: '#f3f4f6',
+                  color: '#374151',
+                  border: 'none',
+                  borderRadius: '8px',
+                  fontSize: '14px',
+                  fontWeight: '600',
+                  cursor: 'pointer'
+                }}
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={() => {
+                  if (confirmDeleteModal.userId) {
+                    handleDeleteUser(confirmDeleteModal.userId);
+                  }
+                }}
+                style={{
+                  padding: '0.75rem 1.5rem',
+                  background: '#ef4444',
+                  color: '#fff',
+                  border: 'none',
+                  borderRadius: '8px',
+                  fontSize: '14px',
+                  fontWeight: '600',
+                  cursor: 'pointer'
+                }}
+              >
+                Sí, eliminar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {messageModal.open && (
+        <div
+          onClick={() => setMessageModal({ open: false, type: 'success', message: '' })}
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: 'rgba(0, 0, 0, 0.5)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 2000
+          }}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              background: '#fff',
+              borderRadius: '16px',
+              padding: '2rem',
+              maxWidth: '400px',
+              width: '90%',
+              textAlign: 'center',
+              boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)'
+            }}
+          >
+            <div style={{
+              width: '64px',
+              height: '64px',
+              background: messageModal.type === 'success' ? '#d1fae5' : '#fee2e2',
+              borderRadius: '50%',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              margin: '0 auto 1.5rem',
+              fontSize: '32px'
+            }}>
+              {messageModal.type === 'success' ? '✅' : '❌'}
+            </div>
+
+            <h3 style={{
+              fontSize: '1.25rem',
+              fontWeight: '700',
+              color: '#111827',
+              marginBottom: '0.75rem'
+            }}>
+              {messageModal.type === 'success' ? '¡Éxito!' : 'Error'}
+            </h3>
+
+            <p style={{
+              fontSize: '14px',
+              color: '#6b7280',
+              marginBottom: '1.5rem'
+            }}>
+              {messageModal.message}
+            </p>
+
+            <button
+              onClick={() => setMessageModal({ open: false, type: 'success', message: '' })}
+              style={{
+                padding: '0.75rem 2rem',
+                background: messageModal.type === 'success' ? '#10b981' : '#ef4444',
+                color: '#fff',
+                border: 'none',
+                borderRadius: '8px',
+                fontSize: '14px',
+                fontWeight: '600',
+                cursor: 'pointer'
+              }}
+            >
+              Entendido
+            </button>
           </div>
         </div>
       )}

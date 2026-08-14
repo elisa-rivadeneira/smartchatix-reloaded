@@ -10,7 +10,7 @@ import remarkGfm from 'remark-gfm';
 import rehypeRaw from 'rehype-raw';
 import { marked } from 'marked';
 import Breadcrumb from '@/components/Breadcrumb';
-import CourseInstructorHeader from '@/components/CourseInstructorHeader';
+import UnifiedSidebar from '@/components/unified/UnifiedSidebar';
 
 function convertMarkdownToHtml(markdown: string): string {
   if (!markdown) return '';
@@ -931,6 +931,7 @@ function SortableLesson({ lesson, lessonIdx, onQuiz, onPreview, onEdit }: any) {
   return (
     <div
       ref={setNodeRef}
+      className="lesson-card"
       style={{
         ...style,
         background: 'white',
@@ -942,6 +943,23 @@ function SortableLesson({ lesson, lessonIdx, onQuiz, onPreview, onEdit }: any) {
         gap: '12px'
       }}
     >
+      <style>{`
+        @media (max-width: 768px) {
+          .lesson-card {
+            flex-wrap: wrap !important;
+          }
+          .lesson-card-content {
+            width: 100% !important;
+            margin-top: 8px;
+          }
+          .lesson-card-actions {
+            width: 100% !important;
+            justify-content: flex-end !important;
+            flex-wrap: wrap;
+            margin-top: 8px;
+          }
+        }
+      `}</style>
       <div
         {...attributes}
         {...listeners}
@@ -972,7 +990,7 @@ function SortableLesson({ lesson, lessonIdx, onQuiz, onPreview, onEdit }: any) {
       }}>
         {lessonIdx + 1}
       </div>
-      <div style={{ flex: 1 }}>
+      <div className="lesson-card-content" style={{ flex: 1 }}>
         <h4 style={{
           fontSize: '14px',
           fontWeight: '600',
@@ -980,7 +998,8 @@ function SortableLesson({ lesson, lessonIdx, onQuiz, onPreview, onEdit }: any) {
           margin: '0 0 4px 0',
           display: 'flex',
           alignItems: 'center',
-          gap: '8px'
+          gap: '8px',
+          flexWrap: 'wrap'
         }}>
           {lesson.title}
           {!hasContent && (
@@ -996,7 +1015,7 @@ function SortableLesson({ lesson, lessonIdx, onQuiz, onPreview, onEdit }: any) {
             </span>
           )}
         </h4>
-        <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+        <div style={{ display: 'flex', gap: '12px', alignItems: 'center', flexWrap: 'wrap' }}>
           <span style={{
             fontSize: '12px',
             color: '#6b7280'
@@ -1037,7 +1056,7 @@ function SortableLesson({ lesson, lessonIdx, onQuiz, onPreview, onEdit }: any) {
           )}
         </div>
       </div>
-      <div style={{ display: 'flex', gap: '6px' }}>
+      <div className="lesson-card-actions" style={{ display: 'flex', gap: '6px' }}>
         {lesson.has_quiz === 1 && (
           <button
             onClick={onQuiz}
@@ -1332,18 +1351,21 @@ function CourseConfigForm({ course, onUpdate }: { course: Course | null; onUpdat
 
   return (
     <form onSubmit={handleSubmit} style={{
-      padding: '24px',
+      padding: '1.5rem',
       background: '#f9fafb',
       borderRadius: '8px',
       border: '1px solid #e5e7eb'
     }}>
       <h3 style={{
-        fontSize: '16px',
+        fontSize: '15px',
         fontWeight: '600',
-        color: '#374151',
-        marginBottom: '24px'
+        color: '#111827',
+        marginBottom: '1.5rem',
+        display: 'flex',
+        alignItems: 'center',
+        gap: '0.5rem'
       }}>
-        ⚙️ Configuración General
+        📝 Información General
       </h3>
 
       <div style={{ marginBottom: '20px' }}>
@@ -2254,6 +2276,7 @@ export default function InstructorCourseEditPage() {
   const [deleteError, setDeleteError] = useState('');
   const [user, setUser] = useState<any>(null);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const showModal = (type: 'success' | 'error' | 'warning' | 'info', message: string) => {
     setModal({ show: true, type, message });
@@ -2285,6 +2308,21 @@ export default function InstructorCourseEditPage() {
       console.error('Error loading user:', error);
     }
   };
+
+  const handleLogout = async () => {
+    await fetch('/api/auth/logout', { method: 'POST' });
+    router.push('/');
+  };
+
+  const sidebarMenuItems = [
+    { id: 'dashboard', label: 'Dashboard del curso', icon: '🏠', onClick: () => setActiveTab('contenido') },
+    { id: 'contenido', label: 'Contenido', icon: '📚', onClick: () => setActiveTab('contenido') },
+    { id: 'estudiantes', label: 'Estudiantes', icon: '👥', onClick: () => setActiveTab('estudiantes') },
+    { id: 'calificaciones-estudiantes', label: 'Calificaciones', icon: '📊', href: `/instructor/curso/${slug}/calificaciones-estudiantes` },
+    { id: 'calificaciones-quizzes', label: 'Quizzes', icon: '📝', href: `/instructor/curso/${slug}/calificaciones-quizzes` },
+    { id: 'calificaciones-tareas', label: 'Tareas', icon: '📋', href: `/instructor/curso/${slug}/calificaciones-tareas` },
+    { id: 'configuracion', label: 'Configuración del curso', icon: '⚙️', onClick: () => setActiveTab('configuracion') },
+  ];
 
   const loadCourse = async () => {
     try {
@@ -2548,6 +2586,354 @@ export default function InstructorCourseEditPage() {
     })
   );
 
+  function EstudiantesSection({ courseSlug }: { courseSlug: string }) {
+    const [students, setStudents] = useState<any[]>([]);
+    const [loadingStudents, setLoadingStudents] = useState(true);
+    const [showAddModal, setShowAddModal] = useState(false);
+    const [newStudentEmail, setNewStudentEmail] = useState('');
+    const [newStudentModality, setNewStudentModality] = useState('grabado');
+    const [saving, setSaving] = useState(false);
+
+    useEffect(() => {
+      fetchStudents();
+    }, [courseSlug]);
+
+    const fetchStudents = async () => {
+      try {
+        const res = await fetch(`/api/instructor/course/${courseSlug}/students`);
+        if (res.ok) {
+          const data = await res.json();
+          setStudents(data.students);
+        }
+      } catch (error) {
+        console.error('Error fetching students:', error);
+      } finally {
+        setLoadingStudents(false);
+      }
+    };
+
+    const handleAddStudent = async () => {
+      if (!newStudentEmail.trim()) {
+        alert('Por favor ingresa un email');
+        return;
+      }
+
+      setSaving(true);
+      try {
+        const res = await fetch(`/api/instructor/course/${courseSlug}/students`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            email: newStudentEmail,
+            modality: newStudentModality
+          })
+        });
+
+        if (res.ok) {
+          alert('✓ Estudiante agregado exitosamente');
+          setShowAddModal(false);
+          setNewStudentEmail('');
+          fetchStudents();
+        } else {
+          const data = await res.json();
+          alert(data.error || 'Error al agregar estudiante');
+        }
+      } catch (error) {
+        alert('Error al agregar estudiante');
+      } finally {
+        setSaving(false);
+      }
+    };
+
+    const handleRemoveStudent = async (studentId: number, studentName: string) => {
+      if (!confirm(`¿Estás seguro de eliminar a ${studentName} del curso?`)) {
+        return;
+      }
+
+      try {
+        const res = await fetch(`/api/instructor/course/${courseSlug}/students`, {
+          method: 'DELETE',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ userId: studentId })
+        });
+
+        if (res.ok) {
+          alert('✓ Estudiante eliminado exitosamente');
+          fetchStudents();
+        } else {
+          const data = await res.json();
+          alert(data.error || 'Error al eliminar estudiante');
+        }
+      } catch (error) {
+        alert('Error al eliminar estudiante');
+      }
+    };
+
+    if (loadingStudents) {
+      return (
+        <div style={{ padding: '2rem', textAlign: 'center' }}>
+          <p>Cargando estudiantes...</p>
+        </div>
+      );
+    }
+
+    return (
+      <div style={{
+        background: 'white',
+        borderRadius: '12px',
+        border: '1px solid #e5e7eb',
+        padding: '2rem'
+      }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+          <h2 style={{
+            fontSize: '1.5rem',
+            fontWeight: '600',
+            color: '#111827',
+            margin: 0
+          }}>
+            👥 Estudiantes del Curso
+          </h2>
+          <button
+            onClick={() => setShowAddModal(true)}
+            style={{
+              padding: '0.75rem 1.5rem',
+              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+              color: 'white',
+              border: 'none',
+              borderRadius: '8px',
+              fontWeight: '600',
+              fontSize: '14px',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.5rem'
+            }}
+          >
+            <span>+</span> Nuevo Estudiante
+          </button>
+        </div>
+
+        {students.length === 0 ? (
+          <div style={{
+            padding: '3rem',
+            textAlign: 'center',
+            background: '#f9fafb',
+            borderRadius: '12px',
+            border: '1px solid #e5e7eb'
+          }}>
+            <div style={{ fontSize: '48px', marginBottom: '1rem' }}>👥</div>
+            <h3 style={{ fontSize: '1.125rem', fontWeight: '600', color: '#111827', marginBottom: '0.5rem' }}>
+              No hay estudiantes inscritos
+            </h3>
+            <p style={{ fontSize: '14px', color: '#6b7280' }}>
+              Haz click en "Nuevo Estudiante" para agregar tu primer estudiante
+            </p>
+          </div>
+        ) : (
+          <div style={{ overflowX: 'auto' }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+              <thead>
+                <tr style={{ borderBottom: '2px solid #e5e7eb' }}>
+                  <th style={{ textAlign: 'left', padding: '0.75rem', color: '#6b7280', fontWeight: '600', fontSize: '0.875rem' }}>
+                    Nombre
+                  </th>
+                  <th style={{ textAlign: 'left', padding: '0.75rem', color: '#6b7280', fontWeight: '600', fontSize: '0.875rem' }}>
+                    Email
+                  </th>
+                  <th style={{ textAlign: 'center', padding: '0.75rem', color: '#6b7280', fontWeight: '600', fontSize: '0.875rem' }}>
+                    Modalidad
+                  </th>
+                  <th style={{ textAlign: 'center', padding: '0.75rem', color: '#6b7280', fontWeight: '600', fontSize: '0.875rem' }}>
+                    Progreso
+                  </th>
+                  <th style={{ textAlign: 'center', padding: '0.75rem', color: '#6b7280', fontWeight: '600', fontSize: '0.875rem' }}>
+                    Fecha Inscripción
+                  </th>
+                  <th style={{ textAlign: 'center', padding: '0.75rem', color: '#6b7280', fontWeight: '600', fontSize: '0.875rem' }}>
+                    Acciones
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {students.map((student) => (
+                  <tr key={student.id} style={{ borderBottom: '1px solid #f3f4f6' }}>
+                    <td style={{ padding: '1rem', fontWeight: '600', color: '#1f2937' }}>
+                      {student.name}
+                    </td>
+                    <td style={{ padding: '1rem', color: '#6b7280', fontSize: '0.875rem' }}>
+                      {student.email}
+                    </td>
+                    <td style={{ textAlign: 'center', padding: '1rem' }}>
+                      <span style={{
+                        padding: '0.25rem 0.75rem',
+                        borderRadius: '12px',
+                        backgroundColor: student.modality === 'vivo' ? '#dbeafe' : '#f3f4f6',
+                        color: student.modality === 'vivo' ? '#1e40af' : '#6b7280',
+                        fontWeight: '600',
+                        fontSize: '0.75rem'
+                      }}>
+                        {student.modality === 'vivo' ? 'En Vivo' : 'Grabado'}
+                      </span>
+                    </td>
+                    <td style={{ textAlign: 'center', padding: '1rem' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}>
+                        <div style={{
+                          width: '60px',
+                          height: '6px',
+                          background: '#e5e7eb',
+                          borderRadius: '3px',
+                          overflow: 'hidden'
+                        }}>
+                          <div style={{
+                            width: `${student.progress}%`,
+                            height: '100%',
+                            background: 'linear-gradient(90deg, #667eea 0%, #764ba2 100%)',
+                            borderRadius: '3px'
+                          }} />
+                        </div>
+                        <span style={{ fontSize: '0.875rem', fontWeight: '600', color: '#667eea' }}>
+                          {student.progress}%
+                        </span>
+                      </div>
+                    </td>
+                    <td style={{ textAlign: 'center', padding: '1rem', color: '#6b7280', fontSize: '0.875rem' }}>
+                      {new Date(student.enrolled_at).toLocaleDateString('es-ES')}
+                    </td>
+                    <td style={{ textAlign: 'center', padding: '1rem' }}>
+                      <button
+                        onClick={() => handleRemoveStudent(student.id, student.name)}
+                        style={{
+                          padding: '0.5rem 1rem',
+                          backgroundColor: '#ef4444',
+                          color: 'white',
+                          border: 'none',
+                          borderRadius: '6px',
+                          cursor: 'pointer',
+                          fontSize: '0.875rem',
+                          fontWeight: '500'
+                        }}
+                      >
+                        Eliminar
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+
+        {showAddModal && (
+          <div
+            onClick={() => setShowAddModal(false)}
+            style={{
+              position: 'fixed',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              background: 'rgba(0,0,0,0.5)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              zIndex: 9999
+            }}
+          >
+            <div
+              onClick={(e) => e.stopPropagation()}
+              style={{
+                background: 'white',
+                borderRadius: '12px',
+                maxWidth: '500px',
+                width: '90%',
+                padding: '2rem'
+              }}
+            >
+              <h3 style={{ marginBottom: '1.5rem', fontSize: '1.25rem', fontWeight: '600', color: '#111827' }}>
+                Agregar Nuevo Estudiante
+              </h3>
+
+              <div style={{ marginBottom: '1.5rem' }}>
+                <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '14px', fontWeight: '600', color: '#374151' }}>
+                  Email del Estudiante
+                </label>
+                <input
+                  type="email"
+                  value={newStudentEmail}
+                  onChange={(e) => setNewStudentEmail(e.target.value)}
+                  placeholder="estudiante@example.com"
+                  style={{
+                    width: '100%',
+                    padding: '0.75rem',
+                    border: '2px solid #e5e7eb',
+                    borderRadius: '8px',
+                    fontSize: '14px',
+                    boxSizing: 'border-box'
+                  }}
+                />
+              </div>
+
+              <div style={{ marginBottom: '1.5rem' }}>
+                <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '14px', fontWeight: '600', color: '#374151' }}>
+                  Modalidad
+                </label>
+                <select
+                  value={newStudentModality}
+                  onChange={(e) => setNewStudentModality(e.target.value)}
+                  style={{
+                    width: '100%',
+                    padding: '0.75rem',
+                    border: '2px solid #e5e7eb',
+                    borderRadius: '8px',
+                    fontSize: '14px',
+                    boxSizing: 'border-box'
+                  }}
+                >
+                  <option value="grabado">Grabado</option>
+                  <option value="vivo">En Vivo</option>
+                </select>
+              </div>
+
+              <div style={{ display: 'flex', gap: '1rem' }}>
+                <button
+                  onClick={() => setShowAddModal(false)}
+                  style={{
+                    flex: 1,
+                    padding: '0.75rem',
+                    backgroundColor: '#f3f4f6',
+                    color: '#374151',
+                    border: 'none',
+                    borderRadius: '8px',
+                    fontWeight: '600',
+                    cursor: 'pointer'
+                  }}
+                >
+                  Cancelar
+                </button>
+                <button
+                  onClick={handleAddStudent}
+                  disabled={saving}
+                  style={{
+                    flex: 1,
+                    padding: '0.75rem',
+                    background: saving ? '#9ca3af' : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '8px',
+                    fontWeight: '600',
+                    cursor: saving ? 'not-allowed' : 'pointer'
+                  }}
+                >
+                  {saving ? 'Agregando...' : 'Agregar'}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  }
+
   if (loading) {
     return (
       <div style={{
@@ -2575,231 +2961,61 @@ export default function InstructorCourseEditPage() {
   }
 
   return (
-    <div style={{ minHeight: '100vh', background: '#f9fafb' }}>
-      <header style={{
-        position: 'sticky',
-        top: 0,
-        height: '72px',
-        background: '#1c1d1f',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        padding: '0 32px',
-        zIndex: 100,
-        boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
-      }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '24px' }}>
-          <Link href="/instructor" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center' }}>
-            <Image
-              src="/images/logo_smartchatix_horiz.png"
-              alt="SmartChatix"
-              width={180}
-              height={52}
-              style={{ objectFit: 'contain' }}
-            />
-          </Link>
-          <div style={{ height: '40px', width: '1px', background: 'rgba(255,255,255,0.2)' }} />
-          <h1 style={{ fontSize: '16px', fontWeight: '700', color: 'white', margin: 0 }}>
-            {course.title}
-          </h1>
-        </div>
+    <div style={{ minHeight: '100vh', background: '#f9fafb', fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif' }}>
+      <style>{`
+        @media (max-width: 1024px) {
+          .mobile-menu-btn { display: flex !important; }
+          .main-content { margin-left: 0 !important; }
+        }
+        @media (min-width: 1025px) {
+          .mobile-menu-btn { display: none !important; }
+          .main-content { margin-left: 280px !important; }
+        }
+      `}</style>
 
-        <div style={{ position: 'relative' }}>
-          <button
-            onClick={() => setUserMenuOpen(!userMenuOpen)}
-            style={{
-              width: '40px',
-              height: '40px',
-              background: userMenuOpen ? 'rgba(255,255,255,0.15)' : 'rgba(255,255,255,0.08)',
-              border: 'none',
-              borderRadius: '50%',
-              color: 'white',
-              fontSize: '20px',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              transition: 'all 0.2s',
-              fontWeight: '600'
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.background = 'rgba(255,255,255,0.15)';
-            }}
-            onMouseLeave={(e) => {
-              if (!userMenuOpen) e.currentTarget.style.background = 'rgba(255,255,255,0.08)';
-            }}
-          >
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-              <circle cx="12" cy="7" r="4"></circle>
-            </svg>
-          </button>
-          {userMenuOpen && (
-            <div style={{
-              position: 'absolute',
-              top: 'calc(100% + 12px)',
-              right: 0,
-              background: 'white',
-              borderRadius: '8px',
-              boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
-              border: '1px solid #e5e7eb',
-              minWidth: '220px',
-              zIndex: 1000,
-              overflow: 'hidden'
-            }}>
-              <div style={{
-                padding: '16px',
-                borderBottom: '1px solid #f3f4f6'
-              }}>
-                <div style={{
-                  fontSize: '14px',
-                  fontWeight: '600',
-                  color: '#1a202c',
-                  marginBottom: '4px'
-                }}>
-                  {user?.name || 'Usuario'}
-                </div>
-                <div style={{
-                  fontSize: '12px',
-                  color: '#6b7280'
-                }}>
-                  {user?.email}
-                </div>
-              </div>
-              <Link
-                href="/aula-virtual"
-                onClick={() => setUserMenuOpen(false)}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '12px',
-                  padding: '12px 16px',
-                  textDecoration: 'none',
-                  color: '#374151',
-                  fontSize: '14px',
-                  fontWeight: '500',
-                  transition: 'background 0.2s',
-                  borderBottom: '1px solid #f3f4f6'
-                }}
-                onMouseEnter={(e) => e.currentTarget.style.background = '#f9fafb'}
-                onMouseLeave={(e) => e.currentTarget.style.background = 'white'}
-              >
-                <span style={{ fontSize: '16px' }}>📚</span>
-                Mis Cursos
-              </Link>
-              <Link
-                href="/"
-                onClick={() => setUserMenuOpen(false)}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '12px',
-                  padding: '12px 16px',
-                  textDecoration: 'none',
-                  color: '#374151',
-                  fontSize: '14px',
-                  fontWeight: '500',
-                  transition: 'background 0.2s',
-                  borderBottom: '1px solid #f3f4f6'
-                }}
-                onMouseEnter={(e) => e.currentTarget.style.background = '#f9fafb'}
-                onMouseLeave={(e) => e.currentTarget.style.background = 'white'}
-              >
-                <span style={{ fontSize: '16px' }}>🔍</span>
-                Catálogo
-              </Link>
-              <Link
-                href="/instructor"
-                onClick={() => setUserMenuOpen(false)}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '12px',
-                  padding: '12px 16px',
-                  textDecoration: 'none',
-                  color: '#374151',
-                  fontSize: '14px',
-                  fontWeight: '500',
-                  transition: 'background 0.2s',
-                  borderBottom: '1px solid #f3f4f6'
-                }}
-                onMouseEnter={(e) => e.currentTarget.style.background = '#f9fafb'}
-                onMouseLeave={(e) => e.currentTarget.style.background = 'white'}
-              >
-                <span style={{ fontSize: '16px' }}>👨‍🏫</span>
-                Panel Instructor
-              </Link>
-              {user?.role === 'admin' && (
-                <Link
-                  href="/admin"
-                  onClick={() => setUserMenuOpen(false)}
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '12px',
-                    padding: '12px 16px',
-                    textDecoration: 'none',
-                    color: '#374151',
-                    fontSize: '14px',
-                    fontWeight: '500',
-                    transition: 'background 0.2s',
-                    borderBottom: '1px solid #f3f4f6'
-                  }}
-                  onMouseEnter={(e) => e.currentTarget.style.background = '#f9fafb'}
-                  onMouseLeave={(e) => e.currentTarget.style.background = 'white'}
-                >
-                  <span style={{ fontSize: '16px' }}>⚙️</span>
-                  Panel Admin
-                </Link>
-              )}
-              <button
-                onClick={async () => {
-                  setUserMenuOpen(false);
-                  await fetch('/api/auth/logout', { method: 'POST' });
-                  router.push('/');
-                }}
-                style={{
-                  width: '100%',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '12px',
-                  padding: '12px 16px',
-                  background: 'white',
-                  border: 'none',
-                  textAlign: 'left',
-                  color: '#ef4444',
-                  fontSize: '14px',
-                  fontWeight: '600',
-                  cursor: 'pointer',
-                  transition: 'background 0.2s'
-                }}
-                onMouseEnter={(e) => e.currentTarget.style.background = '#fef2f2'}
-                onMouseLeave={(e) => e.currentTarget.style.background = 'white'}
-              >
-                <span style={{ fontSize: '16px' }}>🚪</span>
-                Cerrar Sesión
-              </button>
-            </div>
-          )}
-        </div>
-      </header>
-
-      <CourseInstructorHeader
-        courseTitle={course.title}
-        slug={slug}
-        activeTab={activeTab as 'contenido' | 'calificaciones' | 'configuracion' | 'estudiantes'}
-        showCustomHeader={false}
-        setActiveTab={setActiveTab}
+      <UnifiedSidebar
+        menuItems={sidebarMenuItems}
+        activeItem={activeTab}
+        currentUser={user}
+        onLogout={handleLogout}
+        mobileMenuOpen={mobileMenuOpen}
+        setMobileMenuOpen={setMobileMenuOpen}
+        title={course.title}
+        subtitle={course.publication_status === 'published' ? 'Publicado' : 'Borrador'}
+        showLegacyLink={false}
       />
 
-      <main style={{
+      <button
+        onClick={() => setMobileMenuOpen(true)}
+        className="mobile-menu-btn"
+        style={{
+          position: 'fixed',
+          top: '1rem',
+          left: '1rem',
+          zIndex: 1000,
+          padding: '0.75rem',
+          background: 'white',
+          border: '1px solid #e5e7eb',
+          borderRadius: '8px',
+          cursor: 'pointer',
+          display: 'none',
+          boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+        }}
+      >
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <path d="M3 12h18M3 6h18M3 18h18"/>
+        </svg>
+      </button>
+
+
+      <main className="main-content" style={{
         background: '#f9fafb',
-        minHeight: 'calc(100vh - 140px)'
+        minHeight: '100vh',
+        padding: '32px 24px'
       }}>
         <div style={{
           maxWidth: '1200px',
-          margin: '0 auto',
-          padding: '32px 24px'
+          margin: '0 auto'
         }}>
         {activeTab === 'contenido' && (
           <div>
@@ -2874,6 +3090,7 @@ export default function InstructorCourseEditPage() {
                       >
                     <div
                       onClick={() => toggleModule(module.id)}
+                      className="module-header"
                       style={{
                         padding: '20px 24px',
                         cursor: 'pointer',
@@ -2883,6 +3100,19 @@ export default function InstructorCourseEditPage() {
                         background: expandedModules.includes(module.id) ? '#f9fafb' : 'white'
                       }}
                     >
+                      <style>{`
+                        @media (max-width: 768px) {
+                          .module-header {
+                            align-items: flex-start !important;
+                          }
+                          .module-header-content {
+                            flex: 1 !important;
+                          }
+                          .module-header-actions {
+                            margin-top: 20px;
+                          }
+                        }
+                      `}</style>
                       <div style={{
                         width: '32px',
                         height: '32px',
@@ -2898,7 +3128,7 @@ export default function InstructorCourseEditPage() {
                       }}>
                         {idx + 1}
                       </div>
-                      <div style={{ flex: 1 }}>
+                      <div className="module-header-content" style={{ flex: 1 }}>
                         <h3 style={{
                           fontSize: '16px',
                           fontWeight: '600',
@@ -2915,32 +3145,33 @@ export default function InstructorCourseEditPage() {
                           {module.lessons?.length || 0} lecciones
                         </p>
                       </div>
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setModuleModal({ open: true, module });
-                        }}
-                        style={{
-                          padding: '6px 12px',
-                          background: '#f3f4f6',
-                          border: '1px solid #e5e7eb',
-                          borderRadius: '6px',
-                          fontSize: '13px',
-                          cursor: 'pointer',
-                          marginRight: '8px'
-                        }}
-                      >
-                        Editar
-                      </button>
-                      <span style={{
-                        fontSize: '20px',
-                        color: '#6b7280',
-                        transition: 'transform 0.2s',
-                        transform: expandedModules.includes(module.id) ? 'rotate(180deg)' : 'rotate(0deg)',
-                        display: 'inline-block'
-                      }}>
-                        ▼
-                      </span>
+                      <div className="module-header-actions" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setModuleModal({ open: true, module });
+                          }}
+                          style={{
+                            padding: '6px 12px',
+                            background: '#f3f4f6',
+                            border: '1px solid #e5e7eb',
+                            borderRadius: '6px',
+                            fontSize: '13px',
+                            cursor: 'pointer'
+                          }}
+                        >
+                          Editar
+                        </button>
+                        <span style={{
+                          fontSize: '20px',
+                          color: '#6b7280',
+                          transition: 'transform 0.2s',
+                          transform: expandedModules.includes(module.id) ? 'rotate(180deg)' : 'rotate(0deg)',
+                          display: 'inline-block'
+                        }}>
+                          ▼
+                        </span>
+                      </div>
                     </div>
 
                     {expandedModules.includes(module.id) && (
@@ -3108,33 +3339,32 @@ export default function InstructorCourseEditPage() {
             background: 'white',
             borderRadius: '12px',
             border: '1px solid #e5e7eb',
-            padding: '32px'
+            padding: '2rem'
           }}>
             <h2 style={{
-              fontSize: '20px',
+              fontSize: '1.5rem',
               fontWeight: '600',
-              color: '#1a202c',
-              marginBottom: '24px'
+              color: '#111827',
+              marginBottom: '1.5rem'
             }}>
-              Configuración del Curso
+              ⚙️ Configuración del Curso
             </h2>
 
-            {/* Certificación */}
             <div style={{
-              padding: '24px',
+              padding: '1.5rem',
               background: '#f9fafb',
               borderRadius: '8px',
               border: '1px solid #e5e7eb',
-              marginBottom: '24px'
+              marginBottom: '1.5rem'
             }}>
               <h3 style={{
-                fontSize: '16px',
+                fontSize: '15px',
                 fontWeight: '600',
-                color: '#374151',
-                marginBottom: '16px',
+                color: '#111827',
+                marginBottom: '1rem',
                 display: 'flex',
                 alignItems: 'center',
-                gap: '8px'
+                gap: '0.5rem'
               }}>
                 🎓 Sistema de Certificación
               </h3>
@@ -3242,22 +3472,21 @@ export default function InstructorCourseEditPage() {
               ) : null}
             </div>
 
-            {/* Estado de Publicación */}
             <div style={{
-              padding: '24px',
+              padding: '1.5rem',
               background: '#f9fafb',
               borderRadius: '8px',
               border: '1px solid #e5e7eb',
-              marginBottom: '24px'
+              marginBottom: '1.5rem'
             }}>
               <h3 style={{
-                fontSize: '16px',
+                fontSize: '15px',
                 fontWeight: '600',
-                color: '#374151',
-                marginBottom: '16px',
+                color: '#111827',
+                marginBottom: '1rem',
                 display: 'flex',
                 alignItems: 'center',
-                gap: '8px'
+                gap: '0.5rem'
               }}>
                 🌐 Estado de Publicación
               </h3>
@@ -3322,29 +3551,28 @@ export default function InstructorCourseEditPage() {
             {/* Otras configuraciones (placeholder) */}
             <CourseConfigForm course={course} onUpdate={loadCourse} />
 
-            {/* Zona de peligro - Eliminar curso */}
             <div style={{
-              marginTop: '32px',
-              padding: '24px',
+              marginTop: '2rem',
+              padding: '1.5rem',
               background: '#fef2f2',
               borderRadius: '8px',
               border: '2px solid #fca5a5'
             }}>
               <h3 style={{
-                fontSize: '16px',
+                fontSize: '15px',
                 fontWeight: '600',
                 color: '#dc2626',
-                marginBottom: '12px',
+                marginBottom: '0.75rem',
                 display: 'flex',
                 alignItems: 'center',
-                gap: '8px'
+                gap: '0.5rem'
               }}>
                 ⚠️ Zona de Peligro
               </h3>
               <p style={{
-                fontSize: '14px',
+                fontSize: '13px',
                 color: '#991b1b',
-                marginBottom: '16px',
+                marginBottom: '1rem',
                 lineHeight: '1.6'
               }}>
                 Una vez que elimines este curso, no hay vuelta atrás. Por favor, estate seguro.
@@ -3355,7 +3583,7 @@ export default function InstructorCourseEditPage() {
                   setDeleteModal(true);
                 }}
                 style={{
-                  padding: '12px 24px',
+                  padding: '0.75rem 1.5rem',
                   background: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)',
                   color: 'white',
                   border: 'none',
@@ -3365,7 +3593,7 @@ export default function InstructorCourseEditPage() {
                   cursor: 'pointer',
                   display: 'flex',
                   alignItems: 'center',
-                  gap: '8px'
+                  gap: '0.5rem'
                 }}
               >
                 🗑️ Eliminar Curso
@@ -3375,24 +3603,7 @@ export default function InstructorCourseEditPage() {
         )}
 
         {activeTab === 'estudiantes' && (
-          <div style={{
-            background: 'white',
-            borderRadius: '12px',
-            border: '1px solid #e5e7eb',
-            padding: '32px'
-          }}>
-            <h2 style={{
-              fontSize: '20px',
-              fontWeight: '600',
-              color: '#1a202c',
-              marginBottom: '24px'
-            }}>
-              Estudiantes del Curso
-            </h2>
-            <p style={{ fontSize: '14px', color: '#6b7280' }}>
-              Próximamente: Lista de estudiantes inscritos en este curso
-            </p>
-          </div>
+          <EstudiantesSection courseSlug={slug} />
         )}
         </div>
       </main>

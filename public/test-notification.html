@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test de Notificaciones</title>
+</head>
+<body style="font-family: Arial; padding: 40px; text-align: center;">
+    <h1>🔔 Test de Notificaciones</h1>
+    <button onclick="testNotif()" style="padding: 20px 40px; font-size: 18px; cursor: pointer; background: #8b5cf6; color: white; border: none; border-radius: 8px;">
+        Probar Notificación
+    </button>
+    <p id="status" style="margin-top: 20px; font-size: 16px;"></p>
+
+    <script>
+        function testNotif() {
+            const status = document.getElementById('status');
+            
+            status.textContent = 'Permiso actual: ' + Notification.permission;
+            
+            if (!("Notification" in window)) {
+                status.textContent = "❌ Tu navegador no soporta notificaciones";
+                return;
+            }
+
+            if (Notification.permission === "granted") {
+                new Notification("✅ Funciona!", {
+                    body: "El sistema de notificaciones está activo"
+                });
+                status.textContent = "✅ Notificación enviada!";
+            } else if (Notification.permission !== "denied") {
+                Notification.requestPermission().then(permission => {
+                    if (permission === "granted") {
+                        new Notification("✅ Funciona!", {
+                            body: "El sistema de notificaciones está activo"
+                        });
+                        status.textContent = "✅ Notificación enviada!";
+                    } else {
+                        status.textContent = "❌ Permisos denegados";
+                    }
+                });
+            } else {
+                status.textContent = "❌ Las notificaciones están bloqueadas. Ve a la configuración del navegador para habilitarlas.";
+            }
+        }
+    </script>
+</body>
+</html>

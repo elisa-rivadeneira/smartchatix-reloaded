@@ -34,13 +34,7 @@ export default function LoginPage() {
         return;
       }
 
-      if (data.user.role === 'admin') {
-        router.push('/admin');
-      } else if (data.user.role === 'instructor') {
-        router.push('/instructor');
-      } else {
-        router.push('/aula-virtual');
-      }
+      router.push('/dashboard');
     } catch (err) {
       setError('Error de conexión. Por favor intenta de nuevo.');
       setLoading(false);
