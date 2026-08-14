@@ -9,12 +9,14 @@ interface HeaderProps {
   showCursos?: boolean;
   showServicios?: boolean;
   courses?: any[];
+  onPilotClick?: () => void;
 }
 
 const Header: React.FC<HeaderProps> = ({
   showCursos = false,
   showServicios = true,
-  courses = []
+  courses = [],
+  onPilotClick
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
@@ -384,10 +386,13 @@ const Header: React.FC<HeaderProps> = ({
                   textDecoration: 'none',
                   fontSize: '14px',
                   fontWeight: '600',
-                  padding: '10px 20px',
+                  padding: '8px 16px',
                   borderRadius: '8px',
                   transition: 'all 0.2s',
-                  boxShadow: '0 2px 8px rgba(59, 130, 246, 0.25)'
+                  boxShadow: '0 2px 8px rgba(59, 130, 246, 0.25)',
+                  marginRight: onPilotClick ? '0.75rem' : '0',
+                  height: '36px',
+                  lineHeight: '1'
                 }}
                 onMouseEnter={(e) => {
                   e.currentTarget.style.background = 'linear-gradient(135deg, #2563eb 0%, #3b82f6 100%)';
@@ -400,13 +405,46 @@ const Header: React.FC<HeaderProps> = ({
                   e.currentTarget.style.transform = 'translateY(0)';
                 }}
               >
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/>
                   <polyline points="10 17 15 12 10 7"/>
                   <line x1="15" y1="12" x2="3" y2="12"/>
                 </svg>
                 Ingresar
               </Link>
+              {onPilotClick && (
+                <button
+                  onClick={onPilotClick}
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '0.5rem',
+                    background: 'linear-gradient(135deg, #8b5cf6 0%, #d946ef 100%)',
+                    color: '#fff',
+                    fontSize: '14px',
+                    fontWeight: '600',
+                    padding: '8px 16px',
+                    borderRadius: '8px',
+                    transition: 'all 0.2s',
+                    boxShadow: '0 2px 8px rgba(139, 92, 246, 0.25)',
+                    border: 'none',
+                    cursor: 'pointer',
+                    height: '36px',
+                    lineHeight: '1'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.boxShadow = '0 4px 12px rgba(139, 92, 246, 0.4)';
+                    e.currentTarget.style.transform = 'translateY(-1px)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.boxShadow = '0 2px 8px rgba(139, 92, 246, 0.25)';
+                    e.currentTarget.style.transform = 'translateY(0)';
+                  }}
+                >
+                  <span style={{ fontSize: '16px' }}>🚀</span>
+                  Participar en el piloto
+                </button>
+              )}
             </div>
 
             {/* Mobile menu button */}

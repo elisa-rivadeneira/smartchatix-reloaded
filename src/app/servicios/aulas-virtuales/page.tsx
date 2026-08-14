@@ -10,6 +10,40 @@ import { Sparkles, BookOpen, Users, ChartColumnIncreasing, BadgeCheck, Workflow 
 
 export default function AulasVirtualesPage() {
   const [showModal, setShowModal] = React.useState(false);
+  const [showPilotModal, setShowPilotModal] = React.useState(false);
+  const [pilotFormData, setPilotFormData] = React.useState({
+    nombre: '',
+    entidad: '',
+    cargo: '',
+    email: ''
+  });
+  const [sendingPilot, setSendingPilot] = React.useState(false);
+
+  const handlePilotSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSendingPilot(true);
+
+    try {
+      const response = await fetch('/api/email/send-pilot-request', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(pilotFormData)
+      });
+
+      if (response.ok) {
+        alert('✅ ¡Solicitud enviada! Te contactaremos en menos de 24 horas.');
+        setShowPilotModal(false);
+        setPilotFormData({ nombre: '', entidad: '', cargo: '', email: '' });
+      } else {
+        alert('❌ Error al enviar la solicitud. Por favor intenta de nuevo.');
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      alert('❌ Error al enviar la solicitud. Por favor intenta de nuevo.');
+    } finally {
+      setSendingPilot(false);
+    }
+  };
 
   return (
     <div style={{
@@ -211,7 +245,7 @@ export default function AulasVirtualesPage() {
         }
       `}</style>
 
-      <Header />
+      <Header onPilotClick={() => setShowPilotModal(true)} />
 
       {/* Hero Section */}
       <section style={{
@@ -268,6 +302,7 @@ export default function AulasVirtualesPage() {
             alt="SmartChatix Platform"
             width={1400}
             height={1050}
+            priority
             style={{
               width: '100%',
               height: 'auto',
@@ -345,6 +380,7 @@ export default function AulasVirtualesPage() {
                 alt="SmartChatix Platform"
                 width={1400}
                 height={1050}
+                priority
                 style={{
                   width: '100%',
                   height: 'auto',
@@ -355,7 +391,7 @@ export default function AulasVirtualesPage() {
 
             <div style={{ display: 'flex', gap: '1rem', marginBottom: '3rem' }}>
               <button
-                onClick={() => setShowModal(true)}
+                onClick={() => setShowPilotModal(true)}
                 style={{
                   background: 'linear-gradient(135deg, #8b5cf6 0%, #d946ef 100%)',
                   color: '#fff',
@@ -380,8 +416,8 @@ export default function AulasVirtualesPage() {
                   e.currentTarget.style.boxShadow = '0 8px 24px rgba(139, 92, 246, 0.4)';
                 }}
               >
-                <span style={{ fontSize: '16px' }}>📖</span>
-                Solicitar demostración
+                <span style={{ fontSize: '16px' }}>🚀</span>
+                Participar en el piloto
               </button>
 
               <button
@@ -975,7 +1011,7 @@ export default function AulasVirtualesPage() {
             gap: '0.75rem'
           }}>
             <button
-              onClick={() => setShowModal(true)}
+              onClick={() => setShowPilotModal(true)}
               style={{
                 background: 'linear-gradient(135deg, #8b5cf6 0%, #d946ef 100%)',
                 color: '#fff',
@@ -999,7 +1035,7 @@ export default function AulasVirtualesPage() {
                 e.currentTarget.style.boxShadow = '0 0 0 0 rgba(139, 92, 246, 0), 0 8px 24px rgba(139, 92, 246, 0.35)';
               }}
             >
-              Solicitar demostración
+              Participar en el piloto
             </button>
 
             {/* Microcopy de confianza */}
@@ -1009,7 +1045,7 @@ export default function AulasVirtualesPage() {
               fontWeight: '400',
               letterSpacing: '0.01em'
             }}>
-              ✓ Respuesta en menos de 15 minutos
+              ✓ Respuesta en menos de 24 horas
             </span>
           </div>
         </div>
@@ -1056,6 +1092,157 @@ export default function AulasVirtualesPage() {
       </section>
 
       <Footer />
+
+      {/* Modal Piloto */}
+      {showPilotModal && (
+        <div
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: 'rgba(0, 0, 0, 0.7)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 9999,
+            padding: '1rem'
+          }}
+          onClick={() => setShowPilotModal(false)}
+        >
+          <div
+            style={{
+              backgroundColor: '#fff',
+              borderRadius: '20px',
+              maxWidth: '500px',
+              width: '100%',
+              padding: '3rem',
+              position: 'relative'
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              onClick={() => setShowPilotModal(false)}
+              style={{
+                position: 'absolute',
+                top: '20px',
+                right: '20px',
+                background: 'none',
+                border: 'none',
+                fontSize: '28px',
+                cursor: 'pointer',
+                color: '#999',
+                lineHeight: '1'
+              }}
+            >
+              ×
+            </button>
+
+            <div style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
+              <span style={{ fontSize: '48px' }}>🚀</span>
+            </div>
+
+            <h2 style={{
+              fontSize: '1.75rem',
+              fontWeight: '700',
+              marginBottom: '0.5rem',
+              color: '#0a0e27',
+              textAlign: 'center'
+            }}>
+              Participar en el piloto
+            </h2>
+            <p style={{
+              fontSize: '1rem',
+              color: '#64748b',
+              marginBottom: '2rem',
+              textAlign: 'center'
+            }}>
+              Estamos seleccionando las primeras organizaciones para probar SmartChatix Academy. Déjanos tus datos y te contactamos.
+            </p>
+
+            <form onSubmit={handlePilotSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.2rem' }}>
+              <input
+                type="text"
+                placeholder="Nombre completo *"
+                required
+                value={pilotFormData.nombre}
+                onChange={(e) => setPilotFormData({ ...pilotFormData, nombre: e.target.value })}
+                style={{
+                  padding: '14px 16px',
+                  borderRadius: '10px',
+                  border: '2px solid #e5e7eb',
+                  fontSize: '15px',
+                  outline: 'none',
+                  fontFamily: 'inherit'
+                }}
+              />
+              <input
+                type="text"
+                placeholder="Organización *"
+                required
+                value={pilotFormData.entidad}
+                onChange={(e) => setPilotFormData({ ...pilotFormData, entidad: e.target.value })}
+                style={{
+                  padding: '14px 16px',
+                  borderRadius: '10px',
+                  border: '2px solid #e5e7eb',
+                  fontSize: '15px',
+                  outline: 'none',
+                  fontFamily: 'inherit'
+                }}
+              />
+              <input
+                type="text"
+                placeholder="Cargo"
+                value={pilotFormData.cargo}
+                onChange={(e) => setPilotFormData({ ...pilotFormData, cargo: e.target.value })}
+                style={{
+                  padding: '14px 16px',
+                  borderRadius: '10px',
+                  border: '2px solid #e5e7eb',
+                  fontSize: '15px',
+                  outline: 'none',
+                  fontFamily: 'inherit'
+                }}
+              />
+              <input
+                type="email"
+                placeholder="Correo electrónico *"
+                required
+                value={pilotFormData.email}
+                onChange={(e) => setPilotFormData({ ...pilotFormData, email: e.target.value })}
+                style={{
+                  padding: '14px 16px',
+                  borderRadius: '10px',
+                  border: '2px solid #e5e7eb',
+                  fontSize: '15px',
+                  outline: 'none',
+                  fontFamily: 'inherit'
+                }}
+              />
+
+              <button
+                type="submit"
+                disabled={sendingPilot}
+                style={{
+                  background: sendingPilot ? '#9ca3af' : 'linear-gradient(135deg, #8b5cf6 0%, #d946ef 100%)',
+                  color: '#fff',
+                  border: 'none',
+                  padding: '16px',
+                  borderRadius: '10px',
+                  fontSize: '16px',
+                  fontWeight: '600',
+                  cursor: sendingPilot ? 'not-allowed' : 'pointer',
+                  marginTop: '0.5rem'
+                }}
+              >
+                {sendingPilot ? 'Enviando...' : 'Enviar solicitud'}
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
 
       {/* Modal de Contacto */}
       {showModal && (
