@@ -15,7 +15,8 @@ export default function AulasVirtualesPage() {
     nombre: '',
     entidad: '',
     cargo: '',
-    email: ''
+    email: '',
+    telefono: ''
   });
   const [sendingPilot, setSendingPilot] = React.useState(false);
 
@@ -33,7 +34,7 @@ export default function AulasVirtualesPage() {
       if (response.ok) {
         alert('✅ ¡Solicitud enviada! Te contactaremos en menos de 24 horas.');
         setShowPilotModal(false);
-        setPilotFormData({ nombre: '', entidad: '', cargo: '', email: '' });
+        setPilotFormData({ nombre: '', entidad: '', cargo: '', email: '', telefono: '' });
       } else {
         alert('❌ Error al enviar la solicitud. Por favor intenta de nuevo.');
       }
@@ -245,7 +246,10 @@ export default function AulasVirtualesPage() {
         }
       `}</style>
 
-      <Header onPilotClick={() => setShowPilotModal(true)} />
+      <Header
+        onPilotClick={() => setShowPilotModal(true)}
+        pilotButtonColor="purple"
+      />
 
       {/* Hero Section */}
       <section style={{
@@ -1212,6 +1216,21 @@ export default function AulasVirtualesPage() {
                 required
                 value={pilotFormData.email}
                 onChange={(e) => setPilotFormData({ ...pilotFormData, email: e.target.value })}
+                style={{
+                  padding: '14px 16px',
+                  borderRadius: '10px',
+                  border: '2px solid #e5e7eb',
+                  fontSize: '15px',
+                  outline: 'none',
+                  fontFamily: 'inherit'
+                }}
+              />
+              <input
+                type="tel"
+                placeholder="Teléfono/WhatsApp *"
+                required
+                value={pilotFormData.telefono}
+                onChange={(e) => setPilotFormData({ ...pilotFormData, telefono: e.target.value })}
                 style={{
                   padding: '14px 16px',
                   borderRadius: '10px',

@@ -10,13 +10,19 @@ interface HeaderProps {
   showServicios?: boolean;
   courses?: any[];
   onPilotClick?: () => void;
+  pilotButtonText?: string;
+  pilotButtonColor?: 'purple' | 'yellow';
+  hideLoginButton?: boolean;
 }
 
 const Header: React.FC<HeaderProps> = ({
   showCursos = false,
   showServicios = true,
   courses = [],
-  onPilotClick
+  onPilotClick,
+  pilotButtonText = 'Participar en el piloto',
+  pilotButtonColor = 'purple',
+  hideLoginButton = false
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
@@ -57,6 +63,7 @@ const Header: React.FC<HeaderProps> = ({
       show: showServicios,
       children: [
         { name: 'Aulas Virtuales con IA', href: '/servicios/aulas-virtuales' },
+        { name: 'Alertas SEACE', href: '/servicios/alertas-seace' },
       ],
     },
     {
@@ -375,43 +382,45 @@ const Header: React.FC<HeaderProps> = ({
                 </button>
               </div>
               )}
-              <Link
-                href="/login"
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '0.5rem',
-                  background: 'linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%)',
-                  color: '#fff',
-                  textDecoration: 'none',
-                  fontSize: '14px',
-                  fontWeight: '600',
-                  padding: '8px 16px',
-                  borderRadius: '8px',
-                  transition: 'all 0.2s',
-                  boxShadow: '0 2px 8px rgba(59, 130, 246, 0.25)',
-                  marginRight: onPilotClick ? '0.75rem' : '0',
-                  height: '36px',
-                  lineHeight: '1'
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.background = 'linear-gradient(135deg, #2563eb 0%, #3b82f6 100%)';
-                  e.currentTarget.style.boxShadow = '0 4px 12px rgba(59, 130, 246, 0.35)';
-                  e.currentTarget.style.transform = 'translateY(-1px)';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.background = 'linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%)';
-                  e.currentTarget.style.boxShadow = '0 2px 8px rgba(59, 130, 246, 0.25)';
-                  e.currentTarget.style.transform = 'translateY(0)';
-                }}
-              >
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/>
-                  <polyline points="10 17 15 12 10 7"/>
-                  <line x1="15" y1="12" x2="3" y2="12"/>
-                </svg>
-                Ingresar
-              </Link>
+              {!hideLoginButton && (
+                <Link
+                  href="/login"
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '0.5rem',
+                    background: 'linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%)',
+                    color: '#fff',
+                    textDecoration: 'none',
+                    fontSize: '14px',
+                    fontWeight: '600',
+                    padding: '8px 16px',
+                    borderRadius: '8px',
+                    transition: 'all 0.2s',
+                    boxShadow: '0 2px 8px rgba(59, 130, 246, 0.25)',
+                    marginRight: onPilotClick ? '0.75rem' : '0',
+                    height: '36px',
+                    lineHeight: '1'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.background = 'linear-gradient(135deg, #2563eb 0%, #3b82f6 100%)';
+                    e.currentTarget.style.boxShadow = '0 4px 12px rgba(59, 130, 246, 0.35)';
+                    e.currentTarget.style.transform = 'translateY(-1px)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.background = 'linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%)';
+                    e.currentTarget.style.boxShadow = '0 2px 8px rgba(59, 130, 246, 0.25)';
+                    e.currentTarget.style.transform = 'translateY(0)';
+                  }}
+                >
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/>
+                    <polyline points="10 17 15 12 10 7"/>
+                    <line x1="15" y1="12" x2="3" y2="12"/>
+                  </svg>
+                  Ingresar
+                </Link>
+              )}
               {onPilotClick && (
                 <button
                   onClick={onPilotClick}
@@ -419,30 +428,38 @@ const Header: React.FC<HeaderProps> = ({
                     display: 'inline-flex',
                     alignItems: 'center',
                     gap: '0.5rem',
-                    background: 'linear-gradient(135deg, #8b5cf6 0%, #d946ef 100%)',
-                    color: '#fff',
+                    background: pilotButtonColor === 'yellow'
+                      ? 'linear-gradient(135deg, #f7c948 0%, #e6b830 100%)'
+                      : 'linear-gradient(135deg, #8b5cf6 0%, #d946ef 100%)',
+                    color: pilotButtonColor === 'yellow' ? '#1e3a5f' : '#fff',
                     fontSize: '14px',
                     fontWeight: '600',
                     padding: '8px 16px',
                     borderRadius: '8px',
                     transition: 'all 0.2s',
-                    boxShadow: '0 2px 8px rgba(139, 92, 246, 0.25)',
+                    boxShadow: pilotButtonColor === 'yellow'
+                      ? '0 2px 8px rgba(247, 201, 72, 0.25)'
+                      : '0 2px 8px rgba(139, 92, 246, 0.25)',
                     border: 'none',
                     cursor: 'pointer',
                     height: '36px',
                     lineHeight: '1'
                   }}
                   onMouseEnter={(e) => {
-                    e.currentTarget.style.boxShadow = '0 4px 12px rgba(139, 92, 246, 0.4)';
+                    e.currentTarget.style.boxShadow = pilotButtonColor === 'yellow'
+                      ? '0 4px 12px rgba(247, 201, 72, 0.4)'
+                      : '0 4px 12px rgba(139, 92, 246, 0.4)';
                     e.currentTarget.style.transform = 'translateY(-1px)';
                   }}
                   onMouseLeave={(e) => {
-                    e.currentTarget.style.boxShadow = '0 2px 8px rgba(139, 92, 246, 0.25)';
+                    e.currentTarget.style.boxShadow = pilotButtonColor === 'yellow'
+                      ? '0 2px 8px rgba(247, 201, 72, 0.25)'
+                      : '0 2px 8px rgba(139, 92, 246, 0.25)';
                     e.currentTarget.style.transform = 'translateY(0)';
                   }}
                 >
                   <span style={{ fontSize: '16px' }}>🚀</span>
-                  Participar en el piloto
+                  {pilotButtonText}
                 </button>
               )}
             </div>

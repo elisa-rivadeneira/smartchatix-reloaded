@@ -7,18 +7,21 @@ export async function POST(request: NextRequest) {
   try {
     const {
       nombre,
-      entidad,
+      empresa,
       cargo,
       email,
-      telefono
+      whatsapp,
+      segmentos
     } = await request.json();
 
-    if (!nombre || !entidad || !email || !telefono) {
+    if (!nombre || !empresa || !email || !whatsapp || !segmentos || segmentos.length === 0) {
       return NextResponse.json(
-        { error: 'Nombre, entidad, email y teléfono son requeridos' },
+        { error: 'Nombre, empresa, email, WhatsApp y al menos un segmento son requeridos' },
         { status: 400 }
       );
     }
+
+    const segmentosHTML = segmentos.map((s: string) => `<li>${s}</li>`).join('');
 
     const emailHTMLToAdmin = `
       <!DOCTYPE html>
@@ -37,7 +40,7 @@ export async function POST(request: NextRequest) {
             padding: 20px;
           }
           .header {
-            background: linear-gradient(135deg, #8b5cf6 0%, #d946ef 100%);
+            background: linear-gradient(135deg, #1e3a5f 0%, #2d5a8a 100%);
             color: white;
             padding: 30px;
             text-align: center;
@@ -51,10 +54,25 @@ export async function POST(request: NextRequest) {
           }
           .info-box {
             background: #f8f9fa;
-            border-left: 4px solid #8b5cf6;
+            border-left: 4px solid #f7c948;
             padding: 20px;
             margin: 20px 0;
             border-radius: 4px;
+          }
+          .segments-list {
+            background: #f0f9ff;
+            border: 1px solid #bfdbfe;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+          }
+          .segments-list ul {
+            margin: 10px 0;
+            padding-left: 20px;
+          }
+          .segments-list li {
+            padding: 5px 0;
+            color: #1e40af;
           }
           .footer {
             background: #f8f9fa;
@@ -71,27 +89,34 @@ export async function POST(request: NextRequest) {
       <body>
         <div class="container">
           <div class="header">
-            <h1 style="margin: 0; font-size: 28px;">🚀 Nueva Solicitud de Piloto</h1>
-            <p style="margin: 10px 0 0 0; font-size: 16px;">Entidad interesada en probar SmartChatix Academy</p>
+            <h1 style="margin: 0; font-size: 28px;">🤖 Nueva Solicitud Piloto SEACE</h1>
+            <p style="margin: 10px 0 0 0; font-size: 16px;">Empresa interesada en alertas inteligentes</p>
           </div>
 
           <div class="content">
-            <p>Se ha recibido una nueva solicitud para participar en el programa piloto de SmartChatix Academy.</p>
+            <p>Se ha recibido una nueva solicitud para participar en el programa piloto del Agente IA SEACE.</p>
 
             <div class="info-box">
-              <h3 style="margin-top: 0; color: #8b5cf6;">📋 Datos de la Solicitud</h3>
+              <h3 style="margin-top: 0; color: #1e3a5f;">📋 Datos de la Solicitud</h3>
               <p style="margin: 10px 0;">
                 <strong>Nombre completo:</strong> ${nombre}<br>
-                <strong>Organización:</strong> ${entidad}<br>
+                <strong>Empresa:</strong> ${empresa}<br>
                 <strong>Cargo:</strong> ${cargo || 'No especificado'}<br>
-                <strong>Correo electrónico:</strong> ${email}<br>
-                <strong>📱 Teléfono/WhatsApp:</strong> <a href="https://wa.me/${telefono.replace(/\D/g, '')}" style="color: #8b5cf6; text-decoration: none;">${telefono}</a>
+                <strong>📧 Email:</strong> ${email}<br>
+                <strong>📱 WhatsApp:</strong> <a href="https://wa.me/${whatsapp.replace(/\D/g, '')}" style="color: #1e3a5f; text-decoration: none;">${whatsapp}</a>
               </p>
+            </div>
+
+            <div class="segments-list">
+              <h3 style="margin-top: 0; color: #1e40af;">🎯 Segmentos de Interés (${segmentos.length})</h3>
+              <ul>
+                ${segmentosHTML}
+              </ul>
             </div>
 
             <p style="margin-top: 30px; padding: 15px; background: #fff3e0; border-left: 4px solid #ff9800; border-radius: 4px;">
               <strong>⏰ Próximos pasos:</strong><br>
-              Contacta a esta entidad en menos de 24 horas para coordinar la demostración y onboarding.
+              Contacta a esta empresa en menos de 24 horas para coordinar el onboarding y configuración de segmentos.
             </p>
           </div>
 
@@ -120,7 +145,7 @@ export async function POST(request: NextRequest) {
             padding: 20px;
           }
           .header {
-            background: linear-gradient(135deg, #8b5cf6 0%, #d946ef 100%);
+            background: linear-gradient(135deg, #1e3a5f 0%, #2d5a8a 100%);
             color: white;
             padding: 30px;
             text-align: center;
@@ -139,6 +164,21 @@ export async function POST(request: NextRequest) {
             margin: 20px 0;
             border-radius: 4px;
           }
+          .segments-box {
+            background: #f0fdf4;
+            border: 1px solid #86efac;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+          }
+          .segments-box ul {
+            margin: 10px 0;
+            padding-left: 20px;
+          }
+          .segments-box li {
+            padding: 3px 0;
+            color: #166534;
+          }
           .footer {
             background: #f8f9fa;
             padding: 20px;
@@ -155,13 +195,13 @@ export async function POST(request: NextRequest) {
         <div class="container">
           <div class="header">
             <h1 style="margin: 0; font-size: 28px;">✅ ¡Solicitud Recibida!</h1>
-            <p style="margin: 10px 0 0 0; font-size: 16px;">Programa Piloto - SmartChatix Academy</p>
+            <p style="margin: 10px 0 0 0; font-size: 16px;">Programa Piloto - Agente IA SEACE</p>
           </div>
 
           <div class="content">
             <p>Hola <strong>${nombre}</strong>,</p>
 
-            <p>Gracias por tu interés en participar en el programa piloto de SmartChatix Academy.</p>
+            <p>Gracias por tu interés en participar en el programa piloto del Agente IA SEACE.</p>
 
             <div class="info-box">
               <h3 style="margin-top: 0; color: #1e40af;">🎯 ¿Qué sigue?</h3>
@@ -169,18 +209,26 @@ export async function POST(request: NextRequest) {
                 Nuestro equipo revisará tu solicitud y te contactará en <strong>menos de 24 horas</strong> para:
               </p>
               <ul style="margin: 10px 0; padding-left: 20px;">
-                <li>Agendar una demostración personalizada</li>
-                <li>Conocer las necesidades específicas de ${entidad}</li>
-                <li>Definir el plan de implementación del piloto</li>
+                <li>Configurar tus alertas personalizadas en WhatsApp</li>
+                <li>Explicarte cómo interactuar con el agente IA</li>
+                <li>Activar el monitoreo de tus ${segmentos.length} segmentos de interés</li>
+              </ul>
+            </div>
+
+            <div class="segments-box">
+              <h3 style="margin-top: 0; color: #166534;">📊 Segmentos que monitorearemos para ${empresa}</h3>
+              <ul>
+                ${segmentosHTML}
               </ul>
             </div>
 
             <p style="margin-top: 30px; padding: 15px; background: #f0fdf4; border-left: 4px solid #10b981; border-radius: 4px;">
               <strong>✨ Datos de tu solicitud:</strong><br>
-              Organización: ${entidad}<br>
+              Empresa: ${empresa}<br>
               Cargo: ${cargo || 'No especificado'}<br>
               Email: ${email}<br>
-              Teléfono/WhatsApp: ${telefono}
+              WhatsApp: ${whatsapp}<br>
+              Segmentos: ${segmentos.length} seleccionados
             </p>
 
             <p style="margin-top: 30px;">
@@ -203,12 +251,13 @@ export async function POST(request: NextRequest) {
     `;
 
     if (!resend) {
-      console.log('⚠️  RESEND_API_KEY no está configurada. Solicitud de piloto:');
-      console.log(`📧 Email: ${email}`);
-      console.log(`🏢 Entidad: ${entidad}`);
+      console.log('⚠️  RESEND_API_KEY no está configurada. Solicitud piloto SEACE:');
       console.log(`👤 Nombre: ${nombre}`);
+      console.log(`🏢 Empresa: ${empresa}`);
       console.log(`💼 Cargo: ${cargo}`);
-      console.log(`📱 Teléfono: ${telefono}`);
+      console.log(`📧 Email: ${email}`);
+      console.log(`📱 WhatsApp: ${whatsapp}`);
+      console.log(`🎯 Segmentos (${segmentos.length}):`, segmentos);
 
       return NextResponse.json({
         success: true,
@@ -220,24 +269,22 @@ export async function POST(request: NextRequest) {
     const adminEmail = process.env.ADMIN_EMAIL || 'admin@smartchatix.com';
     const fromEmail = process.env.RESEND_FROM_EMAIL || 'SmartChatix <onboarding@resend.dev>';
 
-    // Enviar a admin
     const adminResult = await resend.emails.send({
       from: fromEmail,
       to: adminEmail,
-      subject: `🚀 Nueva Solicitud Piloto - ${entidad}`,
+      subject: `🤖 Nueva Solicitud Piloto SEACE - ${empresa}`,
       html: emailHTMLToAdmin,
-      replyTo: email
+      replyTo: whatsapp
     });
 
     if (adminResult.error) {
       console.error('Error enviando correo al admin:', adminResult.error);
     }
 
-    // Enviar confirmación al usuario
     const userResult = await resend.emails.send({
       from: fromEmail,
       to: email,
-      subject: '✅ Solicitud de Piloto Recibida - SmartChatix Academy',
+      subject: '✅ Solicitud Piloto SEACE Recibida - SmartChatix',
       html: emailHTMLToUser,
     });
 
@@ -245,8 +292,9 @@ export async function POST(request: NextRequest) {
       console.error('Error enviando correo al usuario:', userResult.error);
     }
 
-    console.log(`✅ Solicitud de piloto recibida de ${entidad}`);
-    console.log(`📧 Correos enviados a admin y ${email}`);
+    console.log(`✅ Solicitud piloto SEACE recibida de ${empresa}`);
+    console.log(`📧 Correos enviados a admin y usuario: ${email}`);
+    console.log(`🎯 Segmentos solicitados: ${segmentos.length}`);
 
     return NextResponse.json({
       success: true,
@@ -254,7 +302,7 @@ export async function POST(request: NextRequest) {
     });
 
   } catch (error: any) {
-    console.error('Error enviando solicitud de piloto:', error);
+    console.error('Error enviando solicitud piloto SEACE:', error);
     return NextResponse.json(
       { error: 'Error al enviar solicitud', details: error.message },
       { status: 500 }
