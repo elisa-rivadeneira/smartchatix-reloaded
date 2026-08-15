@@ -310,6 +310,37 @@ export default function CourseConfigPage({ slug, backUrl, backLabel }: CourseCon
         </div>
 
         <nav style={{ padding: '1rem 0' }}>
+          <button
+            onClick={() => {
+              setMobileMenuOpen(false);
+              router.push('/dashboard');
+            }}
+            style={{
+              width: '100%',
+              padding: '0.75rem 1.5rem',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.75rem',
+              background: 'transparent',
+              border: 'none',
+              cursor: 'pointer',
+              fontSize: '14px',
+              fontWeight: '500',
+              color: '#6b7280',
+              textAlign: 'left',
+              transition: 'all 0.2s'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = '#f9fafb';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = 'transparent';
+            }}
+          >
+            <span style={{ fontSize: '18px' }}>🏠</span>
+            Panel Principal
+          </button>
+
           {sidebarItems.map((item) => (
             <button
               key={item.id}

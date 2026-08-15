@@ -13,9 +13,9 @@ export function getDashboardMenuItems(userRole: string, activeTab: string, setAc
     {
       id: 'dashboard',
       label: 'Dashboard',
-      icon: '📊',
+      icon: '🏠',
       onClick: () => setActiveTab('dashboard'),
-      roles: ['admin']
+      roles: ['admin', 'instructor', 'student']
     },
     {
       id: 'usuarios',
@@ -63,13 +63,6 @@ export function getDashboardMenuItems(userRole: string, activeTab: string, setAc
       roles: ['admin']
     },
     {
-      id: 'mis-cursos',
-      label: 'Mis Cursos',
-      icon: '📚',
-      onClick: () => setActiveTab('mis-cursos'),
-      roles: ['student', 'instructor']
-    },
-    {
       id: 'cursos-instructor',
       label: 'Cursos como Instructor',
       icon: '👨‍🏫',
@@ -77,11 +70,11 @@ export function getDashboardMenuItems(userRole: string, activeTab: string, setAc
       roles: ['instructor']
     },
     {
-      id: 'estudiantes',
-      label: 'Estudiantes',
-      icon: '👥',
-      onClick: () => setActiveTab('estudiantes'),
-      roles: ['instructor']
+      id: 'mis-cursos',
+      label: 'Mis Cursos',
+      icon: '📚',
+      onClick: () => setActiveTab('mis-cursos'),
+      roles: ['student', 'instructor']
     },
     {
       id: 'crear-curso',
@@ -100,7 +93,5 @@ export function getDashboardMenuItems(userRole: string, activeTab: string, setAc
 }
 
 export function getDefaultTab(userRole: string): string {
-  if (userRole === 'admin') return 'dashboard';
-  if (userRole === 'instructor') return 'cursos-instructor';
-  return 'mis-cursos';
+  return 'dashboard';
 }

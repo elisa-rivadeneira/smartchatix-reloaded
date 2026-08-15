@@ -13,6 +13,7 @@ import AdminCoursesSection from '@/components/dashboard/AdminCoursesSection';
 import AdminEnrollmentsSection from '@/components/dashboard/AdminEnrollmentsSection';
 import AdminInstructorsSection from '@/components/dashboard/AdminInstructorsSection';
 import AdminSettingsSection from '@/components/dashboard/AdminSettingsSection';
+import CourseStructureAssistant from '@/components/instructor/CourseStructureAssistant';
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -176,7 +177,9 @@ export default function DashboardPage() {
                 <p style={{ fontSize: '1rem', color: '#6b7280', marginBottom: '2rem' }}>
                   Bienvenido, {currentUser.nombre || currentUser.name}
                 </p>
-                <AdminDashboardSection />
+                {currentUser.role === 'admin' && <AdminDashboardSection />}
+                {currentUser.role === 'instructor' && <InstructorCoursesSection />}
+                {currentUser.role === 'student' && <StudentCoursesSection />}
               </>
             )}
 
@@ -264,9 +267,45 @@ export default function DashboardPage() {
                 <h2 style={{ fontSize: '1.5rem', fontWeight: '600', color: '#111827', marginBottom: '1rem' }}>
                   ➕ Crear Curso
                 </h2>
-                <p style={{ color: '#6b7280' }}>
-                  Asistente para crear un nuevo curso.
+                <p style={{ color: '#6b7280', marginBottom: '2rem' }}>
+                  Crea un curso desde cero con ayuda de IA o manualmente.
                 </p>
+                <CourseStructureAssistant
+                  onStructureCreated={async (structure) => {
+                    try {
+                      const response = await fetch('/api/instructor/courses', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(structure)
+                      });
+
+                      if (!response.ok) throw new Error('Error al crear el curso');
+
+                      const data = await response.json();
+                      router.push(`/instructor/curso/${data.slug}`);
+                    } catch (error) {
+                      console.error('Error creando curso:', error);
+                      alert('Error al crear el curso');
+                    }
+                  }}
+                  onManualCreation={async (title, description) => {
+                    try {
+                      const response = await fetch('/api/instructor/courses', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ title, description, modules: [] })
+                      });
+
+                      if (!response.ok) throw new Error('Error al crear el curso');
+
+                      const data = await response.json();
+                      router.push(`/instructor/curso/${data.slug}`);
+                    } catch (error) {
+                      console.error('Error creando curso:', error);
+                      alert('Error al crear el curso');
+                    }
+                  }}
+                />
               </div>
             )}
 
