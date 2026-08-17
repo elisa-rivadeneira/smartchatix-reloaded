@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -26,9 +26,10 @@ interface ParsedStructure {
 interface CourseStructureAssistantProps {
   onStructureCreated: (structure: ParsedStructure) => void;
   onManualCreation?: (title: string, description: string) => void;
+  courseSlug?: string | null;
 }
 
-export default function CourseStructureAssistant({ onStructureCreated, onManualCreation }: CourseStructureAssistantProps) {
+export default function CourseStructureAssistant({ onStructureCreated, onManualCreation, courseSlug }: CourseStructureAssistantProps) {
   const [mode, setMode] = useState<'select' | 'paste' | 'chat' | 'manual'>('select');
   const [pastedContent, setPastedContent] = useState('');
   const [chatMessages, setChatMessages] = useState<Message[]>([]);
@@ -49,6 +50,30 @@ export default function CourseStructureAssistant({ onStructureCreated, onManualC
 
   const closeModal = () => {
     setModal({ show: false, type: 'info', message: '' });
+  };
+
+  useEffect(() => {
+    if (courseSlug) {
+      loadCourseData();
+    }
+  }, [courseSlug]);
+
+  const loadCourseData = async () => {
+    if (!courseSlug) return;
+
+    try {
+      const response = await fetch(`/api/instructor/course/${courseSlug}`);
+      if (!response.ok) throw new Error('Error al cargar curso');
+
+      const data = await response.json();
+      const course = data.course;
+
+      setCourseTitle(course.title || '');
+      setCourseDuration(course.duration || '');
+    } catch (error) {
+      console.error('Error cargando curso:', error);
+      showModal('error', 'Error al cargar los datos del curso');
+    }
   };
 
   const handlePasteAndParse = async () => {

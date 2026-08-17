@@ -2336,9 +2336,9 @@ export default function InstructorCourseEditPage() {
     { id: 'dashboard', label: 'Dashboard del curso', icon: '🏠', onClick: () => setActiveTab('contenido') },
     { id: 'contenido', label: 'Contenido', icon: '📚', onClick: () => setActiveTab('contenido') },
     { id: 'estudiantes', label: 'Estudiantes', icon: '👥', onClick: () => setActiveTab('estudiantes') },
-    { id: 'calificaciones-estudiantes', label: 'Calificaciones', icon: '📊', href: `/instructor/curso/${slug}/calificaciones-estudiantes` },
-    { id: 'calificaciones-quizzes', label: 'Quizzes', icon: '📝', href: `/instructor/curso/${slug}/calificaciones-quizzes` },
-    { id: 'calificaciones-tareas', label: 'Tareas', icon: '📋', href: `/instructor/curso/${slug}/calificaciones-tareas` },
+    { id: 'calificaciones-estudiantes', label: 'Calificaciones', icon: '📊', href: `/dashboard/curso/${slug}/calificaciones-estudiantes` },
+    { id: 'calificaciones-quizzes', label: 'Quizzes', icon: '📝', href: `/dashboard/curso/${slug}/calificaciones-quizzes` },
+    { id: 'calificaciones-tareas', label: 'Tareas', icon: '📋', href: `/dashboard/curso/${slug}/calificaciones-tareas` },
     { id: 'configuracion', label: 'Configuración del curso', icon: '⚙️', onClick: () => setActiveTab('configuracion') },
   ];
 

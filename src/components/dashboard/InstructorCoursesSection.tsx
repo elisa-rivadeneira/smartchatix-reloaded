@@ -124,7 +124,7 @@ export default function InstructorCoursesSection() {
           {courses.map((course) => (
             <Link
               key={course.id}
-              href={`/instructor/curso/${course.slug}`}
+              href={`/dashboard/curso/${course.slug}`}
               style={{
                 background: '#fff',
                 borderRadius: '12px',

@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState, useEffect, Suspense } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import UnifiedSidebar from '@/components/unified/UnifiedSidebar';
 import { getDashboardMenuItems, getDefaultTab } from '@/lib/dashboardMenus';
 import Image from 'next/image';
@@ -15,16 +15,31 @@ import AdminInstructorsSection from '@/components/dashboard/AdminInstructorsSect
 import AdminSettingsSection from '@/components/dashboard/AdminSettingsSection';
 import CourseStructureAssistant from '@/components/instructor/CourseStructureAssistant';
 
-export default function DashboardPage() {
+function DashboardContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [loading, setLoading] = useState(true);
   const [currentUser, setCurrentUser] = useState<any>(null);
   const [activeTab, setActiveTab] = useState('');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [renewingCourseSlug, setRenewingCourseSlug] = useState<string | null>(null);
 
   useEffect(() => {
     checkAuth();
   }, []);
+
+  useEffect(() => {
+    const tab = searchParams.get('tab');
+    const courseSlug = searchParams.get('courseSlug');
+
+    if (tab) {
+      setActiveTab(tab);
+    }
+
+    if (courseSlug) {
+      setRenewingCourseSlug(courseSlug);
+    }
+  }, [searchParams]);
 
   const checkAuth = async () => {
     try {
@@ -35,7 +50,12 @@ export default function DashboardPage() {
       }
       const data = await response.json();
       setCurrentUser(data.user);
-      setActiveTab(getDefaultTab(data.user.role));
+
+      const tabFromUrl = searchParams.get('tab');
+      if (!tabFromUrl) {
+        setActiveTab(getDefaultTab(data.user.role));
+      }
+
       setLoading(false);
     } catch (error) {
       console.error('Error checking auth:', error);
@@ -271,9 +291,14 @@ export default function DashboardPage() {
                   Crea un curso desde cero con ayuda de IA o manualmente.
                 </p>
                 <CourseStructureAssistant
+                  courseSlug={renewingCourseSlug}
                   onStructureCreated={async (structure) => {
                     try {
-                      const response = await fetch('/api/instructor/courses', {
+                      const endpoint = renewingCourseSlug
+                        ? `/api/instructor/course/${renewingCourseSlug}/update-structure`
+                        : '/api/instructor/courses';
+
+                      const response = await fetch(endpoint, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify(structure)
@@ -282,7 +307,9 @@ export default function DashboardPage() {
                       if (!response.ok) throw new Error('Error al crear el curso');
 
                       const data = await response.json();
-                      router.push(`/instructor/curso/${data.slug}`);
+                      const targetSlug = renewingCourseSlug || data.course?.slug || data.slug;
+                      setRenewingCourseSlug(null);
+                      router.push(`/dashboard/curso/${targetSlug}`);
                     } catch (error) {
                       console.error('Error creando curso:', error);
                       alert('Error al crear el curso');
@@ -290,7 +317,11 @@ export default function DashboardPage() {
                   }}
                   onManualCreation={async (title, description) => {
                     try {
-                      const response = await fetch('/api/instructor/courses', {
+                      const endpoint = renewingCourseSlug
+                        ? `/api/instructor/course/${renewingCourseSlug}/update-structure`
+                        : '/api/instructor/courses';
+
+                      const response = await fetch(endpoint, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ title, description, modules: [] })
@@ -299,7 +330,9 @@ export default function DashboardPage() {
                       if (!response.ok) throw new Error('Error al crear el curso');
 
                       const data = await response.json();
-                      router.push(`/instructor/curso/${data.slug}`);
+                      const targetSlug = renewingCourseSlug || data.course?.slug || data.slug;
+                      setRenewingCourseSlug(null);
+                      router.push(`/dashboard/curso/${targetSlug}`);
                     } catch (error) {
                       console.error('Error creando curso:', error);
                       alert('Error al crear el curso');
@@ -335,5 +368,13 @@ export default function DashboardPage() {
         </div>
       </main>
     </div>
+  );
+}
+
+export default function DashboardPage() {
+  return (
+    <Suspense fallback={<div style={{ padding: '2rem', textAlign: 'center' }}>Cargando...</div>}>
+      <DashboardContent />
+    </Suspense>
   );
 }

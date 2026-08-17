@@ -183,7 +183,7 @@ export default function AdminCoursesSection() {
           return (
             <Link
               key={course.id}
-              href={`/instructor/curso/${course.slug}`}
+              href={`/dashboard/curso/${course.slug}`}
               className="course-card"
               style={{
                 background: '#fff',
