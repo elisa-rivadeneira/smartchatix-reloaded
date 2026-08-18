@@ -2346,7 +2346,7 @@ export default function InstructorCourseEditPage() {
     try {
       const response = await fetch(`/api/instructor/course/${slug}`);
       if (!response.ok) {
-        router.push('/instructor');
+        router.push('/dashboard');
         return;
       }
       const data = await response.json();
@@ -2354,7 +2354,7 @@ export default function InstructorCourseEditPage() {
       setExpandedModules(data.course.modules?.map((m: Module) => m.id) || []);
     } catch (error) {
       console.error('Error loading course:', error);
-      router.push('/instructor');
+      router.push('/dashboard');
     } finally {
       setLoading(false);
     }
@@ -4359,10 +4359,7 @@ export default function InstructorCourseEditPage() {
                         setDeleteModal(false);
                         setDeleteConfirmText('');
                         setDeleteError('');
-                        showModal('success', 'Curso eliminado exitosamente');
-                        setTimeout(() => {
-                          router.push('/instructor');
-                        }, 2000);
+                        router.push('/dashboard');
                       } else {
                         const data = await response.json();
                         setDeleteError(data.error || 'Error al eliminar el curso');

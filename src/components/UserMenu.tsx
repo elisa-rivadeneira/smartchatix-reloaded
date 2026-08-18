@@ -160,7 +160,7 @@ export default function UserMenu({ user }: UserMenuProps) {
           )}
           {user?.role === 'instructor' && (
             <Link
-              href="/instructor"
+              href="/dashboard"
               onClick={() => setMenuOpen(false)}
               style={{
                 display: 'flex',

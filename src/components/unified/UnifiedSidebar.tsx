@@ -221,7 +221,7 @@ export default function UnifiedSidebar({
 
           {showLegacyLink && (
             <Link
-              href="/instructor"
+              href="/dashboard"
               style={{
                 width: '100%',
                 padding: '0.75rem 1.5rem',
@@ -332,7 +332,7 @@ export default function UnifiedSidebar({
                 )}
                 {(currentUser?.role === 'instructor' || currentUser?.role === 'admin') && (
                   <Link
-                    href="/instructor"
+                    href="/dashboard"
                     style={{
                       display: 'block',
                       padding: '0.5rem 0.75rem',

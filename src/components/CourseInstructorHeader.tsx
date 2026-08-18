@@ -53,7 +53,7 @@ export default function CourseInstructorHeader({ courseTitle, slug, activeTab, s
           boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '24px' }}>
-            <Link href="/instructor" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center' }}>
+            <Link href="/dashboard" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center' }}>
               <Image
                 src="/images/logo_smartchatix_horiz.png"
                 alt="SmartChatix"
@@ -177,7 +177,7 @@ export default function CourseInstructorHeader({ courseTitle, slug, activeTab, s
                 </Link>
 
                 <Link
-                  href="/instructor"
+                  href="/dashboard"
                   onClick={() => setUserMenuOpen(false)}
                   style={{
                     display: 'flex',
@@ -258,9 +258,9 @@ export default function CourseInstructorHeader({ courseTitle, slug, activeTab, s
       <Breadcrumb
         title={courseTitle}
         items={[
-          { label: 'Instructor', href: '/instructor' },
-          { label: 'Mis Cursos', href: '/instructor' },
-          { label: courseTitle, href: `/instructor/curso/${slug}` },
+          { label: 'Dashboard', href: '/dashboard' },
+          { label: 'Mis Cursos', href: '/dashboard' },
+          { label: courseTitle, href: `/dashboard/curso/${slug}` },
           { label: activeTab === 'contenido' ? 'Contenido del Curso' :
                    activeTab === 'calificaciones' ? 'Calificaciones' :
                    activeTab === 'configuracion' ? 'Configuración' : 'Estudiantes' }
@@ -271,12 +271,12 @@ export default function CourseInstructorHeader({ courseTitle, slug, activeTab, s
           {['contenido', 'calificaciones', 'configuracion', 'estudiantes'].map(tab => {
             const handleClick = () => {
               if (tab === 'calificaciones') {
-                router.push(`/instructor/curso/${slug}/calificaciones`);
+                router.push(`/dashboard/curso/${slug}/calificaciones`);
               } else {
                 if (setActiveTab) {
                   setActiveTab(tab);
                 } else {
-                  router.push(`/instructor/curso/${slug}`);
+                  router.push(`/dashboard/curso/${slug}`);
                 }
               }
             };
