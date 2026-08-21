@@ -252,3 +252,107 @@ R2_PUBLIC_URL=https://pub-39582e519f204b8799b03d63e07c0b67.r2.dev
 ✅ **Separado de la app** - No se pierde en redeploys
 
 ---
+
+## 🔧 Sesión 2026-08-21 - Integración PayPal
+
+### ✅ Completado
+
+**1. Integración completa de PayPal**
+- ✅ Componente `PayPalButton.tsx` con SDK oficial
+- ✅ Endpoints de API:
+  - `/api/payment/paypal/create-order` - Crear orden
+  - `/api/payment/paypal/capture` - Capturar pago
+- ✅ `PayPalScriptProvider.tsx` - Carga dinámica del SDK
+- ✅ Detección automática Sandbox vs Live
+- ✅ Soporte para guest checkout (tarjeta sin cuenta PayPal)
+- ✅ Pagos siempre en USD (PayPal no acepta PEN)
+- ✅ Conversión automática PEN → USD si es necesario
+
+**2. Métodos de pago desactivados temporalmente**
+- ❌ **Culqi (tarjeta)** - Comentado en código
+  - Esperando que Culqi habilite pagos internacionales
+  - Código listo para activar (solo descomentar)
+  - Archivos: `src/app/comprar-grabado/page.tsx:622-855` y `src/app/inscripcion-vivo/page.tsx:622-856`
+
+**3. Métodos de pago activos**
+- ✅ **PayPal** - Funciona con cuenta PayPal con saldo
+  - ⚠️ Tarjetas pueden ser rechazadas por bancos (bloqueo de pagos internacionales)
+  - No es problema del código, es restricción bancaria
+- ✅ **Yape/Plin** - Para usuarios en Perú
+
+**4. Fix de precios USD**
+- ✅ Función `getCoursePrice()` en `smartchatix-principal-page.tsx`
+- ✅ Prioriza precio USD configurado en curso (`priceGrabadoUsd`, `priceVivoUsd`)
+- ✅ Solo convierte desde PEN si no existe precio USD
+- ✅ Ejemplo: Muestra US$ 59 (configurado) en lugar de US$ 52.37 (convertido)
+
+**5. Variables de entorno necesarias**
+```env
+# PayPal - Sandbox (Desarrollo)
+NEXT_PUBLIC_PAYPAL_CLIENT_ID=AbysyyiUwzjlBrPRAwsUIVxYWm17ygCo14koE-DOJudgEnb3PglrNfEfwL3rRsC8gAolwgMHimI6HVfV
+PAYPAL_SECRET_KEY=ENvUbYsbYUJLtEY2ti6CeKaFJ2olPjFlJFAy36_yXXcbhejitYP-C4e-qWOHeM4aSwo-_Poqn8BGazmI
+
+# PayPal - Live (Producción)
+NEXT_PUBLIC_PAYPAL_CLIENT_ID=tu_client_id_live
+PAYPAL_SECRET_KEY=tu_secret_key_live
+PAYPAL_MODE=live
+
+# Culqi (comentado, esperando habilitación)
+# NEXT_PUBLIC_CULQI_PUBLIC_KEY=pk_live_BkVNQg4Qo8SZBcro
+# CULQI_SECRET_KEY=sk_live_BCBKan98UQHmQIaL
+```
+
+### ⏳ Pendiente
+
+**1. Activar Culqi cuando esté disponible**
+Cuando Culqi habilite pagos internacionales:
+1. Descomentar sección de tarjeta en:
+   - `src/app/comprar-grabado/page.tsx` (líneas 622-855)
+   - `src/app/inscripcion-vivo/page.tsx` (líneas 622-856)
+2. Descomentar variables de entorno de Culqi
+3. Push a producción
+4. Listo ✅
+
+**Código a descomentar:**
+```typescript
+{/* Descomentar esta sección completa cuando Culqi habilite pagos */}
+{/*
+<div onClick={() => setPaymentMethod('card')} ...>
+  // Todo el formulario de tarjeta Culqi
+</div>
+*/}
+```
+
+**2. Mejorar experiencia PayPal (opcional)**
+- Implementar Advanced Credit and Debit Card Payments (requiere aprobación PayPal)
+- Permitiría formulario de tarjeta en tu página con mejor control de errores
+
+### 📊 Estado para Webinar (2026-08-22)
+
+**Métodos disponibles:**
+- ✅ PayPal (cuenta con saldo)
+- ✅ Yape/Plin (Perú)
+
+**Mensaje para usuarios:**
+> "Pagos con PayPal (si tienes cuenta con saldo) o Yape/Plin. Pagos con tarjeta internacional estarán disponibles en 24-48 horas."
+
+**Plan B si tarjetas demoran:**
+- Transferencia bancaria manual
+- Western Union / Wise
+- Inscripción manual desde dashboard
+
+### 🐛 Problemas Conocidos
+
+**PayPal rechaza tarjetas:**
+- **Causa**: Bancos bloquean pagos internacionales por defecto
+- **Solución para usuarios**:
+  1. Usar cuenta PayPal con saldo
+  2. Habilitar pagos internacionales con su banco
+  3. Usar Yape/Plin si es peruano
+
+**Comportamiento de PayPal:**
+- Si tarjeta es rechazada, PayPal permite reintentar con otra tarjeta
+- Este comportamiento NO es controlable desde el código
+- Es el flujo estándar de PayPal para no perder ventas
+
+---
