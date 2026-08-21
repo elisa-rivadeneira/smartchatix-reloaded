@@ -146,11 +146,12 @@ export default function PayPalButton({
 
             onCancel: function(data: any) {
               console.log('⚠️ Usuario canceló el pago');
+              onError('Pago cancelado. Si tu tarjeta fue rechazada, intenta con otra tarjeta o método de pago.');
             },
 
             onError: function(err: any) {
               console.error('❌ PayPal Error:', err);
-              onError('Hubo un problema con PayPal. Por favor intenta nuevamente.');
+              onError('Hubo un problema con PayPal. Verifica los datos de tu tarjeta o intenta con otro método de pago.');
             }
           });
 

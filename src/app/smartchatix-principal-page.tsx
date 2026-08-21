@@ -8,7 +8,7 @@ import { useCurrency } from '@/hooks/useCurrency';
 import SmartChatixBusiness from '@/components/sections/SmartChatixBusiness';
 
 export default function SmartChatixPrincipalPage() {
-  const { symbol, convertPrice, loading } = useCurrency();
+  const { symbol, convertPrice, loading, currency } = useCurrency();
 
   const [courses, setCourses] = React.useState<any[]>([]);
   const [showModal, setShowModal] = React.useState(false);
@@ -24,6 +24,26 @@ export default function SmartChatixPrincipalPage() {
       .then(data => setCourses(data.courses || []))
       .catch(err => console.error('Error fetching courses:', err));
   }, []);
+
+  const getCoursePrice = (course: any, isOldPrice: boolean = false) => {
+    const isGrabado = parseFloat(course.priceGrabado) > 0;
+
+    if (currency === 'USD') {
+      const usdPrice = isOldPrice
+        ? (isGrabado ? course.priceGrabadoUsdOld : course.priceVivoUsdOld)
+        : (isGrabado ? course.priceGrabadoUsd : course.priceVivoUsd);
+
+      if (usdPrice && parseFloat(usdPrice) > 0) {
+        return parseFloat(usdPrice);
+      }
+    }
+
+    const penPrice = isOldPrice
+      ? (isGrabado ? course.priceGrabadoOld : course.priceVivoOld)
+      : (isGrabado ? course.priceGrabado : course.priceVivo);
+
+    return convertPrice(parseFloat(penPrice) || 0);
+  };
 
   // Particles animation effect
   React.useEffect(() => {
@@ -903,7 +923,7 @@ export default function SmartChatixPrincipalPage() {
                         }}>
                           {loading
                             ? 'S/ ' + (parseFloat(course.priceGrabado) > 0 ? course.priceGrabado : course.priceVivo)
-                            : symbol + ' ' + convertPrice(parseFloat(course.priceGrabado) > 0 ? parseFloat(course.priceGrabado) : parseFloat(course.priceVivo) || 0)}
+                            : symbol + ' ' + getCoursePrice(course, false)}
                         </span>
                         {(parseFloat(course.priceGrabado) > 0 ? course.priceGrabadoOld : course.priceVivoOld) && (
                           <span style={{
@@ -913,7 +933,7 @@ export default function SmartChatixPrincipalPage() {
                           }}>
                             {loading
                               ? 'S/ ' + (parseFloat(course.priceGrabado) > 0 ? course.priceGrabadoOld : course.priceVivoOld)
-                              : symbol + ' ' + convertPrice(parseFloat(parseFloat(course.priceGrabado) > 0 ? course.priceGrabadoOld : course.priceVivoOld) || 0)}
+                              : symbol + ' ' + getCoursePrice(course, true)}
                           </span>
                         )}
                       </>
