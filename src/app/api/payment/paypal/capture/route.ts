@@ -1,0 +1,306 @@
+import { NextRequest, NextResponse } from 'next/server';
+import { query } from '@/lib/db';
+import bcrypt from 'bcrypt';
+import crypto from 'crypto';
+
+function generateTemporaryPassword(): string {
+  return crypto.randomBytes(8).toString('hex').slice(0, 12);
+}
+
+export async function POST(request: NextRequest) {
+  try {
+    console.log('🔵 PayPal Capture endpoint called');
+    const body = await request.json();
+
+    const {
+      orderId,
+      courseSlug,
+      courseTitle,
+      modality,
+      email,
+      amount,
+      currency = 'USD',
+      paypalOrderData
+    } = body;
+
+    console.log('🔵 Processing PayPal capture:', { orderId, email, courseSlug, amount, currency });
+
+    if (!orderId || !email || !courseSlug) {
+      return NextResponse.json(
+        { error: 'Datos incompletos para procesar el pago' },
+        { status: 400 }
+      );
+    }
+
+    if (courseSlug && email) {
+      try {
+        console.log('🔍 Verificando inscripción previa para:', email, 'en curso:', courseSlug);
+
+        const courseResult = await query(
+          'SELECT id, title FROM courses WHERE slug = ?',
+          [courseSlug]
+        );
+
+        if (courseResult && courseResult.length > 0) {
+          const course = courseResult[0];
+          console.log('📚 Curso encontrado:', course.title, 'ID:', course.id);
+
+          const userResult = await query(
+            'SELECT id FROM users WHERE email = ?',
+            [email]
+          );
+
+          if (userResult && userResult.length > 0) {
+            const userId = userResult[0].id;
+            console.log('👤 Usuario encontrado, ID:', userId);
+
+            const existingEnrollment = await query(
+              'SELECT id FROM enrollments WHERE user_id = ? AND course_id = ?',
+              [userId, course.id]
+            );
+
+            console.log('📋 Inscripciones existentes:', existingEnrollment);
+
+            if (existingEnrollment && existingEnrollment.length > 0) {
+              console.log('❌ INSCRIPCIÓN DUPLICADA DETECTADA - Bloqueando pago');
+              return NextResponse.json(
+                {
+                  error: 'Ya estás inscrito en este curso',
+                  message: 'Ya tienes una inscripción activa en este curso. Por favor revisa tu correo electrónico para ver la confirmación de tu inscripción anterior.',
+                  alreadyEnrolled: true
+                },
+                { status: 400 }
+              );
+            } else {
+              console.log('✅ No hay inscripción previa, procediendo con la inscripción');
+            }
+          } else {
+            console.log('✅ Usuario nuevo, procediendo con la inscripción');
+          }
+        }
+      } catch (dbError) {
+        console.error('Error verificando inscripción existente:', dbError);
+      }
+    }
+
+    if (courseSlug && email) {
+      try {
+        const courseResult = await query(
+          'SELECT id, title, live_start_date, live_schedule FROM courses WHERE slug = ?',
+          [courseSlug]
+        );
+
+        if (courseResult && courseResult.length > 0) {
+          const course = courseResult[0];
+          console.log('📚 Curso encontrado para inscripción:', course.title);
+
+          let userId;
+          let isNewUser = false;
+          const userResult = await query(
+            'SELECT id FROM users WHERE email = ?',
+            [email]
+          );
+
+          if (userResult && userResult.length > 0) {
+            userId = userResult[0].id;
+            console.log('👤 Usuario existente encontrado, ID:', userId);
+          } else {
+            console.log('👤 Creando nuevo usuario');
+            isNewUser = true;
+            const tempPassword = generateTemporaryPassword();
+            const hashedPassword = await bcrypt.hash(tempPassword, 10);
+            const displayName = email.split('@')[0];
+
+            const insertUserResult: any = await query(
+              `INSERT INTO users (
+                email,
+                password,
+                display_name,
+                role,
+                created_at,
+                last_password_change
+              ) VALUES (?, ?, ?, 'student', NOW(), NOW())`,
+              [email, hashedPassword, displayName]
+            );
+            userId = insertUserResult.insertId;
+            console.log('✅ Nuevo usuario creado, ID:', userId);
+
+            try {
+              const emailHtml = `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body style="margin: 0; padding: 0; background-color: #f8f9fa; font-family: Arial, sans-serif;">
+  <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 8px; overflow: hidden;">
+    <div style="background: linear-gradient(135deg, #003366 0%, #0066CC 100%); padding: 30px; text-align: center;">
+      <h1 style="margin: 0; color: #ffffff; font-size: 28px; font-weight: 700;">¡Bienvenido a SmartChatix!</h1>
+    </div>
+    <div style="padding: 40px 30px;">
+      <p style="font-size: 16px; color: #202124; line-height: 1.6; margin-bottom: 20px;">
+        ¡Hola! Te has inscrito exitosamente al curso: <strong>${courseTitle}</strong>
+      </p>
+      <p style="font-size: 16px; color: #202124; line-height: 1.6; margin-bottom: 20px;">
+        Tus credenciales de acceso son:
+      </p>
+      <div style="background-color: #E8F5E9; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+        <p style="margin: 0 0 10px 0; color: #2E7D32; font-size: 14px;"><strong>Email:</strong> ${email}</p>
+        <p style="margin: 0; color: #2E7D32; font-size: 14px;"><strong>Contraseña temporal:</strong> ${tempPassword}</p>
+      </div>
+      <p style="font-size: 14px; color: #5F6368; line-height: 1.6; margin-bottom: 30px;">
+        Por favor, cambia tu contraseña después de iniciar sesión por primera vez.
+      </p>
+      <div style="text-align: center;">
+        <a href="https://smartchatix.com/login" style="display: inline-block; background: linear-gradient(135deg, #FF6600 0%, #FF8C00 100%); color: #ffffff; padding: 15px 40px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 16px;">
+          Ir al Aula Virtual
+        </a>
+      </div>
+    </div>
+    <div style="background-color: #f8f9fa; padding: 20px; text-align: center;">
+      <p style="margin: 0; color: #5F6368; font-size: 12px;">SmartChatix - Transformamos la forma en que las personas trabajan</p>
+    </div>
+  </div>
+</body>
+</html>
+              `;
+
+              const resendApiKey = process.env.RESEND_API_KEY;
+              const emailResponse = await fetch('https://api.resend.com/emails', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'Authorization': `Bearer ${resendApiKey}`
+                },
+                body: JSON.stringify({
+                  from: 'SmartChatix <noreply@smartchatix.com>',
+                  to: email,
+                  subject: `Bienvenido a ${courseTitle} - Tus credenciales de acceso`,
+                  html: emailHtml
+                })
+              });
+
+              if (emailResponse.ok) {
+                console.log('✅ Email de credenciales enviado exitosamente');
+              } else {
+                console.error('❌ Error enviando email de credenciales');
+              }
+            } catch (emailError) {
+              console.error('❌ Error al enviar email de credenciales:', emailError);
+            }
+          }
+
+          const enrollmentMode = modality || 'grabado';
+          const insertEnrollmentResult = await query(
+            `INSERT INTO enrollments (
+              user_id,
+              course_id,
+              enrollment_date,
+              status,
+              mode,
+              payment_method,
+              payment_status,
+              payment_id,
+              payment_amount,
+              payment_currency
+            ) VALUES (?, ?, NOW(), 'active', ?, 'paypal', 'completed', ?, ?, ?)`,
+            [userId, course.id, enrollmentMode, orderId, amount, currency]
+          );
+
+          console.log('✅ Inscripción creada exitosamente:', insertEnrollmentResult);
+
+          try {
+            const confirmationEmailHtml = `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body style="margin: 0; padding: 0; background-color: #f8f9fa; font-family: Arial, sans-serif;">
+  <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 8px; overflow: hidden;">
+    <div style="background: linear-gradient(135deg, #003366 0%, #0066CC 100%); padding: 30px; text-align: center;">
+      <h1 style="margin: 0; color: #ffffff; font-size: 28px; font-weight: 700;">¡Pago Confirmado!</h1>
+    </div>
+    <div style="padding: 40px 30px;">
+      <p style="font-size: 16px; color: #202124; line-height: 1.6; margin-bottom: 20px;">
+        Tu pago ha sido procesado exitosamente a través de PayPal.
+      </p>
+      <div style="background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+        <p style="margin: 0 0 10px 0; color: #5F6368; font-size: 14px;"><strong>Curso:</strong> ${courseTitle}</p>
+        <p style="margin: 0 0 10px 0; color: #5F6368; font-size: 14px;"><strong>Modalidad:</strong> ${modality === 'vivo' ? 'En Vivo' : 'Grabado'}</p>
+        <p style="margin: 0 0 10px 0; color: #5F6368; font-size: 14px;"><strong>Monto:</strong> ${currency === 'USD' ? 'US$' : 'S/'} ${amount.toFixed(2)}</p>
+        <p style="margin: 0; color: #5F6368; font-size: 14px;"><strong>ID de transacción:</strong> ${orderId}</p>
+      </div>
+      <div style="text-align: center;">
+        <a href="https://smartchatix.com/login" style="display: inline-block; background: linear-gradient(135deg, #FF6600 0%, #FF8C00 100%); color: #ffffff; padding: 15px 40px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 16px;">
+          Acceder al Curso
+        </a>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
+            `;
+
+            const resendApiKey = process.env.RESEND_API_KEY;
+            const confirmationEmailResponse = await fetch('https://api.resend.com/emails', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${resendApiKey}`
+              },
+              body: JSON.stringify({
+                from: 'SmartChatix <noreply@smartchatix.com>',
+                to: email,
+                subject: `Confirmación de compra - ${courseTitle}`,
+                html: confirmationEmailHtml
+              })
+            });
+
+            if (confirmationEmailResponse.ok) {
+              console.log('✅ Email de confirmación enviado');
+            }
+          } catch (emailError) {
+            console.error('❌ Error enviando email de confirmación:', emailError);
+          }
+
+          return NextResponse.json({
+            success: true,
+            paymentId: orderId,
+            enrollment: {
+              userId,
+              courseId: course.id,
+              courseTitle: course.title,
+              email: email,
+              isNewUser: isNewUser
+            }
+          });
+        } else {
+          return NextResponse.json(
+            { error: 'Curso no encontrado' },
+            { status: 404 }
+          );
+        }
+      } catch (dbError) {
+        console.error('❌ Error en inscripción:', dbError);
+        return NextResponse.json(
+          { error: 'Error al procesar la inscripción' },
+          { status: 500 }
+        );
+      }
+    }
+
+    return NextResponse.json({
+      success: true,
+      paymentId: orderId
+    });
+  } catch (error) {
+    console.error('❌ Error en PayPal capture:', error);
+    return NextResponse.json(
+      { error: 'Error interno del servidor' },
+      { status: 500 }
+    );
+  }
+}

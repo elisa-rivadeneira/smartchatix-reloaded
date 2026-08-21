@@ -6,6 +6,8 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import { getProductBySlug } from '@/data/courses';
 import Footer from '@/components/Footer';
 import CulqiPaymentForm from '@/components/CulqiPaymentForm';
+import PayPalButton from '@/components/PayPalButton';
+import PayPalScriptProvider from '@/components/PayPalScriptProvider';
 import { useCurrency } from '@/hooks/useCurrency';
 
 function ComprarGrabadoContent() {
@@ -135,6 +137,7 @@ function ComprarGrabadoContent() {
 
   return (
     <>
+      <PayPalScriptProvider />
       <style>{`
         @media (max-width: 768px) {
           .mobile-grid-1 {
@@ -618,8 +621,8 @@ function ComprarGrabadoContent() {
                   Métodos de pago
                 </h3>
 
-                {/* CARD - SIEMPRE VISIBLE */}
-                <div
+                {/* CARD - TEMPORALMENTE DESHABILITADO (Culqi no permite pagos internacionales sin acreditación) */}
+                {/* <div
                   onClick={() => setPaymentMethod('card')}
                   style={{
                     padding: spacing.md,
@@ -663,13 +666,13 @@ function ComprarGrabadoContent() {
                       <img src="/images/diners_color.svg" alt="Diners Club" className="card-icon" style={{ width: 'auto' }} />
                     </div>
                   </div>
-                </div>
+                </div> */}
                 </>
               )}
 
               </form>
 
-              {/* FORMULARIO DE TARJETA - CULQI - FUERA DEL FORM PADRE */}
+              {/* FORMULARIO DE TARJETA - CULQI - TEMPORALMENTE DESHABILITADO
               {step === 2 && paymentMethod === 'card' && curso && (
                 <div style={{
                   padding: spacing.lg,
@@ -851,6 +854,7 @@ function ComprarGrabadoContent() {
                       )}
                 </div>
               )}
+              */}
 
               <form onSubmit={(e) => e.preventDefault()}>
                 {step === 2 && (
@@ -895,34 +899,27 @@ function ComprarGrabadoContent() {
                   {paymentMethod === 'paypal' && (
                     <div style={{
                       marginTop: spacing.md,
-                      textAlign: 'center',
-                      backgroundColor: colors.gray[50],
-                      padding: spacing.lg,
-                      borderRadius: '8px'
+                      padding: spacing.md,
+                      border: `2px solid ${colors.gray[200]}`,
+                      borderRadius: '8px',
+                      backgroundColor: colors.gray[50]
                     }}>
-                      <p style={{ marginBottom: spacing.md, color: colors.gray[700] }}>
-                        Serás redirigido a PayPal para completar el pago de forma segura.
-                      </p>
-                      <img src="/images/paypal_icon.png" alt="PayPal" style={{ height: '60px', width: 'auto', marginBottom: spacing.md }} />
-                      <button
-                        type="button"
-                        onClick={() => alert('Integración de PayPal próximamente')}
-                        style={{
-                          width: '100%',
-                          padding: '1rem',
-                          background: 'linear-gradient(135deg, #0070BA 0%, #1546A0 100%)',
-                          color: 'white',
-                          border: 'none',
-                          borderRadius: '8px',
-                          fontSize: '1rem',
-                          fontWeight: '600',
-                          cursor: 'pointer',
-                          marginTop: spacing.md,
-                          boxShadow: '0 4px 12px rgba(0, 112, 186, 0.3)'
+                      <PayPalButton
+                        amount={currency === 'USD' ? getPrice() : convertPrice(getPrice())}
+                        courseSlug={curso.slug}
+                        courseTitle={curso.title}
+                        modality="grabado"
+                        email={email}
+                        currency="USD"
+                        onSuccess={(data) => {
+                          setPaymentSuccess(true);
+                          setEnrollment(data.enrollment);
                         }}
-                      >
-                        Pagar con PayPal - {symbol} {getPrice().toFixed(2)}
-                      </button>
+                        onError={(error) => {
+                          setPaymentError(error);
+                          setTimeout(() => setPaymentError(''), 5000);
+                        }}
+                      />
                     </div>
                   )}
                 </div>

@@ -6,6 +6,8 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import { getProductBySlug } from '@/data/courses';
 import Footer from '@/components/Footer';
 import CulqiPaymentForm from '@/components/CulqiPaymentForm';
+import PayPalButton from '@/components/PayPalButton';
+import PayPalScriptProvider from '@/components/PayPalScriptProvider';
 import { useCurrency } from '@/hooks/useCurrency';
 
 function InscripcionVivoContent() {
@@ -135,6 +137,7 @@ function InscripcionVivoContent() {
 
   return (
     <>
+      <PayPalScriptProvider />
       <style>{`
         @media (max-width: 768px) {
           .mobile-grid-1 {
@@ -618,8 +621,8 @@ function InscripcionVivoContent() {
                   Métodos de pago
                 </h3>
 
-                {/* CARD - SIEMPRE VISIBLE */}
-                <div
+                {/* CARD - TEMPORALMENTE DESHABILITADO (Culqi no permite pagos internacionales sin acreditación) */}
+                {/* <div
                   onClick={() => setPaymentMethod('card')}
                   style={{
                     padding: spacing.md,
@@ -664,13 +667,13 @@ function InscripcionVivoContent() {
                     </div>
                   </div>
 
-                </div>
+                </div> */}
                 </>
               )}
 
               </form>
 
-              {/* FORMULARIO DE TARJETA - CULQI - FUERA DEL FORM PADRE */}
+              {/* FORMULARIO DE TARJETA - CULQI - TEMPORALMENTE DESHABILITADO
               {step === 2 && paymentMethod === 'card' && curso && (
                 <div style={{
                   padding: spacing.lg,
@@ -852,6 +855,7 @@ function InscripcionVivoContent() {
                   )}
                 </div>
               )}
+              */}
 
               <form onSubmit={(e) => e.preventDefault()}>
                 {step === 2 && (
@@ -893,21 +897,35 @@ function InscripcionVivoContent() {
                     <span style={{ fontWeight: '600', color: colors.gray[700] }}>PayPal</span>
                   </div>
 
-                  {paymentMethod === 'paypal' && (
-                    <div style={{
-                      marginTop: spacing.md,
-                      textAlign: 'center',
-                      backgroundColor: colors.gray[50],
-                      padding: spacing.lg,
-                      borderRadius: '8px'
-                    }}>
-                      <p style={{ marginBottom: spacing.md, color: colors.gray[700] }}>
-                        Serás redirigido a PayPal para completar el pago de forma segura.
-                      </p>
-                      <img src="/images/paypal_icon.png" alt="PayPal" style={{ height: '60px', width: 'auto' }} />
-                    </div>
-                  )}
                 </div>
+
+                {/* PayPal Integration Area */}
+                {paymentMethod === 'paypal' && (
+                  <div style={{
+                    padding: spacing.md,
+                    border: `2px solid ${colors.gray[200]}`,
+                    borderRadius: '8px',
+                    backgroundColor: colors.gray[50],
+                    marginBottom: spacing.sm
+                  }}>
+                    <PayPalButton
+                      amount={currency === 'USD' ? getPrice() : convertPrice(getPrice())}
+                      courseSlug={curso.slug}
+                      courseTitle={curso.title}
+                      modality="vivo"
+                      email={email}
+                      currency="USD"
+                      onSuccess={(data) => {
+                        setPaymentSuccess(true);
+                        setEnrollment(data.enrollment);
+                      }}
+                      onError={(error) => {
+                        setPaymentError(error);
+                        setTimeout(() => setPaymentError(''), 5000);
+                      }}
+                    />
+                  </div>
+                )}
 
                 {/* YAPE */}
                 <div
