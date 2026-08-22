@@ -130,19 +130,14 @@ export async function POST(request: NextRequest) {
                 </p>
                 <p style="margin: 15px 0 0 0; padding: 15px; background: white; border-radius: 4px;">
                   <strong>📌 Importante:</strong><br>
-                  Te enviaremos el enlace para unirte a la clase el mismo día de inicio del curso.
-                  Asegúrate de revisar tu correo electrónico antes de la clase.
+                  Asegúrate de estar conectado el día <strong>${liveStartDate || '[fecha de inicio]'}</strong>
+                  en el horario <strong>${liveSchedule || '[horario]'}</strong> para no perderte la clase.
+                  <br><br>
+                  Te enviaremos el enlace para unirte a la sesión el mismo día antes de la clase.
+                  Revisa tu correo electrónico.
                 </p>
               </div>
-            ` : `
-              <div class="info-box" style="background: #e8f5e9; border-left-color: #4caf50;">
-                <h3 style="margin-top: 0; color: #2e7d32;">🎬 Acceso Inmediato al Curso</h3>
-                <p style="margin: 10px 0;">
-                  ¡Ya puedes acceder a todo el contenido grabado del curso!
-                  Estudia a tu propio ritmo, cuando y donde quieras.
-                </p>
-              </div>
-            `}
+            ` : ``}
 
             ${isNewUser && password ? `
               <div class="credentials-box">

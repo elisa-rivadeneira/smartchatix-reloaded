@@ -621,8 +621,7 @@ function InscripcionVivoContent() {
                   Métodos de pago
                 </h3>
 
-                {/* CARD - TEMPORALMENTE DESHABILITADO (Culqi no permite pagos internacionales sin acreditación) */}
-                {/* <div
+                <div
                   onClick={() => setPaymentMethod('card')}
                   style={{
                     padding: spacing.md,
@@ -667,13 +666,12 @@ function InscripcionVivoContent() {
                     </div>
                   </div>
 
-                </div> */}
+                </div>
                 </>
               )}
 
               </form>
 
-              {/* FORMULARIO DE TARJETA - CULQI - TEMPORALMENTE DESHABILITADO
               {step === 2 && paymentMethod === 'card' && curso && (
                 <div style={{
                   padding: spacing.lg,
@@ -855,7 +853,6 @@ function InscripcionVivoContent() {
                   )}
                 </div>
               )}
-              */}
 
               <form onSubmit={(e) => e.preventDefault()}>
                 {step === 2 && (

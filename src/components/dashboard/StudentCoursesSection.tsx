@@ -118,7 +118,7 @@ export default function StudentCoursesSection() {
           {courses.map((course) => (
             <Link
               key={course.id}
-              href={`/aula-virtual/${course.slug}`}
+              href={`/dashboard/curso/${course.slug}`}
               style={{
                 background: 'white',
                 borderRadius: '12px',

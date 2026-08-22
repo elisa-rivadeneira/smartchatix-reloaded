@@ -621,8 +621,7 @@ function ComprarGrabadoContent() {
                   Métodos de pago
                 </h3>
 
-                {/* CARD - TEMPORALMENTE DESHABILITADO (Culqi no permite pagos internacionales sin acreditación) */}
-                {/* <div
+                <div
                   onClick={() => setPaymentMethod('card')}
                   style={{
                     padding: spacing.md,
@@ -666,13 +665,12 @@ function ComprarGrabadoContent() {
                       <img src="/images/diners_color.svg" alt="Diners Club" className="card-icon" style={{ width: 'auto' }} />
                     </div>
                   </div>
-                </div> */}
+                </div>
                 </>
               )}
 
               </form>
 
-              {/* FORMULARIO DE TARJETA - CULQI - TEMPORALMENTE DESHABILITADO
               {step === 2 && paymentMethod === 'card' && curso && (
                 <div style={{
                   padding: spacing.lg,
@@ -854,7 +852,6 @@ function ComprarGrabadoContent() {
                       )}
                 </div>
               )}
-              */}
 
               <form onSubmit={(e) => e.preventDefault()}>
                 {step === 2 && (
