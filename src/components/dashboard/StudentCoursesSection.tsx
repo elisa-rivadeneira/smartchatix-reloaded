@@ -118,7 +118,7 @@ export default function StudentCoursesSection() {
           {courses.map((course) => (
             <Link
               key={course.id}
-              href={`/dashboard/curso/${course.slug}`}
+              href={`/curso/${course.slug}`}
               style={{
                 background: 'white',
                 borderRadius: '12px',
