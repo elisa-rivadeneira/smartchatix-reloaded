@@ -906,7 +906,11 @@ function InscripcionVivoContent() {
                     marginBottom: spacing.sm
                   }}>
                     <PayPalButton
-                      amount={currency === 'USD' ? getPrice() : convertPrice(getPrice())}
+                      amount={
+                        curso.priceVivoUsd && parseFloat(curso.priceVivoUsd) > 0
+                          ? parseFloat(curso.priceVivoUsd)
+                          : convertPrice(curso.priceVivo || 0)
+                      }
                       courseSlug={curso.slug}
                       courseTitle={curso.title}
                       modality="vivo"

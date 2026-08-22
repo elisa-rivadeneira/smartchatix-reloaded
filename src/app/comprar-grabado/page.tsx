@@ -902,7 +902,11 @@ function ComprarGrabadoContent() {
                       backgroundColor: colors.gray[50]
                     }}>
                       <PayPalButton
-                        amount={currency === 'USD' ? getPrice() : convertPrice(getPrice())}
+                        amount={
+                          curso.priceGrabadoUsd && parseFloat(curso.priceGrabadoUsd) > 0
+                            ? parseFloat(curso.priceGrabadoUsd)
+                            : convertPrice(curso.priceGrabado || 0)
+                        }
                         courseSlug={curso.slug}
                         courseTitle={curso.title}
                         modality="grabado"

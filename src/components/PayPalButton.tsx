@@ -215,7 +215,7 @@ export default function PayPalButton({
           color: '#0070BA',
           marginBottom: '1rem'
         }}>
-          {currency === 'USD' ? 'US$' : 'S/'} {amount.toFixed(2)}
+          {currency === 'USD' ? 'US$' : 'S/'} {(typeof amount === 'number' ? amount : parseFloat(amount) || 0).toFixed(2)}
         </div>
       </div>
 
