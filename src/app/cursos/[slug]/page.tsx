@@ -2,6 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { notFound } from 'next/navigation';
 import Footer from '@/components/Footer';
 import Header from '@/components/layout/Header';
@@ -89,7 +90,7 @@ export default function CursoPage({ params }: { params: Promise<{ slug: string }
   React.useEffect(() => {
     if (!curso) return;
 
-    setSidebarVisible(false);
+    setSidebarVisible(true);
 
     const handleScroll = () => {
       const footer = document.querySelector('footer');
@@ -360,11 +361,11 @@ export default function CursoPage({ params }: { params: Promise<{ slug: string }
         </div>
       )}
 
-      {/* Módulo flotante sticky - Fixed position */}
+      {/* Módulo lateral - Absolute position */}
       {sidebarVisible && (
       <aside className="sticky-sidebar" style={{
-        position: stickyPosition,
-        top: `${stickyTop}px`,
+        position: 'absolute',
+        top: '80px',
         zIndex: sidebarZIndex
       }}>
         <div className="floating-card" style={{
@@ -852,6 +853,376 @@ export default function CursoPage({ params }: { params: Promise<{ slug: string }
                 )}
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Sección Certificado */}
+      <section style={{
+        backgroundColor: colors.gray[50],
+        padding: `${spacing.xxl} ${spacing.lg}`,
+        display: 'flex',
+        justifyContent: 'center'
+      }}>
+        <div style={{
+          maxWidth: '1200px',
+          width: '100%',
+          padding: `0 ${spacing.lg}`
+        }}>
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: '1fr 380px',
+            gap: spacing.xl,
+            alignItems: 'stretch'
+          }}>
+            <div style={{
+              display: 'flex',
+              flexDirection: 'column'
+            }}>
+              <div style={{
+                textAlign: 'left',
+                marginBottom: spacing.xl,
+                display: 'flex',
+                alignItems: 'flex-start',
+                gap: spacing.md
+              }}>
+                <div style={{
+                  fontSize: '2.5rem',
+                  color: colors.primary,
+                  marginTop: '4px'
+                }}>
+                  🎓
+                </div>
+                <div>
+                  <h2 style={{
+                    fontSize: '1.6rem',
+                    fontWeight: '700',
+                    color: colors.primary,
+                    marginBottom: spacing.xs,
+                    margin: 0
+                  }}>
+                    Al finalizar, recibe tu certificado digital
+                  </h2>
+                  <p style={{
+                    fontSize: '0.95rem',
+                    color: colors.gray[600],
+                    margin: 0,
+                    lineHeight: '1.6'
+                  }}>
+                    Demuestra que completaste satisfactoriamente el curso {curso.title} y cuenta con un certificado digital verificable.
+                  </p>
+                </div>
+              </div>
+
+              <div style={{
+                backgroundColor: colors.white,
+                padding: spacing.lg,
+                borderRadius: '12px',
+                boxShadow: '0 4px 20px rgba(0,0,0,0.1)',
+                marginBottom: spacing.lg
+              }}>
+                <Image
+                  src="/images/certificado-aprobacion.jpeg"
+                  alt="Certificado de Aprobación"
+                  width={800}
+                  height={566}
+                  style={{
+                    width: '100%',
+                    height: 'auto',
+                    borderRadius: '8px'
+                  }}
+                  priority
+                />
+              </div>
+
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(3, 1fr)',
+                gap: spacing.lg,
+                textAlign: 'center'
+              }}>
+                <div>
+                  <div style={{
+                    backgroundColor: colors.white,
+                    padding: spacing.md,
+                    borderRadius: '50%',
+                    width: '60px',
+                    height: '60px',
+                    margin: '0 auto',
+                    marginBottom: spacing.sm,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    boxShadow: '0 2px 8px rgba(0,0,0,0.08)'
+                  }}>
+                    <span style={{ fontSize: '1.8rem' }}>✅</span>
+                  </div>
+                  <h3 style={{ fontSize: '1rem', fontWeight: '700', color: colors.primary, marginBottom: spacing.xs }}>
+                    Certificado digital
+                  </h3>
+                  <p style={{ fontSize: '0.85rem', color: colors.gray[600], margin: 0 }}>
+                    Se certifica el certificado satisfactoriamente
+                  </p>
+                </div>
+
+                <div>
+                  <div style={{
+                    backgroundColor: colors.white,
+                    padding: spacing.md,
+                    borderRadius: '50%',
+                    width: '60px',
+                    height: '60px',
+                    margin: '0 auto',
+                    marginBottom: spacing.sm,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    boxShadow: '0 2px 8px rgba(0,0,0,0.08)'
+                  }}>
+                    <span style={{ fontSize: '1.8rem' }}>🔍</span>
+                  </div>
+                  <h3 style={{ fontSize: '1rem', fontWeight: '700', color: colors.primary, marginBottom: spacing.xs }}>
+                    Código verificable
+                  </h3>
+                  <p style={{ fontSize: '0.85rem', color: colors.gray[600], margin: 0 }}>
+                    Cada certificado cuenta con código único
+                  </p>
+                </div>
+
+                <div>
+                  <div style={{
+                    backgroundColor: colors.white,
+                    padding: spacing.md,
+                    borderRadius: '50%',
+                    width: '60px',
+                    height: '60px',
+                    margin: '0 auto',
+                    marginBottom: spacing.sm,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    boxShadow: '0 2px 8px rgba(0,0,0,0.08)'
+                  }}>
+                    <span style={{ fontSize: '1.8rem' }}>📄</span>
+                  </div>
+                  <h3 style={{ fontSize: '1rem', fontWeight: '700', color: colors.primary, marginBottom: spacing.xs }}>
+                    Verificación online
+                  </h3>
+                  <p style={{ fontSize: '0.85rem', color: colors.gray[600], margin: 0 }}>
+                    El certificado puede verificarse mediante código QR
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div style={{
+              display: 'flex',
+              flexDirection: 'column'
+            }}>
+              <div style={{
+                background: 'linear-gradient(135deg, #003366 0%, #0066CC 100%)',
+                padding: spacing.lg,
+                borderRadius: '12px',
+                boxShadow: '0 8px 24px rgba(0,0,0,0.3)',
+                border: '2px solid rgba(255,255,255,0.2)',
+                flex: 1,
+                display: 'flex',
+                flexDirection: 'column'
+              }}>
+                <div>
+                  <h3 style={{
+                    fontSize: '1.4rem',
+                    fontWeight: '700',
+                    color: colors.white,
+                    marginBottom: spacing.sm,
+                    lineHeight: '1.3'
+                  }}>
+                    Da el siguiente paso en CFD
+                  </h3>
+
+                  <p style={{
+                    fontSize: '0.9rem',
+                    color: 'rgba(255,255,255,0.85)',
+                    marginBottom: spacing.md,
+                    lineHeight: '1.6'
+                  }}>
+                    Aprende desde cero el flujo completo de una simulación y desarrolla fundamentos aplicables a proyectos de ingeniería.
+                  </p>
+
+                  <div style={{
+                    border: `3px solid ${colors.accent}`,
+                    borderRadius: '12px',
+                    padding: spacing.md,
+                    marginBottom: '12px',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    textAlign: 'center'
+                  }}>
+                    <div style={{
+                      backgroundColor: colors.accent,
+                      color: colors.white,
+                      padding: `${spacing.xs} ${spacing.sm}`,
+                      borderRadius: '6px',
+                      fontSize: '0.75rem',
+                      fontWeight: '700',
+                      marginBottom: spacing.md,
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '6px'
+                    }}>
+                      🔥 Precio de lanzamiento
+                    </div>
+
+                    <div style={{
+                      fontSize: '2.4rem',
+                      fontWeight: '700',
+                      color: colors.white,
+                      marginBottom: spacing.xs
+                    }}>
+                      {symbol} {getPrice(
+                        curso.hasLiveMode ? curso.priceVivo : curso.priceGrabado,
+                        curso.hasLiveMode ? curso.priceVivoUsd : curso.priceGrabadoUsd
+                      ).toFixed(2)}
+                    </div>
+
+                    {currency === 'USD' && curso.price_pen && (
+                      <div style={{
+                        fontSize: '1rem',
+                        color: 'rgba(255,255,255,0.5)',
+                        textDecoration: 'line-through',
+                        marginBottom: spacing.sm
+                      }}>
+                        S/ {curso.price_pen}
+                      </div>
+                    )}
+
+                    <p style={{
+                      fontSize: '0.9rem',
+                      color: 'rgba(255,255,255,0.9)',
+                      lineHeight: '1.6',
+                      margin: 0
+                    }}>
+                      Acceso al curso + grabaciones + certificado digital + soporte del instructor
+                    </p>
+                  </div>
+                </div>
+
+                <div>
+                {curso?.publication_status === 'coming_soon' ? (
+                  <div style={{
+                    backgroundColor: '#fef3c7',
+                    color: '#92400e',
+                    border: '2px solid #fbbf24',
+                    padding: `${spacing.md} ${spacing.lg}`,
+                    borderRadius: '8px',
+                    fontSize: '0.95rem',
+                    fontWeight: '700',
+                    textAlign: 'center'
+                  }}>
+                    ⏳ PRÓXIMAMENTE
+                  </div>
+                ) : curso?.hasLiveMode && curso?.hasRecordedMode ? (
+                  <button
+                    onClick={() => setShowModal(true)}
+                    style={{
+                      width: '100%',
+                      backgroundColor: colors.accent,
+                      color: colors.white,
+                      border: 'none',
+                      padding: `${spacing.md} ${spacing.lg}`,
+                      borderRadius: '8px',
+                      fontSize: '1rem',
+                      fontWeight: '700',
+                      cursor: 'pointer',
+                      boxShadow: '0 4px 16px rgba(255,102,0,0.4)',
+                      transition: 'all 0.2s',
+                      whiteSpace: 'nowrap'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.transform = 'scale(1.03)';
+                      e.currentTarget.style.boxShadow = '0 6px 20px rgba(255,102,0,0.5)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.transform = 'scale(1)';
+                      e.currentTarget.style.boxShadow = '0 4px 16px rgba(255,102,0,0.4)';
+                    }}
+                  >
+                    ELIGE TU ACCESO →
+                  </button>
+                ) : curso?.hasLiveMode ? (
+                  <Link href={`/inscripcion-vivo?curso=${slug}`} style={{ textDecoration: 'none' }}>
+                    <button
+                      style={{
+                        width: '100%',
+                        backgroundColor: colors.accent,
+                        color: colors.white,
+                        border: 'none',
+                        padding: `${spacing.md} ${spacing.lg}`,
+                        borderRadius: '8px',
+                        fontSize: '1rem',
+                        fontWeight: '700',
+                        cursor: 'pointer',
+                        boxShadow: '0 4px 16px rgba(255,102,0,0.4)',
+                        transition: 'all 0.2s',
+                        whiteSpace: 'nowrap'
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.transform = 'scale(1.03)';
+                        e.currentTarget.style.boxShadow = '0 6px 20px rgba(255,102,0,0.5)';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.transform = 'scale(1)';
+                        e.currentTarget.style.boxShadow = '0 4px 16px rgba(255,102,0,0.4)';
+                      }}
+                    >
+                      INSCRIBIRME AL CURSO EN VIVO →
+                    </button>
+                  </Link>
+                ) : (
+                  <Link href={`/comprar-grabado?curso=${slug}`} style={{ textDecoration: 'none' }}>
+                    <button
+                      style={{
+                        width: '100%',
+                        backgroundColor: colors.accent,
+                        color: colors.white,
+                        border: 'none',
+                        padding: `${spacing.md} ${spacing.lg}`,
+                        borderRadius: '8px',
+                        fontSize: '1rem',
+                        fontWeight: '700',
+                        cursor: 'pointer',
+                        boxShadow: '0 4px 16px rgba(255,102,0,0.4)',
+                        transition: 'all 0.2s',
+                        whiteSpace: 'nowrap'
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.transform = 'scale(1.03)';
+                        e.currentTarget.style.boxShadow = '0 6px 20px rgba(255,102,0,0.5)';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.transform = 'scale(1)';
+                        e.currentTarget.style.boxShadow = '0 4px 16px rgba(255,102,0,0.4)';
+                      }}
+                    >
+                      COMPRAR ACCESO GRABADO →
+                    </button>
+                  </Link>
+                )}
+
+                <div style={{
+                  marginTop: spacing.xs,
+                  padding: 0,
+                  textAlign: 'center',
+                  fontSize: '0.8rem',
+                  color: 'rgba(255,255,255,0.7)'
+                }}>
+                  🔒 Pago seguro y acceso inmediato
+                </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
