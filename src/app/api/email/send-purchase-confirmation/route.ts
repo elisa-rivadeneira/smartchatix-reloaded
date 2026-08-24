@@ -88,22 +88,11 @@ export async function POST(request: NextRequest) {
 
     let emailHTML = '';
 
-    if (isNewUser && emailConfirmationTemplate) {
+    if (emailConfirmationTemplate) {
       const textWithVariables = replaceEmailVariables(emailConfirmationTemplate, {
         nombre: name,
         email: email,
         clave: password || '',
-        curso: courseTitle,
-        modalidad: modality,
-        precio: `S/ ${Number(amount).toFixed(2)}`
-      });
-      const htmlContent = convertTextToHtml(textWithVariables);
-      emailHTML = wrapInEmailTemplate(htmlContent);
-    } else if (!isNewUser && emailPaymentConfirmationTemplate) {
-      const textWithVariables = replaceEmailVariables(emailPaymentConfirmationTemplate, {
-        nombre: name,
-        email: email,
-        clave: '',
         curso: courseTitle,
         modalidad: modality,
         precio: `S/ ${Number(amount).toFixed(2)}`
