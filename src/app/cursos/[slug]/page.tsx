@@ -208,6 +208,7 @@ export default function CursoPage({ params }: { params: Promise<{ slug: string }
         }
         @media (max-width: 768px) {
           .mobile-hidden { display: none !important; }
+          .certificate-icons { display: none !important; }
           .mobile-hamburger {
             display: flex !important;
             position: fixed !important;
@@ -237,6 +238,10 @@ export default function CursoPage({ params }: { params: Promise<{ slug: string }
           }
           .section-subtitle {
             font-size: 0.95rem !important;
+          }
+          .certificado-grid {
+            grid-template-columns: 1fr !important;
+            gap: 1.5rem !important;
           }
           .floating-card {
             position: relative !important;
@@ -869,7 +874,7 @@ export default function CursoPage({ params }: { params: Promise<{ slug: string }
           width: '100%',
           padding: `0 ${spacing.lg}`
         }}>
-          <div style={{
+          <div className="certificado-grid" style={{
             display: 'grid',
             gridTemplateColumns: '1fr 380px',
             gap: spacing.xl,
@@ -935,7 +940,7 @@ export default function CursoPage({ params }: { params: Promise<{ slug: string }
                 />
               </div>
 
-              <div style={{
+              <div className="certificate-icons" style={{
                 display: 'grid',
                 gridTemplateColumns: 'repeat(3, 1fr)',
                 gap: spacing.lg,
