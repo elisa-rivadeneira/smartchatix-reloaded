@@ -154,6 +154,7 @@ export async function POST(request: NextRequest) {
 
           let userId;
           let isNewUser = false;
+          let tempPassword = '';
           const userResult = await query(
             'SELECT id FROM users WHERE email = ?',
             [email]
@@ -162,10 +163,12 @@ export async function POST(request: NextRequest) {
           if (userResult && userResult.length > 0) {
             userId = userResult[0].id;
             console.log('👤 Usuario existente encontrado, ID:', userId);
+            console.log('📧 NO se enviará email de bienvenida (usuario ya existe)');
           } else {
             console.log('👤 Creando nuevo usuario');
+            console.log('📧 SE ENVIARÁ email de bienvenida con credenciales');
             isNewUser = true;
-            const tempPassword = generateTemporaryPassword();
+            tempPassword = generateTemporaryPassword();
             const hashedPassword = await bcrypt.hash(tempPassword, 10);
             const displayName = email.split('@')[0];
 
@@ -251,9 +254,12 @@ export async function POST(request: NextRequest) {
               });
 
               if (emailResponse.ok) {
-                console.log('✅ Email de credenciales enviado exitosamente');
+                const emailResult = await emailResponse.json();
+                console.log('✅ Email de credenciales enviado exitosamente:', emailResult);
               } else {
-                console.error('❌ Error enviando email de credenciales');
+                const errorText = await emailResponse.text();
+                console.error('❌ Error enviando email de credenciales - Status:', emailResponse.status);
+                console.error('❌ Error details:', errorText);
               }
             } catch (emailError) {
               console.error('❌ Error al enviar email de credenciales:', emailError);
@@ -343,7 +349,12 @@ export async function POST(request: NextRequest) {
             });
 
             if (confirmationEmailResponse.ok) {
-              console.log('✅ Email de confirmación enviado');
+              const confirmResult = await confirmationEmailResponse.json();
+              console.log('✅ Email de confirmación enviado:', confirmResult);
+            } else {
+              const errorText = await confirmationEmailResponse.text();
+              console.error('❌ Error enviando email de confirmación - Status:', confirmationEmailResponse.status);
+              console.error('❌ Error details:', errorText);
             }
           } catch (emailError) {
             console.error('❌ Error enviando email de confirmación:', emailError);
