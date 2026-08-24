@@ -232,6 +232,114 @@ function ComprarGrabadoContent() {
           }
         }
       `}</style>
+    {paymentSuccess ? (
+      <div style={{
+        fontFamily: 'Arial, sans-serif',
+        minHeight: '100vh',
+        background: 'linear-gradient(135deg, #003366 0%, #0066CC 100%)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: spacing.md
+      }}>
+        <div style={{
+          backgroundColor: colors.white,
+          borderRadius: '16px',
+          maxWidth: '600px',
+          width: '100%',
+          padding: spacing.xxl,
+          boxShadow: '0 8px 32px rgba(0,0,0,0.3)',
+          textAlign: 'center'
+        }}>
+          <div style={{ fontSize: '4rem', marginBottom: spacing.lg }}>✅</div>
+          <h1 style={{
+            fontSize: '2rem',
+            fontWeight: '700',
+            color: colors.success,
+            marginBottom: spacing.md
+          }}>
+            ¡Pago Exitoso!
+          </h1>
+          <p style={{
+            fontSize: '1.1rem',
+            color: colors.gray[600],
+            lineHeight: '1.6',
+            marginBottom: spacing.lg
+          }}>
+            Tu acceso al curso <strong>{curso?.title}</strong> ha sido confirmado.
+          </p>
+          <div style={{
+            backgroundColor: colors.gray[50],
+            padding: spacing.lg,
+            borderRadius: '8px',
+            marginBottom: spacing.xl,
+            textAlign: 'left'
+          }}>
+            <h3 style={{
+              fontSize: '1.1rem',
+              fontWeight: '700',
+              color: colors.primary,
+              marginBottom: spacing.md
+            }}>
+              📧 Revisa tu correo electrónico
+            </h3>
+            <p style={{
+              fontSize: '0.95rem',
+              color: colors.gray[600],
+              lineHeight: '1.6',
+              margin: 0
+            }}>
+              Hemos enviado un email a <strong>{email}</strong> con:
+            </p>
+            <ul style={{
+              marginTop: spacing.sm,
+              paddingLeft: spacing.lg,
+              fontSize: '0.9rem',
+              color: colors.gray[600],
+              lineHeight: '1.8'
+            }}>
+              <li>Tus credenciales de acceso al aula virtual</li>
+              <li>Confirmación de compra</li>
+              <li>Detalles del curso</li>
+            </ul>
+            <p style={{
+              marginTop: spacing.md,
+              fontSize: '0.85rem',
+              color: colors.gray[500],
+              fontStyle: 'italic'
+            }}>
+              💡 Si no lo ves, revisa tu carpeta de spam
+            </p>
+          </div>
+          <Link href="/login" style={{ textDecoration: 'none' }}>
+            <button style={{
+              backgroundColor: colors.accent,
+              color: colors.white,
+              border: 'none',
+              padding: `${spacing.md} ${spacing.xxl}`,
+              borderRadius: '8px',
+              fontSize: '1.1rem',
+              fontWeight: '700',
+              cursor: 'pointer',
+              boxShadow: '0 4px 16px rgba(255,102,0,0.3)',
+              width: '100%',
+              marginBottom: spacing.sm
+            }}>
+              Ir al Aula Virtual →
+            </button>
+          </Link>
+          <Link href="/" style={{
+            display: 'block',
+            marginTop: spacing.md,
+            color: colors.secondary,
+            textDecoration: 'none',
+            fontSize: '0.9rem'
+          }}>
+            Volver al inicio
+          </Link>
+        </div>
+      </div>
+    ) : (
     <div style={{
       fontFamily: 'Arial, sans-serif',
       backgroundColor: colors.gray[50],
@@ -1164,10 +1272,11 @@ function ComprarGrabadoContent() {
           </div>
         </div>
       </div>
+      <div className="hide-on-mobile">
+        <Footer />
+      </div>
     </div>
-    <div className="hide-on-mobile">
-      <Footer />
-    </div>
+    )}
 
     {showAlreadyEnrolledModal && (
       <div

@@ -3,6 +3,64 @@ import { Resend } from 'resend';
 
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 
+function replaceEmailVariables(template: string, variables: {
+  nombre: string;
+  email: string;
+  clave: string;
+  curso: string;
+  modalidad?: string;
+  precio?: string;
+}): string {
+  return template
+    .replace(/{nombre}/g, variables.nombre)
+    .replace(/{email}/g, variables.email)
+    .replace(/{clave}/g, variables.clave)
+    .replace(/{curso}/g, variables.curso)
+    .replace(/{modalidad}/g, variables.modalidad || '')
+    .replace(/{precio}/g, variables.precio || '');
+}
+
+function convertTextToHtml(text: string): string {
+  return text
+    .split('\n')
+    .map(line => line.trim())
+    .filter(line => line.length > 0)
+    .map(line => {
+      if (line.startsWith('---')) {
+        return '<hr style="border: none; border-top: 1px solid #e0e0e0; margin: 20px 0;">';
+      }
+      if (line.match(/^#+\s/)) {
+        return `<h2 style="color: #003366; margin: 20px 0 10px 0;">${line.replace(/^#+\s/, '')}</h2>`;
+      }
+      return `<p style="margin: 10px 0; line-height: 1.6;">${line}</p>`;
+    })
+    .join('\n');
+}
+
+function wrapInEmailTemplate(content: string): string {
+  return `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body style="margin: 0; padding: 0; background-color: #f8f9fa; font-family: Arial, sans-serif;">
+  <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+    <div style="background: linear-gradient(135deg, #003366 0%, #0066CC 100%); padding: 30px; text-align: center;">
+      <h1 style="margin: 0; color: #ffffff; font-size: 28px; font-weight: 700;">SmartChatix</h1>
+    </div>
+    <div style="padding: 40px 30px;">
+      ${content}
+    </div>
+    <div style="background-color: #f8f9fa; padding: 20px; text-align: center; border-top: 1px solid #e0e0e0;">
+      <p style="margin: 0; color: #5F6368; font-size: 12px;">SmartChatix - Transformamos la forma en que las personas trabajan</p>
+    </div>
+  </div>
+</body>
+</html>`;
+}
+
 export async function POST(request: NextRequest) {
   try {
     const {
@@ -14,7 +72,9 @@ export async function POST(request: NextRequest) {
       password,
       isNewUser,
       liveStartDate,
-      liveSchedule
+      liveSchedule,
+      emailConfirmationTemplate,
+      emailPaymentConfirmationTemplate
     } = await request.json();
 
     if (!email || !courseTitle || !modality) {
@@ -26,7 +86,32 @@ export async function POST(request: NextRequest) {
 
     const isLiveMode = modality.toLowerCase().includes('vivo');
 
-    const emailHTML = `
+    let emailHTML = '';
+
+    if (isNewUser && emailConfirmationTemplate) {
+      const textWithVariables = replaceEmailVariables(emailConfirmationTemplate, {
+        nombre: name,
+        email: email,
+        clave: password || '',
+        curso: courseTitle,
+        modalidad: modality,
+        precio: `S/ ${Number(amount).toFixed(2)}`
+      });
+      const htmlContent = convertTextToHtml(textWithVariables);
+      emailHTML = wrapInEmailTemplate(htmlContent);
+    } else if (!isNewUser && emailPaymentConfirmationTemplate) {
+      const textWithVariables = replaceEmailVariables(emailPaymentConfirmationTemplate, {
+        nombre: name,
+        email: email,
+        clave: '',
+        curso: courseTitle,
+        modalidad: modality,
+        precio: `S/ ${Number(amount).toFixed(2)}`
+      });
+      const htmlContent = convertTextToHtml(textWithVariables);
+      emailHTML = wrapInEmailTemplate(htmlContent);
+    } else {
+      emailHTML = `
       <!DOCTYPE html>
       <html>
       <head>
@@ -182,6 +267,7 @@ export async function POST(request: NextRequest) {
       </body>
       </html>
     `;
+    }
 
     if (!resend) {
       console.log('⚠️  RESEND_API_KEY no está configurada. Confirmación de compra:');

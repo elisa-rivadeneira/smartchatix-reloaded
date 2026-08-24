@@ -261,6 +261,36 @@ export async function PATCH(
       values.push(body.publication_status);
     }
 
+    if (body.email_confirmation_template !== undefined) {
+      updates.push('email_confirmation_template = ?');
+      values.push(body.email_confirmation_template || null);
+    }
+
+    if (body.email_payment_confirmation_template !== undefined) {
+      updates.push('email_payment_confirmation_template = ?');
+      values.push(body.email_payment_confirmation_template || null);
+    }
+
+    if (body.language !== undefined) {
+      updates.push('language = ?');
+      values.push(body.language);
+    }
+
+    if (body.difficulty_level !== undefined) {
+      updates.push('difficulty_level = ?');
+      values.push(body.difficulty_level);
+    }
+
+    if (body.duration !== undefined) {
+      updates.push('duration = ?');
+      values.push(body.duration);
+    }
+
+    if (body.key_learnings !== undefined) {
+      updates.push('key_learnings = ?');
+      values.push(JSON.stringify(body.key_learnings));
+    }
+
     if (updates.length === 0) {
       return NextResponse.json({ error: 'No hay cambios para actualizar' }, { status: 400 });
     }

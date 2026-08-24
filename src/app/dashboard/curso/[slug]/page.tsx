@@ -104,6 +104,8 @@ interface Course {
   is_certification_enabled?: boolean;
   passing_score?: number;
   publication_status?: 'published' | 'coming_soon' | 'unpublished';
+  email_confirmation_template?: string | null;
+  email_payment_confirmation_template?: string | null;
   modules: Module[];
 }
 
@@ -3566,6 +3568,163 @@ export default function InstructorCourseEditPage() {
                   {course?.publication_status === 'published' && '✅ El curso está completamente visible con precios y enlaces de inscripción.'}
                   {course?.publication_status === 'coming_soon' && '⏳ El curso es visible pero sin precios ni enlaces de inscripción.'}
                   {(course?.publication_status === 'unpublished' || !course?.publication_status) && '🔒 El curso no es visible en la web pública. Solo admins e instructores pueden verlo.'}
+                </p>
+              </div>
+            </div>
+
+            {/* Email Templates */}
+            <div style={{
+              padding: '1.5rem',
+              background: '#f9fafb',
+              borderRadius: '8px',
+              border: '1px solid #e5e7eb',
+              marginBottom: '1.5rem'
+            }}>
+              <h3 style={{
+                fontSize: '15px',
+                fontWeight: '600',
+                color: '#111827',
+                marginBottom: '1rem',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.5rem'
+              }}>
+                📧 Mensajes de Email Personalizados
+              </h3>
+
+              {/* Email de Bienvenida */}
+              <div style={{ marginBottom: '2rem' }}>
+                <label style={{
+                  display: 'block',
+                  fontSize: '13px',
+                  fontWeight: '600',
+                  color: '#374151',
+                  marginBottom: '8px'
+                }}>
+                  Email de bienvenida (con credenciales)
+                </label>
+                <p style={{ fontSize: '12px', color: '#6b7280', marginBottom: '12px' }}>
+                  Este mensaje se envía a <strong>usuarios nuevos</strong> cuando se inscriben. Variables disponibles: <code style={{ background: '#e5e7eb', padding: '2px 6px', borderRadius: '4px' }}>{'{nombre}'}</code>, <code style={{ background: '#e5e7eb', padding: '2px 6px', borderRadius: '4px' }}>{'{email}'}</code>, <code style={{ background: '#e5e7eb', padding: '2px 6px', borderRadius: '4px' }}>{'{clave}'}</code>, <code style={{ background: '#e5e7eb', padding: '2px 6px', borderRadius: '4px' }}>{'{curso}'}</code>, <code style={{ background: '#e5e7eb', padding: '2px 6px', borderRadius: '4px' }}>{'{modalidad}'}</code>, <code style={{ background: '#e5e7eb', padding: '2px 6px', borderRadius: '4px' }}>{'{precio}'}</code>
+                </p>
+                <textarea
+                  value={course?.email_confirmation_template || `¡Hola {nombre}!
+
+Bienvenido al curso: {curso}
+
+Tus credenciales de acceso son:
+
+📧 Email: {email}
+🔑 Contraseña temporal: {clave}
+
+Por favor, cambia tu contraseña después de iniciar sesión por primera vez.
+
+👉 Accede al aula virtual aquí: https://smartchatix.com/login
+
+Modalidad: {modalidad}
+Precio: {precio}
+
+¡Nos vemos en clase!
+
+---
+SmartChatix - Transformamos la forma en que las personas trabajan`}
+                  onChange={(e) => setCourse(prev => prev ? { ...prev, email_confirmation_template: e.target.value } : null)}
+                  onBlur={async (e) => {
+                    const value = e.target.value;
+                    setSaving(true);
+                    try {
+                      await fetch(`/api/instructor/course/${slug}/config`, {
+                        method: 'PATCH',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ email_confirmation_template: value || null })
+                      });
+                    } catch (error) {
+                      console.error('Error:', error);
+                    } finally {
+                      setSaving(false);
+                    }
+                  }}
+                  rows={18}
+                  style={{
+                    width: '100%',
+                    padding: '12px',
+                    border: '2px solid #e5e7eb',
+                    borderRadius: '8px',
+                    fontSize: '13px',
+                    fontFamily: 'monospace',
+                    boxSizing: 'border-box',
+                    resize: 'vertical',
+                    lineHeight: '1.6'
+                  }}
+                />
+                <p style={{ fontSize: '11px', color: '#9ca3af', marginTop: '6px', fontStyle: 'italic' }}>
+                  Si dejas vacío, se usa el mensaje por defecto.
+                </p>
+              </div>
+
+              {/* Email de Confirmación de Pago */}
+              <div>
+                <label style={{
+                  display: 'block',
+                  fontSize: '13px',
+                  fontWeight: '600',
+                  color: '#374151',
+                  marginBottom: '8px'
+                }}>
+                  Email de confirmación de pago
+                </label>
+                <p style={{ fontSize: '12px', color: '#6b7280', marginBottom: '12px' }}>
+                  Este mensaje se envía a <strong>todos</strong> después del pago exitoso. Variables disponibles: <code style={{ background: '#e5e7eb', padding: '2px 6px', borderRadius: '4px' }}>{'{nombre}'}</code>, <code style={{ background: '#e5e7eb', padding: '2px 6px', borderRadius: '4px' }}>{'{email}'}</code>, <code style={{ background: '#e5e7eb', padding: '2px 6px', borderRadius: '4px' }}>{'{curso}'}</code>, <code style={{ background: '#e5e7eb', padding: '2px 6px', borderRadius: '4px' }}>{'{modalidad}'}</code>, <code style={{ background: '#e5e7eb', padding: '2px 6px', borderRadius: '4px' }}>{'{precio}'}</code>
+                </p>
+                <textarea
+                  value={course?.email_payment_confirmation_template || `¡Pago Confirmado! ✅
+
+Tu pago ha sido procesado exitosamente.
+
+📚 Curso: {curso}
+📍 Modalidad: {modalidad}
+💰 Monto: {precio}
+
+Ya puedes acceder al aula virtual con tu email: {email}
+
+👉 Ir al aula virtual: https://smartchatix.com/login
+
+Si tienes alguna consulta, no dudes en contactarnos.
+
+¡Nos vemos en clase!
+
+---
+SmartChatix - Transformamos la forma en que las personas trabajan`}
+                  onChange={(e) => setCourse(prev => prev ? { ...prev, email_payment_confirmation_template: e.target.value } : null)}
+                  onBlur={async (e) => {
+                    const value = e.target.value;
+                    setSaving(true);
+                    try {
+                      await fetch(`/api/instructor/course/${slug}/config`, {
+                        method: 'PATCH',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ email_payment_confirmation_template: value || null })
+                      });
+                    } catch (error) {
+                      console.error('Error:', error);
+                    } finally {
+                      setSaving(false);
+                    }
+                  }}
+                  rows={16}
+                  style={{
+                    width: '100%',
+                    padding: '12px',
+                    border: '2px solid #e5e7eb',
+                    borderRadius: '8px',
+                    fontSize: '13px',
+                    fontFamily: 'monospace',
+                    boxSizing: 'border-box',
+                    resize: 'vertical',
+                    lineHeight: '1.6'
+                  }}
+                />
+                <p style={{ fontSize: '11px', color: '#9ca3af', marginTop: '6px', fontStyle: 'italic' }}>
+                  Si dejas vacío, se usa el mensaje por defecto.
                 </p>
               </div>
             </div>

@@ -7,6 +7,64 @@ function generateTemporaryPassword(): string {
   return crypto.randomBytes(8).toString('hex').slice(0, 12);
 }
 
+function replaceEmailVariables(template: string, variables: {
+  nombre: string;
+  email: string;
+  clave: string;
+  curso: string;
+  modalidad?: string;
+  precio?: string;
+}): string {
+  return template
+    .replace(/{nombre}/g, variables.nombre)
+    .replace(/{email}/g, variables.email)
+    .replace(/{clave}/g, variables.clave)
+    .replace(/{curso}/g, variables.curso)
+    .replace(/{modalidad}/g, variables.modalidad || '')
+    .replace(/{precio}/g, variables.precio || '');
+}
+
+function convertTextToHtml(text: string): string {
+  return text
+    .split('\n')
+    .map(line => line.trim())
+    .filter(line => line.length > 0)
+    .map(line => {
+      if (line.startsWith('---')) {
+        return '<hr style="border: none; border-top: 1px solid #e0e0e0; margin: 20px 0;">';
+      }
+      if (line.match(/^#+\s/)) {
+        return `<h2 style="color: #003366; margin: 20px 0 10px 0;">${line.replace(/^#+\s/, '')}</h2>`;
+      }
+      return `<p style="margin: 10px 0; line-height: 1.6;">${line}</p>`;
+    })
+    .join('\n');
+}
+
+function wrapInEmailTemplate(content: string): string {
+  return `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body style="margin: 0; padding: 0; background-color: #f8f9fa; font-family: Arial, sans-serif;">
+  <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+    <div style="background: linear-gradient(135deg, #003366 0%, #0066CC 100%); padding: 30px; text-align: center;">
+      <h1 style="margin: 0; color: #ffffff; font-size: 28px; font-weight: 700;">SmartChatix</h1>
+    </div>
+    <div style="padding: 40px 30px;">
+      ${content}
+    </div>
+    <div style="background-color: #f8f9fa; padding: 20px; text-align: center; border-top: 1px solid #e0e0e0;">
+      <p style="margin: 0; color: #5F6368; font-size: 12px;">SmartChatix - Transformamos la forma en que las personas trabajan</p>
+    </div>
+  </div>
+</body>
+</html>`;
+}
+
 export async function POST(request: NextRequest) {
   try {
     console.log('🔵 Charge endpoint called');
@@ -147,7 +205,7 @@ export async function POST(request: NextRequest) {
     if (metadata?.course_slug && metadata?.student_email) {
       try {
         const courseResult = await query(
-          'SELECT id, title, live_start_date, live_schedule FROM courses WHERE slug = ?',
+          'SELECT id, title, live_start_date, live_schedule, email_confirmation_template, email_payment_confirmation_template FROM courses WHERE slug = ?',
           [metadata.course_slug]
         );
 
@@ -208,7 +266,9 @@ export async function POST(request: NextRequest) {
                 password: isNewUser ? temporaryPassword : null,
                 isNewUser: isNewUser,
                 liveStartDate: course.live_start_date,
-                liveSchedule: course.live_schedule
+                liveSchedule: course.live_schedule,
+                emailConfirmationTemplate: course.email_confirmation_template,
+                emailPaymentConfirmationTemplate: course.email_payment_confirmation_template
               })
             });
 

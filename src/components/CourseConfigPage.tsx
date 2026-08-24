@@ -19,6 +19,8 @@ interface Course {
   difficulty_level?: string;
   duration?: string;
   key_learnings?: string[];
+  email_confirmation_template?: string | null;
+  email_payment_confirmation_template?: string | null;
 }
 
 interface CourseConfigPageProps {
@@ -46,6 +48,8 @@ export default function CourseConfigPage({ slug, backUrl, backLabel }: CourseCon
     price: 0,
     discountPrice: 0,
     key_learnings: [] as string[],
+    email_confirmation_template: '',
+    email_payment_confirmation_template: '',
   });
 
   const [newLearning, setNewLearning] = useState('');
@@ -72,6 +76,8 @@ export default function CourseConfigPage({ slug, backUrl, backLabel }: CourseCon
         price: data.course.price_vivo || 0,
         discountPrice: data.course.price_grabado || 0,
         key_learnings: data.course.key_learnings || [],
+        email_confirmation_template: data.course.email_confirmation_template || '',
+        email_payment_confirmation_template: data.course.email_payment_confirmation_template || '',
       });
     } catch (error) {
       console.error('Error loading course:', error);
@@ -96,6 +102,8 @@ export default function CourseConfigPage({ slug, backUrl, backLabel }: CourseCon
           price_vivo: formData.price,
           price_grabado: formData.discountPrice,
           key_learnings: formData.key_learnings,
+          email_confirmation_template: formData.email_confirmation_template,
+          email_payment_confirmation_template: formData.email_payment_confirmation_template,
         })
       });
       if (response.ok) {
@@ -993,6 +1001,101 @@ export default function CourseConfigPage({ slug, backUrl, backLabel }: CourseCon
                         borderRadius: '8px',
                         fontSize: '14px',
                         boxSizing: 'border-box'
+                      }}
+                    />
+                  </div>
+
+                  <div style={{ gridColumn: '1 / -1', marginTop: '2rem' }}>
+                    <h3 style={{ fontSize: '1.125rem', fontWeight: '600', color: '#111827', marginBottom: '0.5rem' }}>
+                      📧 Email de bienvenida (con credenciales)
+                    </h3>
+                    <p style={{ fontSize: '13px', color: '#6b7280', marginBottom: '1rem' }}>
+                      Este mensaje se envía a <strong>usuarios nuevos</strong> cuando se inscriben y se les crea una cuenta.
+                    </p>
+                    <div style={{
+                      padding: '1rem',
+                      background: '#eff6ff',
+                      border: '1px solid #bfdbfe',
+                      borderRadius: '8px',
+                      marginBottom: '1rem'
+                    }}>
+                      <p style={{ fontSize: '13px', color: '#1e40af', margin: '0 0 0.5rem 0', fontWeight: '600' }}>
+                        Variables disponibles (escríbelas entre llaves):
+                      </p>
+                      <div style={{ fontSize: '12px', color: '#1e3a8a', display: 'flex', flexWrap: 'wrap', gap: '0.75rem' }}>
+                        <code style={{ background: 'white', padding: '2px 6px', borderRadius: '4px', border: '1px solid #bfdbfe' }}>{'{nombre}'}</code>
+                        <code style={{ background: 'white', padding: '2px 6px', borderRadius: '4px', border: '1px solid #bfdbfe' }}>{'{email}'}</code>
+                        <code style={{ background: 'white', padding: '2px 6px', borderRadius: '4px', border: '1px solid #bfdbfe' }}>{'{clave}'}</code>
+                        <code style={{ background: 'white', padding: '2px 6px', borderRadius: '4px', border: '1px solid #bfdbfe' }}>{'{curso}'}</code>
+                        <code style={{ background: 'white', padding: '2px 6px', borderRadius: '4px', border: '1px solid #bfdbfe' }}>{'{modalidad}'}</code>
+                        <code style={{ background: 'white', padding: '2px 6px', borderRadius: '4px', border: '1px solid #bfdbfe' }}>{'{precio}'}</code>
+                      </div>
+                      <p style={{ fontSize: '12px', color: '#1e40af', margin: '0.5rem 0 0 0', fontStyle: 'italic' }}>
+                        Si dejas vacío este campo, se usará el mensaje por defecto del sistema.
+                      </p>
+                    </div>
+                    <textarea
+                      value={formData.email_confirmation_template}
+                      onChange={(e) => setFormData(prev => ({ ...prev, email_confirmation_template: e.target.value }))}
+                      placeholder="Ejemplo:&#10;&#10;¡Hola {nombre}!&#10;&#10;Bienvenido al curso {curso}.&#10;&#10;Tus credenciales de acceso:&#10;Email: {email}&#10;Contraseña: {clave}&#10;&#10;Inicia sesión en: https://smartchatix.com/login"
+                      rows={10}
+                      style={{
+                        width: '100%',
+                        padding: '0.75rem',
+                        border: '2px solid #e5e7eb',
+                        borderRadius: '8px',
+                        fontSize: '13px',
+                        fontFamily: 'monospace',
+                        boxSizing: 'border-box',
+                        resize: 'vertical',
+                        lineHeight: '1.6'
+                      }}
+                    />
+                  </div>
+
+                  <div style={{ gridColumn: '1 / -1', marginTop: '2rem' }}>
+                    <h3 style={{ fontSize: '1.125rem', fontWeight: '600', color: '#111827', marginBottom: '0.5rem' }}>
+                      ✅ Email de confirmación de pago
+                    </h3>
+                    <p style={{ fontSize: '13px', color: '#6b7280', marginBottom: '1rem' }}>
+                      Este mensaje se envía a <strong>todos los usuarios</strong> después de completar el pago exitosamente.
+                    </p>
+                    <div style={{
+                      padding: '1rem',
+                      background: '#f0fdf4',
+                      border: '1px solid #86efac',
+                      borderRadius: '8px',
+                      marginBottom: '1rem'
+                    }}>
+                      <p style={{ fontSize: '13px', color: '#166534', margin: '0 0 0.5rem 0', fontWeight: '600' }}>
+                        Variables disponibles (escríbelas entre llaves):
+                      </p>
+                      <div style={{ fontSize: '12px', color: '#14532d', display: 'flex', flexWrap: 'wrap', gap: '0.75rem' }}>
+                        <code style={{ background: 'white', padding: '2px 6px', borderRadius: '4px', border: '1px solid #86efac' }}>{'{nombre}'}</code>
+                        <code style={{ background: 'white', padding: '2px 6px', borderRadius: '4px', border: '1px solid #86efac' }}>{'{email}'}</code>
+                        <code style={{ background: 'white', padding: '2px 6px', borderRadius: '4px', border: '1px solid #86efac' }}>{'{curso}'}</code>
+                        <code style={{ background: 'white', padding: '2px 6px', borderRadius: '4px', border: '1px solid #86efac' }}>{'{modalidad}'}</code>
+                        <code style={{ background: 'white', padding: '2px 6px', borderRadius: '4px', border: '1px solid #86efac' }}>{'{precio}'}</code>
+                      </div>
+                      <p style={{ fontSize: '12px', color: '#166534', margin: '0.5rem 0 0 0', fontStyle: 'italic' }}>
+                        Si dejas vacío este campo, se usará el mensaje por defecto del sistema.
+                      </p>
+                    </div>
+                    <textarea
+                      value={formData.email_payment_confirmation_template}
+                      onChange={(e) => setFormData(prev => ({ ...prev, email_payment_confirmation_template: e.target.value }))}
+                      placeholder="Ejemplo:&#10;&#10;¡Pago confirmado!&#10;&#10;Tu pago por el curso {curso} ha sido procesado exitosamente.&#10;&#10;Modalidad: {modalidad}&#10;Monto: {precio}&#10;&#10;Ya puedes acceder al aula virtual."
+                      rows={10}
+                      style={{
+                        width: '100%',
+                        padding: '0.75rem',
+                        border: '2px solid #e5e7eb',
+                        borderRadius: '8px',
+                        fontSize: '13px',
+                        fontFamily: 'monospace',
+                        boxSizing: 'border-box',
+                        resize: 'vertical',
+                        lineHeight: '1.6'
                       }}
                     />
                   </div>
