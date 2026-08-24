@@ -160,21 +160,17 @@ export async function POST(request: NextRequest) {
             [email]
           );
 
-          let userName = '';
-
           if (userResult && userResult.length > 0) {
             userId = userResult[0].id;
             console.log('👤 Usuario existente encontrado, ID:', userId);
-            console.log('📧 SE ENVIARÁ email de bienvenida al curso (sin credenciales)');
-            const userNameResult = await query('SELECT name FROM users WHERE id = ?', [userId]);
-            userName = userNameResult && userNameResult.length > 0 ? userNameResult[0].name : email.split('@')[0];
+            console.log('📧 NO se enviará email de bienvenida (solo confirmación de pago)');
           } else {
             console.log('👤 Creando nuevo usuario');
-            console.log('📧 SE ENVIARÁ email de bienvenida al curso (con credenciales)');
+            console.log('📧 SE ENVIARÁ email de bienvenida con credenciales');
             isNewUser = true;
             tempPassword = generateTemporaryPassword();
             const hashedPassword = await bcrypt.hash(tempPassword, 10);
-            userName = email.split('@')[0];
+            const userName = email.split('@')[0];
 
             const insertUserResult: any = await query(
               `INSERT INTO users (name, email, password_hash, role, is_active, created_at)
@@ -183,24 +179,23 @@ export async function POST(request: NextRequest) {
             );
             userId = insertUserResult.insertId;
             console.log('✅ Nuevo usuario creado, ID:', userId);
-          }
 
-          try {
-            let emailBody = '';
+            try {
+              let emailBody = '';
 
-            if (course.email_confirmation_template) {
-              const textWithVariables = replaceEmailVariables(course.email_confirmation_template, {
-                nombre: userName,
-                email: email,
-                clave: tempPassword,
-                curso: courseTitle,
-                modalidad: modality === 'vivo' ? 'En Vivo' : 'Grabado',
-                precio: `${currency === 'USD' ? 'US$' : 'S/'} ${amount.toFixed(2)}`
-              });
-              const htmlContent = convertTextToHtml(textWithVariables);
-              emailBody = wrapInEmailTemplate(htmlContent);
-            } else {
-              emailBody = `
+              if (course.email_confirmation_template) {
+                const textWithVariables = replaceEmailVariables(course.email_confirmation_template, {
+                  nombre: userName,
+                  email: email,
+                  clave: tempPassword,
+                  curso: courseTitle,
+                  modalidad: modality === 'vivo' ? 'En Vivo' : 'Grabado',
+                  precio: `${currency === 'USD' ? 'US$' : 'S/'} ${amount.toFixed(2)}`
+                });
+                const htmlContent = convertTextToHtml(textWithVariables);
+                emailBody = wrapInEmailTemplate(htmlContent);
+              } else {
+                emailBody = `
 <!DOCTYPE html>
 <html>
 <head>
@@ -216,7 +211,6 @@ export async function POST(request: NextRequest) {
       <p style="font-size: 16px; color: #202124; line-height: 1.6; margin-bottom: 20px;">
         ¡Hola ${userName}! Te has inscrito exitosamente al curso: <strong>${courseTitle}</strong>
       </p>
-      ${isNewUser ? `
       <p style="font-size: 16px; color: #202124; line-height: 1.6; margin-bottom: 20px;">
         Tus credenciales de acceso son:
       </p>
@@ -227,11 +221,6 @@ export async function POST(request: NextRequest) {
       <p style="font-size: 14px; color: #5F6368; line-height: 1.6; margin-bottom: 30px;">
         Por favor, cambia tu contraseña después de iniciar sesión por primera vez.
       </p>
-      ` : `
-      <p style="font-size: 16px; color: #202124; line-height: 1.6; margin-bottom: 20px;">
-        Puedes acceder al curso usando tu cuenta existente: <strong>${email}</strong>
-      </p>
-      `}
       <div style="text-align: center;">
         <a href="https://smartchatix.com/login" style="display: inline-block; background: linear-gradient(135deg, #FF6600 0%, #FF8C00 100%); color: #ffffff; padding: 15px 40px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 16px;">
           Ir al Aula Virtual
@@ -244,36 +233,37 @@ export async function POST(request: NextRequest) {
   </div>
 </body>
 </html>
-              `;
+                `;
+              }
+
+              const emailHtml = emailBody;
+
+              const resendApiKey = process.env.RESEND_API_KEY;
+              const emailResponse = await fetch('https://api.resend.com/emails', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'Authorization': `Bearer ${resendApiKey}`
+                },
+                body: JSON.stringify({
+                  from: 'SmartChatix <noreply@smartchatix.com>',
+                  to: email,
+                  subject: `Bienvenido a ${courseTitle} - Tus credenciales de acceso`,
+                  html: emailHtml
+                })
+              });
+
+              if (emailResponse.ok) {
+                const emailResult = await emailResponse.json();
+                console.log('✅ Email de bienvenida enviado exitosamente:', emailResult);
+              } else {
+                const errorText = await emailResponse.text();
+                console.error('❌ Error enviando email de bienvenida - Status:', emailResponse.status);
+                console.error('❌ Error details:', errorText);
+              }
+            } catch (emailError) {
+              console.error('❌ Error al enviar email de bienvenida:', emailError);
             }
-
-            const emailHtml = emailBody;
-
-            const resendApiKey = process.env.RESEND_API_KEY;
-            const emailResponse = await fetch('https://api.resend.com/emails', {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${resendApiKey}`
-              },
-              body: JSON.stringify({
-                from: 'SmartChatix <noreply@smartchatix.com>',
-                to: email,
-                subject: `Bienvenido a ${courseTitle}${isNewUser ? ' - Tus credenciales de acceso' : ''}`,
-                html: emailHtml
-              })
-            });
-
-            if (emailResponse.ok) {
-              const emailResult = await emailResponse.json();
-              console.log('✅ Email de bienvenida enviado exitosamente:', emailResult);
-            } else {
-              const errorText = await emailResponse.text();
-              console.error('❌ Error enviando email de bienvenida - Status:', emailResponse.status);
-              console.error('❌ Error details:', errorText);
-            }
-          } catch (emailError) {
-            console.error('❌ Error al enviar email de bienvenida:', emailError);
           }
 
           const enrollmentMode = modality || 'grabado';
