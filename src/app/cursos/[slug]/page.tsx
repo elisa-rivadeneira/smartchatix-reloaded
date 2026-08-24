@@ -6,6 +6,7 @@ import { notFound } from 'next/navigation';
 import Footer from '@/components/Footer';
 import Header from '@/components/layout/Header';
 import { useCurrency } from '@/hooks/useCurrency';
+import * as fbPixel from '@/lib/fbPixel';
 
 export default function CursoPage({ params }: { params: Promise<{ slug: string }> }) {
   const { currency, symbol, exchangeRate } = useCurrency();
@@ -46,6 +47,15 @@ export default function CursoPage({ params }: { params: Promise<{ slug: string }
         if (response.ok) {
           const data = await response.json();
           setCurso(data.course);
+
+          if (data.course) {
+            fbPixel.viewContent(
+              data.course.title,
+              'Cursos',
+              parseFloat(data.course.price_pen || data.course.precio || '0'),
+              'PEN'
+            );
+          }
         } else {
           setCurso(null);
         }
@@ -590,6 +600,83 @@ export default function CursoPage({ params }: { params: Promise<{ slug: string }
                 </div>
               </div>
             </div>
+
+            {curso?.live_start_date && curso?.live_schedule && (
+              <div style={{
+                background: `linear-gradient(135deg, ${colors.primary} 0%, #1e40af 100%)`,
+                padding: spacing.lg,
+                borderRadius: '12px',
+                marginBottom: spacing.lg,
+                boxShadow: '0 4px 16px rgba(37, 99, 235, 0.2)'
+              }}>
+                <div className="schedule-container" style={{
+                  display: 'flex',
+                  flexWrap: 'wrap',
+                  gap: spacing.lg,
+                  justifyContent: 'space-between'
+                }}>
+                  <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '12px',
+                    color: colors.white,
+                    flex: '1 1 250px'
+                  }}>
+                    <div style={{
+                      backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                      borderRadius: '8px',
+                      padding: '10px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center'
+                    }}>
+                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                        <line x1="16" y1="2" x2="16" y2="6"/>
+                        <line x1="8" y1="2" x2="8" y2="6"/>
+                        <line x1="3" y1="10" x2="21" y2="10"/>
+                      </svg>
+                    </div>
+                    <div>
+                      <div style={{ fontSize: '0.75rem', opacity: 0.9, marginBottom: '2px' }}>Inicio del curso</div>
+                      <div style={{ fontSize: '1.1rem', fontWeight: '700' }}>
+                        {new Date(curso.live_start_date).toLocaleDateString('es-ES', {
+                          day: 'numeric',
+                          month: 'long',
+                          year: 'numeric'
+                        })}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '12px',
+                    color: colors.white,
+                    flex: '1 1 250px'
+                  }}>
+                    <div style={{
+                      backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                      borderRadius: '8px',
+                      padding: '10px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center'
+                    }}>
+                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <circle cx="12" cy="12" r="10"/>
+                        <polyline points="12 6 12 12 16 14"/>
+                      </svg>
+                    </div>
+                    <div>
+                      <div style={{ fontSize: '0.75rem', opacity: 0.9, marginBottom: '2px' }}>Horario de clases</div>
+                      <div style={{ fontSize: '1.1rem', fontWeight: '700' }}>{curso.live_schedule}</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
 
             {curso?.publication_status === 'coming_soon' ? (
               <div style={{

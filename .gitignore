@@ -46,3 +46,10 @@ next-env.d.ts
 /public/documents/
 *.db
 *.mp4
+
+# Internal documentation with sensitive info
+README_CULQI.md
+INSTRUCCIONES_DEPLOY.md
+DESARROLLO.md
+migrate-code-to-r2.md
+AULAVIRTUAL.md

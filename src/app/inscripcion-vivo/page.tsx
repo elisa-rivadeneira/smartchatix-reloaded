@@ -925,6 +925,37 @@ function InscripcionVivoContent() {
                         setTimeout(() => setPaymentError(''), 5000);
                       }}
                     />
+
+                    <div style={{
+                      marginTop: spacing.md,
+                      padding: spacing.md,
+                      backgroundColor: '#fff3cd',
+                      border: '2px solid #ffc107',
+                      borderRadius: '8px',
+                      fontSize: '0.85rem',
+                      lineHeight: '1.5'
+                    }}>
+                      <div style={{ fontWeight: '700', marginBottom: spacing.sm, color: '#856404' }}>
+                        📸 Importante:
+                      </div>
+                      <div style={{ color: '#856404' }}>
+                        Después de completar el pago, toma una captura de pantalla del comprobante de PayPal y envíala a:
+                      </div>
+                      <div style={{
+                        marginTop: spacing.sm,
+                        padding: spacing.sm,
+                        backgroundColor: 'white',
+                        borderRadius: '6px',
+                        fontWeight: '700',
+                        color: colors.primary,
+                        textAlign: 'center'
+                      }}>
+                        📧 admin@smartchatix.com
+                      </div>
+                      <div style={{ marginTop: spacing.sm, fontSize: '0.8rem', color: '#856404' }}>
+                        Incluye tu nombre completo en el correo para activar tu acceso al curso.
+                      </div>
+                    </div>
                   </div>
                 )}
 
@@ -1005,9 +1036,42 @@ function InscripcionVivoContent() {
                         color: colors.white,
                         padding: spacing.sm,
                         borderRadius: '8px',
-                        fontSize: '0.85rem'
+                        fontSize: '0.85rem',
+                        marginBottom: spacing.md
                       }}>
                         💡 Monto: {symbol} {getPrice().toFixed(2)}
+                      </div>
+
+                      <div style={{
+                        padding: spacing.md,
+                        backgroundColor: '#fff3cd',
+                        border: '2px solid #ffc107',
+                        borderRadius: '8px',
+                        fontSize: '0.85rem',
+                        lineHeight: '1.5',
+                        textAlign: 'left'
+                      }}>
+                        <div style={{ fontWeight: '700', marginBottom: spacing.sm, color: '#856404' }}>
+                          📸 Después de realizar el pago:
+                        </div>
+                        <ol style={{ margin: 0, paddingLeft: '20px', color: '#856404' }}>
+                          <li style={{ marginBottom: spacing.xs }}>Toma una captura de pantalla del comprobante de Yape</li>
+                          <li>Envíala junto con tu nombre completo a:</li>
+                        </ol>
+                        <div style={{
+                          marginTop: spacing.sm,
+                          padding: spacing.sm,
+                          backgroundColor: 'white',
+                          borderRadius: '6px',
+                          fontWeight: '700',
+                          color: colors.primary,
+                          textAlign: 'center'
+                        }}>
+                          📧 admin@smartchatix.com
+                        </div>
+                        <div style={{ marginTop: spacing.sm, fontSize: '0.8rem', color: '#856404', textAlign: 'center' }}>
+                          Activaremos tu acceso al curso en menos de 24 horas
+                        </div>
                       </div>
                     </div>
                   )}
