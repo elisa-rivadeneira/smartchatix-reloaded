@@ -281,10 +281,15 @@ export async function POST(request: NextRequest) {
 
           console.log('✅ Inscripción creada exitosamente:', insertEnrollmentResult);
 
+          console.log('📧 Preparando email de confirmación de pago...');
+          console.log('📧 Email destino:', email);
+          console.log('📧 RESEND_API_KEY existe:', !!process.env.RESEND_API_KEY);
+
           try {
             let confirmationEmailBody = '';
 
             if (course.email_payment_confirmation_template) {
+              console.log('📧 Usando template personalizado de confirmación');
               const userName = await query('SELECT name FROM users WHERE id = ?', [userId]);
               const textWithVariables = replaceEmailVariables(course.email_payment_confirmation_template, {
                 nombre: userName && userName.length > 0 ? userName[0].name : email.split('@')[0],

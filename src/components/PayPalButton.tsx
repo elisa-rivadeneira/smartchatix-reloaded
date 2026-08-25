@@ -128,8 +128,11 @@ export default function PayPalButton({
 
                 const result = await response.json();
                 console.log('📊 Resultado del servidor:', result);
+                console.log('📊 Response status:', response.status);
+                console.log('📊 Response OK:', response.ok);
 
                 if (!response.ok) {
+                  console.error('❌ El servidor retornó un error:', result);
                   if (result.alreadyEnrolled) {
                     throw new Error(result.message || 'Ya estás inscrito en este curso');
                   }
@@ -137,6 +140,7 @@ export default function PayPalButton({
                 }
 
                 console.log('✅ Pago procesado exitosamente');
+                console.log('✅ Llamando a onSuccess con:', result);
                 onSuccess(result);
               } catch (error: any) {
                 console.error('❌ Error procesando pago:', error);
