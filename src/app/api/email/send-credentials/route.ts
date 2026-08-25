@@ -5,11 +5,18 @@ const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KE
 
 export async function POST(request: NextRequest) {
   try {
-    const { email, name, password, courseTitle } = await request.json();
+    const { email, name, password, courseTitle, isNewUser = true } = await request.json();
 
-    if (!email || !password || !courseTitle) {
+    if (!email || !courseTitle) {
       return NextResponse.json(
         { error: 'Faltan datos requeridos' },
+        { status: 400 }
+      );
+    }
+
+    if (isNewUser && !password) {
+      return NextResponse.json(
+        { error: 'Se requiere contraseña para usuarios nuevos' },
         { status: 400 }
       );
     }
@@ -83,10 +90,11 @@ export async function POST(request: NextRequest) {
           </div>
 
           <div class="content">
-            <p>Hola <strong>${name}</strong>,</p>
+            <p>Hola <strong>${name || 'Estudiante'}</strong>,</p>
 
             <p>¡Bienvenido a <strong>SmartChatix</strong>! Nos complace confirmarte que tu inscripción al curso <strong>"${courseTitle}"</strong> ha sido exitosa.</p>
 
+            ${isNewUser ? `
             <div class="credentials-box">
               <h3 style="margin-top: 0; color: #003366;">📧 Tus Credenciales de Acceso</h3>
               <p style="margin: 10px 0;">
@@ -97,6 +105,20 @@ export async function POST(request: NextRequest) {
                 ⚠️ Por seguridad, te recomendamos cambiar tu contraseña después de iniciar sesión.
               </p>
             </div>
+            ` : `
+            <div class="credentials-box">
+              <h3 style="margin-top: 0; color: #003366;">🎓 Acceso al Curso</h3>
+              <p style="margin: 10px 0;">
+                Ya tienes una cuenta con nosotros. Puedes acceder al curso usando tus credenciales habituales:
+              </p>
+              <p style="margin: 10px 0;">
+                <strong>Usuario:</strong> ${email}
+              </p>
+              <p style="margin: 10px 0 0 0; font-size: 13px; color: #666;">
+                💡 Si olvidaste tu contraseña, puedes restablecerla desde la página de inicio de sesión.
+              </p>
+            </div>
+            `}
 
             <p><strong>Ya puedes acceder al aula virtual:</strong></p>
 
@@ -141,7 +163,9 @@ export async function POST(request: NextRequest) {
     const { data, error } = await resend.emails.send({
       from: 'SmartChatix <onboarding@resend.dev>',
       to: [email],
-      subject: `🎉 Bienvenido a ${courseTitle} - Tus credenciales de acceso`,
+      subject: isNewUser
+        ? `🎉 Bienvenido a ${courseTitle} - Tus credenciales de acceso`
+        : `🎉 Te inscribiste a ${courseTitle} - ¡Ya puedes acceder!`,
       html: emailHTML,
     });
 

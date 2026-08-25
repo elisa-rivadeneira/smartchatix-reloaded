@@ -47,6 +47,12 @@ export default function AdminUsersSection() {
   });
   const [userEnrollments, setUserEnrollments] = useState<number[]>([]);
   const [selectedCourseToAdd, setSelectedCourseToAdd] = useState<number | null>(null);
+  const [showEmailModal, setShowEmailModal] = useState(false);
+  const [enrollmentEmailData, setEnrollmentEmailData] = useState<{
+    user: { id: number; email: string; name: string } | null;
+    course: { id: number; title: string; slug: string } | null;
+  }>({ user: null, course: null });
+  const [sendingEmail, setSendingEmail] = useState(false);
 
   useEffect(() => {
     loadData();
@@ -174,16 +180,53 @@ export default function AdminUsersSection() {
       });
 
       if (response.ok) {
+        const data = await response.json();
         setUserEnrollments([...userEnrollments, selectedCourseToAdd]);
         setSelectedCourseToAdd(null);
         loadData();
-        alert('✅ Inscripción agregada correctamente');
+
+        if (data.user && data.course) {
+          setEnrollmentEmailData({ user: data.user, course: data.course });
+          setShowEmailModal(true);
+        } else {
+          alert('✅ Inscripción agregada correctamente');
+        }
       } else {
         alert('❌ Error al agregar inscripción');
       }
     } catch (error) {
       console.error('Error adding enrollment:', error);
       alert('❌ Error al agregar inscripción');
+    }
+  };
+
+  const handleSendWelcomeEmail = async () => {
+    if (!enrollmentEmailData.user || !enrollmentEmailData.course) return;
+
+    setSendingEmail(true);
+    try {
+      const response = await fetch('/api/email/send-credentials', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: enrollmentEmailData.user.email,
+          name: enrollmentEmailData.user.name,
+          courseTitle: enrollmentEmailData.course.title,
+          isNewUser: false
+        })
+      });
+
+      if (response.ok) {
+        alert('✅ Email de bienvenida enviado correctamente');
+        setShowEmailModal(false);
+      } else {
+        alert('❌ Error al enviar email');
+      }
+    } catch (error) {
+      console.error('Error sending email:', error);
+      alert('❌ Error al enviar email');
+    } finally {
+      setSendingEmail(false);
     }
   };
 
@@ -1188,6 +1231,105 @@ export default function AdminUsersSection() {
                   ✅ Crear Usuario
                 </button>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal de confirmación de email */}
+      {showEmailModal && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(0, 0, 0, 0.5)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 9999
+        }}>
+          <div style={{
+            backgroundColor: 'white',
+            borderRadius: '12px',
+            padding: '2rem',
+            maxWidth: '500px',
+            width: '90%',
+            boxShadow: '0 8px 32px rgba(0,0,0,0.3)'
+          }}>
+            <h2 style={{
+              fontSize: '1.5rem',
+              fontWeight: '700',
+              color: '#003366',
+              marginBottom: '1rem',
+              textAlign: 'center'
+            }}>
+              📧 Enviar Email de Bienvenida
+            </h2>
+
+            <p style={{
+              fontSize: '1rem',
+              color: '#5F6368',
+              lineHeight: '1.6',
+              marginBottom: '1.5rem',
+              textAlign: 'center'
+            }}>
+              ¿Deseas enviar un email de bienvenida al curso a <strong>{enrollmentEmailData.user?.name}</strong>?
+            </p>
+
+            <div style={{
+              background: '#F8F9FA',
+              borderLeft: '4px solid #FF6600',
+              padding: '1rem',
+              borderRadius: '4px',
+              marginBottom: '1.5rem'
+            }}>
+              <p style={{ margin: 0, fontSize: '0.9rem', color: '#5F6368' }}>
+                <strong>Usuario:</strong> {enrollmentEmailData.user?.email}<br/>
+                <strong>Curso:</strong> {enrollmentEmailData.course?.title}
+              </p>
+            </div>
+
+            <div style={{
+              display: 'flex',
+              gap: '1rem',
+              justifyContent: 'center'
+            }}>
+              <button
+                onClick={() => setShowEmailModal(false)}
+                disabled={sendingEmail}
+                style={{
+                  padding: '0.75rem 1.5rem',
+                  background: 'white',
+                  color: '#5F6368',
+                  border: '2px solid #E8EAED',
+                  borderRadius: '8px',
+                  fontSize: '1rem',
+                  fontWeight: '600',
+                  cursor: sendingEmail ? 'not-allowed' : 'pointer',
+                  opacity: sendingEmail ? 0.5 : 1
+                }}
+              >
+                No, gracias
+              </button>
+              <button
+                onClick={handleSendWelcomeEmail}
+                disabled={sendingEmail}
+                style={{
+                  padding: '0.75rem 1.5rem',
+                  background: sendingEmail ? '#9AA0A6' : 'linear-gradient(135deg, #FF6600 0%, #FF8C00 100%)',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '8px',
+                  fontSize: '1rem',
+                  fontWeight: '600',
+                  cursor: sendingEmail ? 'not-allowed' : 'pointer',
+                  boxShadow: '0 4px 12px rgba(255, 102, 0, 0.3)'
+                }}
+              >
+                {sendingEmail ? '📧 Enviando...' : '✅ Sí, enviar email'}
+              </button>
             </div>
           </div>
         </div>

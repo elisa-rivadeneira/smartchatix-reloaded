@@ -35,9 +35,21 @@ export async function POST(request: NextRequest) {
       [user_id, course_id, modality || 'grabado', payment_amount || 0, payment_status || 'completed']
     );
 
+    const userResult = await query(
+      'SELECT id, email, name FROM users WHERE id = ?',
+      [user_id]
+    );
+
+    const courseResult = await query(
+      'SELECT id, title, slug FROM courses WHERE id = ?',
+      [course_id]
+    );
+
     return NextResponse.json({
       success: true,
-      message: 'Inscripción agregada correctamente'
+      message: 'Inscripción agregada correctamente',
+      user: userResult && userResult.length > 0 ? userResult[0] : null,
+      course: courseResult && courseResult.length > 0 ? courseResult[0] : null
     });
   } catch (error: any) {
     console.error('Error adding enrollment:', error);

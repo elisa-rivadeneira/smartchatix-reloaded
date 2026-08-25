@@ -729,6 +729,211 @@ function ComprarGrabadoContent() {
                   Métodos de pago
                 </h3>
 
+                {/* PAYMENT_METHODS_GRABADO_START */}
+
+                {/* 1. PAYPAL */}
+                <div
+                  onClick={() => setPaymentMethod('paypal')}
+                  style={{
+                    padding: spacing.md,
+                    border: `2px solid ${paymentMethod === 'paypal' ? colors.primary : colors.gray[300]}`,
+                    borderRadius: '8px',
+                    cursor: 'pointer',
+                    marginBottom: spacing.sm,
+                    backgroundColor: paymentMethod === 'paypal' ? `${colors.primary}05` : colors.white
+                  }}
+                >
+                  <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: spacing.sm,
+                    marginBottom: paymentMethod === 'paypal' ? spacing.md : 0
+                  }}>
+                    <div style={{
+                      width: '20px',
+                      height: '20px',
+                      borderRadius: '50%',
+                      border: `2px solid ${paymentMethod === 'paypal' ? colors.primary : colors.gray[400]}`,
+                      backgroundColor: paymentMethod === 'paypal' ? colors.primary : 'transparent',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      color: colors.white,
+                      fontSize: '0.7rem',
+                      flexShrink: 0
+                    }}>
+                      {paymentMethod === 'paypal' && '✓'}
+                    </div>
+                    <img src="/images/paypal_icon.png" alt="PayPal" style={{ height: '30px', width: 'auto' }} />
+                    <span style={{ fontWeight: '600', color: colors.gray[700] }}>PayPal</span>
+                  </div>
+
+                  {paymentMethod === 'paypal' && (
+                    <div style={{
+                      marginTop: spacing.md,
+                      padding: spacing.md,
+                      border: `2px solid ${colors.gray[200]}`,
+                      borderRadius: '8px',
+                      backgroundColor: colors.gray[50]
+                    }}>
+                      <PayPalButton
+                        amount={(() => {
+                          console.log('💰 CALCULANDO PRECIO PAYPAL GRABADO:');
+                          console.log('  - curso.priceGrabado (PEN):', curso.priceGrabado);
+                          console.log('  - curso.priceGrabadoUsd (USD):', curso.priceGrabadoUsd);
+                          console.log('  - parseFloat(curso.priceGrabadoUsd):', parseFloat(curso.priceGrabadoUsd));
+                          console.log('  - parseFloat(curso.priceGrabadoUsd) > 0:', parseFloat(curso.priceGrabadoUsd) > 0);
+
+                          let finalAmount;
+                          if (curso.priceGrabadoUsd && parseFloat(curso.priceGrabadoUsd) > 0) {
+                            finalAmount = parseFloat(curso.priceGrabadoUsd);
+                            console.log('  ✅ USANDO precio USD configurado:', finalAmount);
+                          } else {
+                            finalAmount = Math.round(((curso.priceGrabado || 0) / 3.80) * 100) / 100;
+                            console.log('  ✅ CONVIRTIENDO de PEN a USD:');
+                            console.log('     ', curso.priceGrabado, '÷ 3.80 =', finalAmount);
+                          }
+
+                          console.log('  📤 PRECIO FINAL ENVIADO A PAYPAL:', finalAmount);
+                          return finalAmount;
+                        })()}
+                        courseSlug={curso.slug}
+                        courseTitle={curso.title}
+                        modality="grabado"
+                        email={email}
+                        currency="USD"
+                        onSuccess={(data) => {
+                          setPaymentSuccess(true);
+                          setEnrollment(data.enrollment);
+                        }}
+                        onError={(error) => {
+                          setPaymentError(error);
+                          setTimeout(() => setPaymentError(''), 5000);
+                        }}
+                      />
+                    </div>
+                  )}
+                </div>
+
+                {/* 2. YAPE */}
+                <div
+                  onClick={() => setPaymentMethod('yape')}
+                  style={{
+                    padding: spacing.md,
+                    border: `2px solid ${paymentMethod === 'yape' ? colors.primary : colors.gray[300]}`,
+                    borderRadius: '8px',
+                    cursor: 'pointer',
+                    marginBottom: spacing.sm,
+                    backgroundColor: paymentMethod === 'yape' ? `${colors.primary}05` : colors.white
+                  }}
+                >
+                  <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: spacing.sm,
+                    marginBottom: paymentMethod === 'yape' ? spacing.md : 0
+                  }}>
+                    <div style={{
+                      width: '20px',
+                      height: '20px',
+                      borderRadius: '50%',
+                      border: `2px solid ${paymentMethod === 'yape' ? colors.primary : colors.gray[400]}`,
+                      backgroundColor: paymentMethod === 'yape' ? colors.primary : 'transparent',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      color: colors.white,
+                      fontSize: '0.7rem',
+                      flexShrink: 0
+                    }}>
+                      {paymentMethod === 'yape' && '✓'}
+                    </div>
+                    <img src="/images/yape_icon.png" alt="Yape" style={{ height: '30px', width: 'auto' }} />
+                    <span style={{ fontWeight: '600', color: colors.gray[700] }}>Yape / Plin</span>
+                  </div>
+
+                  {paymentMethod === 'yape' && (
+                    <div style={{
+                      marginTop: spacing.md,
+                      textAlign: 'center',
+                      backgroundColor: colors.gray[50],
+                      padding: spacing.lg,
+                      borderRadius: '8px'
+                    }}>
+                      <p style={{ marginBottom: spacing.md, color: colors.gray[700], fontWeight: '600' }}>
+                        Escanea el QR o yapea al número:
+                      </p>
+                      <img
+                        src="/images/yape.jpeg"
+                        alt="QR Yape"
+                        style={{
+                          maxWidth: '200px',
+                          width: '100%',
+                          height: 'auto',
+                          borderRadius: '8px',
+                          marginBottom: spacing.md,
+                          border: `2px solid ${colors.gray[300]}`
+                        }}
+                      />
+                      <div style={{
+                        backgroundColor: colors.primary,
+                        color: colors.white,
+                        padding: spacing.sm,
+                        borderRadius: '8px',
+                        marginBottom: spacing.sm
+                      }}>
+                        <div style={{ fontSize: '0.85rem', marginBottom: '4px' }}>📱 Número:</div>
+                        <div style={{ fontSize: '1.3rem', fontWeight: '700', letterSpacing: '0.05em' }}>
+                          +51 983 269 818
+                        </div>
+                      </div>
+                      <div style={{
+                        backgroundColor: '#6B1F7B',
+                        color: colors.white,
+                        padding: spacing.sm,
+                        borderRadius: '8px',
+                        fontSize: '0.85rem',
+                        marginBottom: spacing.md
+                      }}>
+                        💡 Monto: {symbol} {getPrice().toFixed(2)}
+                      </div>
+
+                      <div style={{
+                        padding: spacing.md,
+                        backgroundColor: '#fff3cd',
+                        border: '2px solid #ffc107',
+                        borderRadius: '8px',
+                        fontSize: '0.85rem',
+                        lineHeight: '1.5',
+                        textAlign: 'left'
+                      }}>
+                        <div style={{ fontWeight: '700', marginBottom: spacing.sm, color: '#856404' }}>
+                          📸 Después de realizar el pago:
+                        </div>
+                        <ol style={{ margin: 0, paddingLeft: '20px', color: '#856404' }}>
+                          <li style={{ marginBottom: spacing.xs }}>Toma una captura de pantalla del comprobante de Yape</li>
+                          <li>Envíala junto con tu nombre completo a:</li>
+                        </ol>
+                        <div style={{
+                          marginTop: spacing.sm,
+                          padding: spacing.sm,
+                          backgroundColor: 'white',
+                          borderRadius: '6px',
+                          fontWeight: '700',
+                          color: colors.primary,
+                          textAlign: 'center'
+                        }}>
+                          📧 admin@smartchatix.com
+                        </div>
+                        <div style={{ marginTop: spacing.sm, fontSize: '0.8rem', color: '#856404', textAlign: 'center' }}>
+                          Activaremos tu acceso al curso en menos de 24 horas
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* 3. TARJETA (CULQI) */}
                 <div
                   onClick={() => setPaymentMethod('card')}
                   style={{
@@ -763,7 +968,7 @@ function ComprarGrabadoContent() {
                         {paymentMethod === 'card' && '✓'}
                       </div>
                       <div style={{ display: 'flex', alignItems: 'center', gap: spacing.xs }}>
-                        <span className="payment-method-text" style={{ fontWeight: '600', color: colors.gray[700] }}>💳  Tarjeta de Crédito o Débito</span>
+                        <span className="payment-method-text" style={{ fontWeight: '600', color: colors.gray[700] }}>💳 Tarjeta de Crédito o Débito (Solo Perú)</span>
                       </div>
                     </div>
                     <div className="payment-method-icons" style={{ display: 'flex', gap: spacing.sm, alignItems: 'center' }}>
@@ -773,7 +978,10 @@ function ComprarGrabadoContent() {
                       <img src="/images/diners_color.svg" alt="Diners Club" className="card-icon" style={{ width: 'auto' }} />
                     </div>
                   </div>
+
                 </div>
+
+                {/* PAYMENT_METHODS_GRABADO_END */}
                 </>
               )}
 

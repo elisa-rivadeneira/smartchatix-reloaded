@@ -19,7 +19,7 @@ function InscripcionVivoContent() {
   const [curso, setCurso] = React.useState<any>(null);
   const [loading, setLoading] = React.useState(true);
   const [step, setStep] = React.useState(1);
-  const [paymentMethod, setPaymentMethod] = React.useState('card');
+  const [paymentMethod, setPaymentMethod] = React.useState('');
   const [fullName, setFullName] = React.useState('');
   const [email, setEmail] = React.useState('');
   const [phone, setPhone] = React.useState('');
@@ -720,252 +720,15 @@ function InscripcionVivoContent() {
                   </div>
                 </div>
 
-                <h3 style={{
-                  fontSize: '1.1rem',
-                  fontWeight: '700',
-                  color: colors.gray[700],
-                  marginBottom: spacing.md
-                }}>
-                  Métodos de pago
-                </h3>
-
-                <div
-                  onClick={() => setPaymentMethod('card')}
-                  style={{
-                    padding: spacing.md,
-                    border: `2px solid ${paymentMethod === 'card' ? colors.primary : colors.gray[300]}`,
-                    borderRadius: '8px',
-                    cursor: 'pointer',
-                    marginBottom: spacing.sm,
-                    backgroundColor: paymentMethod === 'card' ? `${colors.primary}05` : colors.white
-                  }}
-                >
-                  <div className="payment-method-header" style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    marginBottom: paymentMethod === 'card' ? spacing.md : 0
-                  }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: spacing.sm }}>
-                      <div className="payment-check" style={{
-                        width: '20px',
-                        height: '20px',
-                        borderRadius: '50%',
-                        border: `2px solid ${paymentMethod === 'card' ? colors.primary : colors.gray[400]}`,
-                        backgroundColor: paymentMethod === 'card' ? colors.primary : 'transparent',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        color: colors.white,
-                        fontSize: '0.7rem',
-                        flexShrink: 0
-                      }}>
-                        {paymentMethod === 'card' && '✓'}
-                      </div>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: spacing.xs }}>
-                        <span className="payment-method-text" style={{ fontWeight: '600', color: colors.gray[700] }}>💳 Tarjeta de Crédito o Débito </span>
-                      </div>
-                    </div>
-                    <div className="payment-method-icons" style={{ display: 'flex', gap: spacing.sm, alignItems: 'center' }}>
-                      <img src="/images/visa_color.svg" alt="Visa" className="card-icon" style={{ width: 'auto' }} />
-                      <img src="/images/mastercard_color.svg" alt="Mastercard" className="card-icon" style={{ width: 'auto' }} />
-                      <img src="/images/amex_color.svg" alt="American Express" className="card-icon" style={{ width: 'auto' }} />
-                      <img src="/images/diners_color.svg" alt="Diners Club" className="card-icon" style={{ width: 'auto' }} />
-                    </div>
-                  </div>
-
-                </div>
                 </>
               )}
 
               </form>
 
-              {step === 2 && paymentMethod === 'card' && curso && (
-                <div style={{
-                  padding: spacing.lg,
-                  border: `2px solid ${colors.gray[200]}`,
-                  borderRadius: '12px',
-                  backgroundColor: colors.white,
-                  marginTop: spacing.md
-                }}>
-                  {paymentError && (
-                    <div style={{
-                      padding: '1.5rem',
-                      background: 'linear-gradient(135deg, #FFEBEE 0%, #FFCDD2 100%)',
-                      border: '2px solid #EF5350',
-                      borderRadius: '12px',
-                      marginBottom: '1.5rem',
-                      boxShadow: '0 4px 12px rgba(239, 83, 80, 0.2)'
-                    }}>
-                      <div style={{
-                        display: 'flex',
-                        alignItems: 'flex-start',
-                        gap: '12px'
-                      }}>
-                        <div style={{ fontSize: '1.5rem', flexShrink: 0 }}>❌</div>
-                        <div style={{ flex: 1 }}>
-                          <h4 style={{
-                            color: '#C62828',
-                            margin: '0 0 8px 0',
-                            fontSize: '1.1rem',
-                            fontWeight: '700'
-                          }}>
-                            Error al procesar el pago
-                          </h4>
-                          <p style={{
-                            color: '#D32F2F',
-                            margin: 0,
-                            fontSize: '0.95rem',
-                            lineHeight: '1.5'
-                          }}>
-                            {paymentError}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-
-                  {!paymentSuccess ? (
-                    <CulqiPaymentForm
-                      amount={getPrice()}
-                      courseSlug={curso.slug}
-                      courseTitle={curso.title}
-                      modality="vivo"
-                      email={email}
-                      fullName={fullName}
-                      phone={phone}
-                      currency={currency}
-                      onSuccess={(data) => {
-                        setPaymentSuccess(true);
-                        setEnrollment(data.enrollment);
-                      }}
-                      onError={(error) => {
-                        setPaymentError(error);
-                        setTimeout(() => setPaymentError(''), 5000);
-                      }}
-                    />
-                  ) : (
-                    <div style={{
-                      padding: '3rem 2rem',
-                      background: 'linear-gradient(135deg, #E8F5E9 0%, #C8E6C9 100%)',
-                      borderRadius: '16px',
-                      textAlign: 'center',
-                      boxShadow: '0 8px 24px rgba(46, 125, 50, 0.15)'
-                    }}>
-                      <div style={{ fontSize: '4rem', marginBottom: '1rem', animation: 'bounce 1s ease' }}>🎉</div>
-                      <h2 style={{
-                        color: '#1B5E20',
-                        marginBottom: '0.5rem',
-                        fontSize: '2rem',
-                        fontWeight: '700'
-                      }}>
-                        ¡Felicitaciones!
-                      </h2>
-                      <h3 style={{ color: '#2E7D32', marginBottom: '1.5rem', fontSize: '1.3rem' }}>
-                        Te has inscrito exitosamente al curso
-                      </h3>
-
-                      <div style={{
-                        background: 'white',
-                        padding: '1.5rem',
-                        borderRadius: '12px',
-                        marginBottom: '2rem',
-                        border: '2px solid #4CAF50',
-                        textAlign: 'left'
-                      }}>
-                        <div style={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '12px',
-                          marginBottom: '1rem',
-                          paddingBottom: '1rem',
-                          borderBottom: '1px solid #E0E0E0'
-                        }}>
-                          <div style={{ fontSize: '2rem' }}>📧</div>
-                          <div>
-                            <h4 style={{ margin: 0, color: '#1B5E20', fontSize: '1.1rem' }}>
-                              Credenciales enviadas
-                            </h4>
-                            <p style={{ margin: '4px 0 0 0', color: '#558B2F', fontSize: '0.9rem' }}>
-                              {enrollment?.email || email}
-                            </p>
-                          </div>
-                        </div>
-
-                        <p style={{
-                          color: '#424242',
-                          fontSize: '0.95rem',
-                          lineHeight: '1.6',
-                          margin: 0
-                        }}>
-                          {enrollment?.isNewUser ? (
-                            <>
-                              📨 Hemos enviado tus <strong>credenciales de acceso</strong> al correo electrónico:
-                              <br/>
-                              <strong style={{ color: '#2E7D32' }}>{enrollment?.email || email}</strong>
-                              <br/><br/>
-                              ✅ Revisa tu bandeja de entrada (y carpeta de spam) para acceder al aula virtual.
-                            </>
-                          ) : (
-                            <>
-                              ✅ Ya tenías una cuenta con nosotros. Puedes acceder al curso con tus credenciales habituales.
-                            </>
-                          )}
-                        </p>
-                      </div>
-
-                      <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap' }}>
-                        <button
-                          onClick={() => router.push('/login')}
-                          style={{
-                            padding: '1rem 2rem',
-                            background: 'linear-gradient(135deg, #2E7D32 0%, #388E3C 100%)',
-                            color: 'white',
-                            border: 'none',
-                            borderRadius: '8px',
-                            fontSize: '1rem',
-                            fontWeight: '600',
-                            cursor: 'pointer',
-                            boxShadow: '0 4px 12px rgba(46, 125, 50, 0.3)',
-                            transition: 'transform 0.2s'
-                          }}
-                          onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-2px)'}
-                          onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
-                        >
-                          🎓 Ir al Aula Virtual
-                        </button>
-                        <button
-                          onClick={() => router.push('/')}
-                          style={{
-                            padding: '1rem 2rem',
-                            background: 'white',
-                            color: '#2E7D32',
-                            border: '2px solid #4CAF50',
-                            borderRadius: '8px',
-                            fontSize: '1rem',
-                            fontWeight: '600',
-                            cursor: 'pointer',
-                            transition: 'all 0.2s'
-                          }}
-                          onMouseEnter={(e) => {
-                            e.currentTarget.style.background = '#F1F8E9';
-                          }}
-                          onMouseLeave={(e) => {
-                            e.currentTarget.style.background = 'white';
-                          }}
-                        >
-                          🏠 Volver al Inicio
-                        </button>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              )}
-
               <form onSubmit={(e) => e.preventDefault()}>
                 {step === 2 && (
                   <>
-                {/* PAYPAL */}
+                {/* 1. PAYPAL */}
                 <div
                   onClick={() => setPaymentMethod('paypal')}
                   style={{
@@ -1082,7 +845,7 @@ function InscripcionVivoContent() {
                   </div>
                 )}
 
-                {/* YAPE */}
+                {/* 2. YAPE */}
                 <div
                   onClick={() => setPaymentMethod('yape')}
                   style={{
@@ -1199,6 +962,237 @@ function InscripcionVivoContent() {
                     </div>
                   )}
                 </div>
+
+                {/* 3. TARJETA (CULQI) */}
+                <div
+                  onClick={() => setPaymentMethod('card')}
+                  style={{
+                    padding: spacing.md,
+                    border: `2px solid ${paymentMethod === 'card' ? colors.primary : colors.gray[300]}`,
+                    borderRadius: '8px',
+                    cursor: 'pointer',
+                    marginBottom: spacing.sm,
+                    backgroundColor: paymentMethod === 'card' ? `${colors.primary}05` : colors.white
+                  }}
+                >
+                  <div className="payment-method-header" style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    marginBottom: paymentMethod === 'card' ? spacing.md : 0
+                  }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: spacing.sm }}>
+                      <div className="payment-check" style={{
+                        width: '20px',
+                        height: '20px',
+                        borderRadius: '50%',
+                        border: `2px solid ${paymentMethod === 'card' ? colors.primary : colors.gray[400]}`,
+                        backgroundColor: paymentMethod === 'card' ? colors.primary : 'transparent',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        color: colors.white,
+                        fontSize: '0.7rem',
+                        flexShrink: 0
+                      }}>
+                        {paymentMethod === 'card' && '✓'}
+                      </div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: spacing.xs }}>
+                        <span className="payment-method-text" style={{ fontWeight: '600', color: colors.gray[700] }}>💳 Tarjeta de Crédito o Débito (Solo Perú)</span>
+                      </div>
+                    </div>
+                    <div className="payment-method-icons" style={{ display: 'flex', gap: spacing.sm, alignItems: 'center' }}>
+                      <img src="/images/visa_color.svg" alt="Visa" className="card-icon" style={{ width: 'auto' }} />
+                      <img src="/images/mastercard_color.svg" alt="Mastercard" className="card-icon" style={{ width: 'auto' }} />
+                      <img src="/images/amex_color.svg" alt="American Express" className="card-icon" style={{ width: 'auto' }} />
+                      <img src="/images/diners_color.svg" alt="Diners Club" className="card-icon" style={{ width: 'auto' }} />
+                    </div>
+                  </div>
+
+                </div>
+
+                {/* Card Payment Form Area */}
+                {paymentMethod === 'card' && (
+                  <div style={{
+                    padding: spacing.md,
+                    border: `2px solid ${colors.gray[200]}`,
+                    borderRadius: '8px',
+                    backgroundColor: colors.gray[50],
+                    marginBottom: spacing.sm
+                  }}>
+                    {paymentError && (
+                      <div style={{
+                        padding: '1.5rem',
+                        background: 'linear-gradient(135deg, #FFEBEE 0%, #FFCDD2 100%)',
+                        border: '2px solid #EF5350',
+                        borderRadius: '12px',
+                        marginBottom: '1.5rem',
+                        boxShadow: '0 4px 12px rgba(239, 83, 80, 0.2)'
+                      }}>
+                        <div style={{
+                          display: 'flex',
+                          alignItems: 'flex-start',
+                          gap: '12px'
+                        }}>
+                          <div style={{ fontSize: '1.5rem', flexShrink: 0 }}>❌</div>
+                          <div style={{ flex: 1 }}>
+                            <h4 style={{
+                              color: '#C62828',
+                              margin: '0 0 8px 0',
+                              fontSize: '1.1rem',
+                              fontWeight: '700'
+                            }}>
+                              Error al procesar el pago
+                            </h4>
+                            <p style={{
+                              color: '#D32F2F',
+                              margin: 0,
+                              fontSize: '0.95rem',
+                              lineHeight: '1.5'
+                            }}>
+                              {paymentError}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {!paymentSuccess ? (
+                      <CulqiPaymentForm
+                        amount={getPrice()}
+                        courseSlug={curso.slug}
+                        courseTitle={curso.title}
+                        modality="vivo"
+                        email={email}
+                        fullName={fullName}
+                        phone={phone}
+                        currency={currency}
+                        onSuccess={(data) => {
+                          setPaymentSuccess(true);
+                          setEnrollment(data.enrollment);
+                        }}
+                        onError={(error) => {
+                          setPaymentError(error);
+                          setTimeout(() => setPaymentError(''), 5000);
+                        }}
+                      />
+                    ) : (
+                      <div style={{
+                        padding: '3rem 2rem',
+                        background: 'linear-gradient(135deg, #E8F5E9 0%, #C8E6C9 100%)',
+                        borderRadius: '16px',
+                        textAlign: 'center',
+                        boxShadow: '0 8px 24px rgba(46, 125, 50, 0.15)'
+                      }}>
+                        <div style={{ fontSize: '4rem', marginBottom: '1rem', animation: 'bounce 1s ease' }}>🎉</div>
+                        <h2 style={{
+                          color: '#1B5E20',
+                          marginBottom: '0.5rem',
+                          fontSize: '2rem',
+                          fontWeight: '700'
+                        }}>
+                          ¡Felicitaciones!
+                        </h2>
+                        <h3 style={{ color: '#2E7D32', marginBottom: '1.5rem', fontSize: '1.3rem' }}>
+                          Te has inscrito exitosamente al curso
+                        </h3>
+
+                        <div style={{
+                          background: 'white',
+                          padding: '1.5rem',
+                          borderRadius: '12px',
+                          marginBottom: '2rem',
+                          border: '2px solid #4CAF50',
+                          textAlign: 'left'
+                        }}>
+                          <div style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '12px',
+                            marginBottom: '1rem',
+                            paddingBottom: '1rem',
+                            borderBottom: '1px solid #E0E0E0'
+                          }}>
+                            <div style={{ fontSize: '2rem' }}>📧</div>
+                            <div>
+                              <h4 style={{ margin: 0, color: '#1B5E20', fontSize: '1.1rem' }}>
+                                Credenciales enviadas
+                              </h4>
+                              <p style={{ margin: '4px 0 0 0', color: '#558B2F', fontSize: '0.9rem' }}>
+                                {enrollment?.email || email}
+                              </p>
+                            </div>
+                          </div>
+
+                          <p style={{
+                            color: '#424242',
+                            fontSize: '0.95rem',
+                            lineHeight: '1.6',
+                            margin: 0
+                          }}>
+                            {enrollment?.isNewUser ? (
+                              <>
+                                📨 Hemos enviado tus <strong>credenciales de acceso</strong> al correo electrónico:
+                                <br/>
+                                <strong style={{ color: '#2E7D32' }}>{enrollment?.email || email}</strong>
+                                <br/><br/>
+                                ✅ Revisa tu bandeja de entrada (y carpeta de spam) para acceder al aula virtual.
+                              </>
+                            ) : (
+                              <>
+                                ✅ Ya tenías una cuenta con nosotros. Puedes acceder al curso con tus credenciales habituales.
+                              </>
+                            )}
+                          </p>
+                        </div>
+
+                        <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap' }}>
+                          <button
+                            onClick={() => router.push('/login')}
+                            style={{
+                              padding: '1rem 2rem',
+                              background: 'linear-gradient(135deg, #2E7D32 0%, #388E3C 100%)',
+                              color: 'white',
+                              border: 'none',
+                              borderRadius: '8px',
+                              fontSize: '1rem',
+                              fontWeight: '600',
+                              cursor: 'pointer',
+                              boxShadow: '0 4px 12px rgba(46, 125, 50, 0.3)',
+                              transition: 'transform 0.2s'
+                            }}
+                            onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-2px)'}
+                            onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
+                          >
+                            🎓 Ir al Aula Virtual
+                          </button>
+                          <button
+                            onClick={() => router.push('/')}
+                            style={{
+                              padding: '1rem 2rem',
+                              background: 'white',
+                              color: '#2E7D32',
+                              border: '2px solid #4CAF50',
+                              borderRadius: '8px',
+                              fontSize: '1rem',
+                              fontWeight: '600',
+                              cursor: 'pointer',
+                              transition: 'all 0.2s'
+                            }}
+                            onMouseEnter={(e) => {
+                              e.currentTarget.style.background = '#F1F8E9';
+                            }}
+                            onMouseLeave={(e) => {
+                              e.currentTarget.style.background = 'white';
+                            }}
+                          >
+                            🏠 Volver al Inicio
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
 
                 <div className="mobile-fixed-bottom">
                   {/* Detalles del pedido en paso 2 */}

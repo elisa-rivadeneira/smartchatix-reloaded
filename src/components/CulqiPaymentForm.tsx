@@ -174,7 +174,7 @@ export default function CulqiPaymentForm({
 
   const openCulqiCheckout = () => {
     if (!culqiLoaded || !window.Culqi) {
-      onError('Culqi no está disponible. Por favor recarga la página.');
+      console.warn('Culqi no está cargado aún');
       return;
     }
 
