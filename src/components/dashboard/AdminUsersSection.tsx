@@ -123,6 +123,40 @@ export default function AdminUsersSection() {
     }
   };
 
+  const handleDeleteUser = async () => {
+    if (!editingUser) return;
+
+    const confirmDelete = window.confirm(
+      `⚠️ ¿Estás seguro de que deseas eliminar al usuario "${editingUser.name}"?\n\n` +
+      `Esta acción NO se puede deshacer y eliminará:\n` +
+      `• El usuario y toda su información\n` +
+      `• Todas sus inscripciones a cursos\n` +
+      `• Todo su progreso y calificaciones\n\n` +
+      `¿Deseas continuar?`
+    );
+
+    if (!confirmDelete) return;
+
+    try {
+      const response = await fetch(`/api/admin/users/${editingUser.id}`, {
+        method: 'DELETE'
+      });
+
+      if (response.ok) {
+        setEditModalOpen(false);
+        setEditingUser(null);
+        loadData();
+        alert('✅ Usuario eliminado correctamente');
+      } else {
+        const error = await response.json();
+        alert(`❌ ${error.error || 'Error al eliminar usuario'}`);
+      }
+    } catch (error) {
+      console.error('Error deleting user:', error);
+      alert('❌ Error al eliminar usuario');
+    }
+  };
+
   const handleAddEnrollment = async () => {
     if (!editingUser || !selectedCourseToAdd) return;
 
@@ -866,6 +900,44 @@ export default function AdminUsersSection() {
                     ➕ Agregar
                   </button>
                 </div>
+              </div>
+
+              <div style={{
+                marginTop: '2rem',
+                paddingTop: '1.5rem',
+                borderTop: '2px solid #fee2e2'
+              }}>
+                <button
+                  onClick={handleDeleteUser}
+                  style={{
+                    width: '100%',
+                    padding: '0.75rem 1.5rem',
+                    background: '#ef4444',
+                    color: '#fff',
+                    border: 'none',
+                    borderRadius: '8px',
+                    fontSize: '14px',
+                    fontWeight: '600',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '0.5rem'
+                  }}
+                  onMouseEnter={(e) => e.currentTarget.style.background = '#dc2626'}
+                  onMouseLeave={(e) => e.currentTarget.style.background = '#ef4444'}
+                >
+                  🗑️ Eliminar Usuario
+                </button>
+                <p style={{
+                  fontSize: '12px',
+                  color: '#991b1b',
+                  marginTop: '0.5rem',
+                  marginBottom: 0,
+                  textAlign: 'center'
+                }}>
+                  ⚠️ Esta acción no se puede deshacer
+                </p>
               </div>
 
               <div style={{

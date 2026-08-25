@@ -98,11 +98,39 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const token = request.cookies.get('auth_token')?.value;
+    if (!token) {
+      return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
+    }
+
+    const decoded = verifyToken(token);
+    if (!decoded || decoded.role !== 'admin') {
+      return NextResponse.json({ error: 'Acceso denegado' }, { status: 403 });
+    }
+
     const { id } = await params;
     const userId = parseInt(id);
 
+    const userToDelete = await query('SELECT role FROM users WHERE id = ?', [userId]);
+    if (!userToDelete || userToDelete.length === 0) {
+      return NextResponse.json({ error: 'Usuario no encontrado' }, { status: 404 });
+    }
+
+    if (decoded.id === userId) {
+      return NextResponse.json(
+        { error: 'No puedes eliminar tu propia cuenta' },
+        { status: 400 }
+      );
+    }
+
+    console.log(`🗑️ Eliminando usuario ID: ${userId}`);
+
+    await query('DELETE FROM quiz_responses WHERE user_id = ?', [userId]);
+    await query('DELETE FROM assignment_submissions WHERE user_id = ?', [userId]);
     await query('DELETE FROM enrollments WHERE user_id = ?', [userId]);
     await query('DELETE FROM users WHERE id = ?', [userId]);
+
+    console.log(`✅ Usuario ID: ${userId} eliminado exitosamente`);
 
     return NextResponse.json({
       success: true,
