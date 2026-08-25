@@ -161,7 +161,7 @@ export async function POST(request: NextRequest) {
     }
 
     const { data, error } = await resend.emails.send({
-      from: 'SmartChatix <onboarding@resend.dev>',
+      from: 'SmartChatix <noreply@smartchatix.com>',
       to: [email],
       subject: isNewUser
         ? `🎉 Bienvenido a ${courseTitle} - Tus credenciales de acceso`

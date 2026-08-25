@@ -275,7 +275,7 @@ export async function POST(request: NextRequest) {
     const adminEmail = process.env.ADMIN_EMAIL || 'admin@smartchatix.com';
 
     const { data, error } = await resend.emails.send({
-      from: process.env.RESEND_FROM_EMAIL || 'SmartChatix <onboarding@resend.dev>',
+      from: process.env.RESEND_FROM_EMAIL || 'SmartChatix <noreply@smartchatix.com>',
       to: [email, adminEmail],
       subject: `✅ Confirmación de Compra - ${courseTitle}`,
       html: emailHTML,
