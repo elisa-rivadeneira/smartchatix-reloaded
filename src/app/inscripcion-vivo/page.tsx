@@ -1017,7 +1017,7 @@ function InscripcionVivoContent() {
                       amount={
                         curso.priceVivoUsd && parseFloat(curso.priceVivoUsd) > 0
                           ? parseFloat(curso.priceVivoUsd)
-                          : convertPrice(curso.priceVivo || 0)
+                          : Math.round(((curso.priceVivo || 0) / 3.80) * 100) / 100
                       }
                       courseSlug={curso.slug}
                       courseTitle={curso.title}

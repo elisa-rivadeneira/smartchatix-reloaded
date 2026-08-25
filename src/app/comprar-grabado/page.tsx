@@ -1013,7 +1013,7 @@ function ComprarGrabadoContent() {
                         amount={
                           curso.priceGrabadoUsd && parseFloat(curso.priceGrabadoUsd) > 0
                             ? parseFloat(curso.priceGrabadoUsd)
-                            : convertPrice(curso.priceGrabado || 0)
+                            : Math.round(((curso.priceGrabado || 0) / 3.80) * 100) / 100
                         }
                         courseSlug={curso.slug}
                         courseTitle={curso.title}
