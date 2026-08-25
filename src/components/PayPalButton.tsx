@@ -107,10 +107,13 @@ export default function PayPalButton({
 
             onApprove: async function(data: any, actions: any) {
               console.log('✅ Pago aprobado, capturando orden...');
-              const order = await actions.order.capture();
-              console.log('📦 Orden capturada:', order.id);
 
               try {
+                const order = await actions.order.capture();
+                console.log('📦 Orden capturada por PayPal:', order.id);
+                console.log('📦 Orden completa:', JSON.stringify(order, null, 2));
+
+                console.log('🔵 Enviando datos al servidor para registrar inscripción...');
                 const response = await fetch('/api/payment/paypal/capture', {
                   method: 'POST',
                   headers: { 'Content-Type': 'application/json' },
@@ -126,25 +129,36 @@ export default function PayPalButton({
                   })
                 });
 
-                const result = await response.json();
-                console.log('📊 Resultado del servidor:', result);
                 console.log('📊 Response status:', response.status);
                 console.log('📊 Response OK:', response.ok);
+
+                let result;
+                try {
+                  result = await response.json();
+                  console.log('📊 Resultado del servidor:', JSON.stringify(result, null, 2));
+                } catch (jsonError) {
+                  console.error('❌ Error parseando respuesta JSON:', jsonError);
+                  const textResponse = await response.text();
+                  console.error('❌ Respuesta del servidor (texto):', textResponse);
+                  throw new Error('Error: El servidor no respondió correctamente. Tu pago fue procesado pero hubo un error al registrar tu inscripción. Por favor contacta a soporte con el ID de orden: ' + order.id);
+                }
 
                 if (!response.ok) {
                   console.error('❌ El servidor retornó un error:', result);
                   if (result.alreadyEnrolled) {
-                    throw new Error(result.message || 'Ya estás inscrito en este curso');
+                    onSuccess({ alreadyEnrolled: true, message: result.message });
+                    return;
                   }
-                  throw new Error(result.error || 'Error al procesar el pago');
+                  throw new Error(result.error || `Error del servidor (${response.status}). Tu pago fue procesado. ID de orden: ${order.id}. Por favor contacta a soporte.`);
                 }
 
-                console.log('✅ Pago procesado exitosamente');
+                console.log('✅ Pago procesado exitosamente en el servidor');
                 console.log('✅ Llamando a onSuccess con:', result);
                 onSuccess(result);
               } catch (error: any) {
                 console.error('❌ Error procesando pago:', error);
-                onError(error.message || 'Error al procesar el pago con PayPal');
+                console.error('❌ Stack trace:', error.stack);
+                onError(error.message || 'Error al procesar el pago con PayPal. Por favor contacta a soporte.');
               }
             },
 
