@@ -1014,11 +1014,26 @@ function InscripcionVivoContent() {
                     marginBottom: spacing.sm
                   }}>
                     <PayPalButton
-                      amount={
-                        curso.priceVivoUsd && parseFloat(curso.priceVivoUsd) > 0
-                          ? parseFloat(curso.priceVivoUsd)
-                          : Math.round(((curso.priceVivo || 0) / 3.80) * 100) / 100
-                      }
+                      amount={(() => {
+                        console.log('💰 CALCULANDO PRECIO PAYPAL VIVO:');
+                        console.log('  - curso.priceVivo (PEN):', curso.priceVivo);
+                        console.log('  - curso.priceVivoUsd (USD):', curso.priceVivoUsd);
+                        console.log('  - parseFloat(curso.priceVivoUsd):', parseFloat(curso.priceVivoUsd));
+                        console.log('  - parseFloat(curso.priceVivoUsd) > 0:', parseFloat(curso.priceVivoUsd) > 0);
+
+                        let finalAmount;
+                        if (curso.priceVivoUsd && parseFloat(curso.priceVivoUsd) > 0) {
+                          finalAmount = parseFloat(curso.priceVivoUsd);
+                          console.log('  ✅ USANDO precio USD configurado:', finalAmount);
+                        } else {
+                          finalAmount = Math.round(((curso.priceVivo || 0) / 3.80) * 100) / 100;
+                          console.log('  ✅ CONVIRTIENDO de PEN a USD:');
+                          console.log('     ', curso.priceVivo, '÷ 3.80 =', finalAmount);
+                        }
+
+                        console.log('  📤 PRECIO FINAL ENVIADO A PAYPAL:', finalAmount);
+                        return finalAmount;
+                      })()}
                       courseSlug={curso.slug}
                       courseTitle={curso.title}
                       modality="vivo"

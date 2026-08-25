@@ -1010,11 +1010,26 @@ function ComprarGrabadoContent() {
                       backgroundColor: colors.gray[50]
                     }}>
                       <PayPalButton
-                        amount={
-                          curso.priceGrabadoUsd && parseFloat(curso.priceGrabadoUsd) > 0
-                            ? parseFloat(curso.priceGrabadoUsd)
-                            : Math.round(((curso.priceGrabado || 0) / 3.80) * 100) / 100
-                        }
+                        amount={(() => {
+                          console.log('💰 CALCULANDO PRECIO PAYPAL GRABADO:');
+                          console.log('  - curso.priceGrabado (PEN):', curso.priceGrabado);
+                          console.log('  - curso.priceGrabadoUsd (USD):', curso.priceGrabadoUsd);
+                          console.log('  - parseFloat(curso.priceGrabadoUsd):', parseFloat(curso.priceGrabadoUsd));
+                          console.log('  - parseFloat(curso.priceGrabadoUsd) > 0:', parseFloat(curso.priceGrabadoUsd) > 0);
+
+                          let finalAmount;
+                          if (curso.priceGrabadoUsd && parseFloat(curso.priceGrabadoUsd) > 0) {
+                            finalAmount = parseFloat(curso.priceGrabadoUsd);
+                            console.log('  ✅ USANDO precio USD configurado:', finalAmount);
+                          } else {
+                            finalAmount = Math.round(((curso.priceGrabado || 0) / 3.80) * 100) / 100;
+                            console.log('  ✅ CONVIRTIENDO de PEN a USD:');
+                            console.log('     ', curso.priceGrabado, '÷ 3.80 =', finalAmount);
+                          }
+
+                          console.log('  📤 PRECIO FINAL ENVIADO A PAYPAL:', finalAmount);
+                          return finalAmount;
+                        })()}
                         courseSlug={curso.slug}
                         courseTitle={curso.title}
                         modality="grabado"
