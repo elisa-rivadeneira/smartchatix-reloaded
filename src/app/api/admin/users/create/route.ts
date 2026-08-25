@@ -45,6 +45,23 @@ export async function POST(request: NextRequest) {
       [name, email, hashedPassword, role || 'student', is_active !== false]
     );
 
+    try {
+      await fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/email/send-credentials`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: email,
+          name: name,
+          password: password,
+          courseTitle: 'SmartChatix',
+          isNewUser: true
+        })
+      });
+      console.log(`✅ Email de bienvenida enviado a ${email}`);
+    } catch (emailError) {
+      console.error('⚠️ Error al enviar email de bienvenida:', emailError);
+    }
+
     return NextResponse.json({
       success: true,
       message: 'Usuario creado correctamente'

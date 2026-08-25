@@ -50,8 +50,9 @@ export default function AdminUsersSection() {
   const [showEmailModal, setShowEmailModal] = useState(false);
   const [enrollmentEmailData, setEnrollmentEmailData] = useState<{
     user: { id: number; email: string; name: string } | null;
-    course: { id: number; title: string; slug: string } | null;
-  }>({ user: null, course: null });
+    course: { id: number; title: string; slug: string; emailTemplate?: string } | null;
+    hasPassword: boolean;
+  }>({ user: null, course: null, hasPassword: true });
   const [sendingEmail, setSendingEmail] = useState(false);
 
   useEffect(() => {
@@ -186,7 +187,11 @@ export default function AdminUsersSection() {
         loadData();
 
         if (data.user && data.course) {
-          setEnrollmentEmailData({ user: data.user, course: data.course });
+          setEnrollmentEmailData({
+            user: data.user,
+            course: data.course,
+            hasPassword: data.hasPassword || false
+          });
           setShowEmailModal(true);
         } else {
           alert('✅ Inscripción agregada correctamente');
@@ -205,19 +210,39 @@ export default function AdminUsersSection() {
 
     setSendingEmail(true);
     try {
-      const response = await fetch('/api/email/send-credentials', {
+      const tempPassword = Math.random().toString(36).slice(-8);
+
+      const updatePasswordResponse = await fetch(`/api/admin/users/${enrollmentEmailData.user.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          password: tempPassword
+        })
+      });
+
+      if (!updatePasswordResponse.ok) {
+        alert('❌ Error al generar contraseña');
+        setSendingEmail(false);
+        return;
+      }
+
+      const response = await fetch('/api/email/send-purchase-confirmation', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           email: enrollmentEmailData.user.email,
           name: enrollmentEmailData.user.name,
           courseTitle: enrollmentEmailData.course.title,
-          isNewUser: false
+          modality: 'grabado',
+          amount: 0,
+          password: tempPassword,
+          isNewUser: true,
+          emailConfirmationTemplate: enrollmentEmailData.course.emailTemplate || ''
         })
       });
 
       if (response.ok) {
-        alert('✅ Email de bienvenida enviado correctamente');
+        alert('✅ Email de bienvenida enviado correctamente con contraseña temporal');
         setShowEmailModal(false);
       } else {
         alert('❌ Error al enviar email');

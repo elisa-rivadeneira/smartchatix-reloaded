@@ -36,20 +36,31 @@ export async function POST(request: NextRequest) {
     );
 
     const userResult = await query(
-      'SELECT id, email, name FROM users WHERE id = ?',
+      'SELECT id, email, name, password_hash FROM users WHERE id = ?',
       [user_id]
     );
 
     const courseResult = await query(
-      'SELECT id, title, slug FROM courses WHERE id = ?',
+      'SELECT id, title, slug, email_confirmation_template FROM courses WHERE id = ?',
       [course_id]
     );
+
+    const user = userResult && userResult.length > 0 ? userResult[0] : null;
+    const hasPassword = user && user.password_hash ? true : false;
+
+    const course = courseResult && courseResult.length > 0 ? courseResult[0] : null;
 
     return NextResponse.json({
       success: true,
       message: 'Inscripción agregada correctamente',
-      user: userResult && userResult.length > 0 ? userResult[0] : null,
-      course: courseResult && courseResult.length > 0 ? courseResult[0] : null
+      user: user ? { id: user.id, email: user.email, name: user.name } : null,
+      course: course ? {
+        id: course.id,
+        title: course.title,
+        slug: course.slug,
+        emailTemplate: course.email_confirmation_template
+      } : null,
+      hasPassword: hasPassword
     });
   } catch (error: any) {
     console.error('Error adding enrollment:', error);

@@ -7,9 +7,9 @@ export async function POST(request: NextRequest) {
   try {
     const { email, name, password, courseTitle, isNewUser = true } = await request.json();
 
-    if (!email || !courseTitle) {
+    if (!email) {
       return NextResponse.json(
-        { error: 'Faltan datos requeridos' },
+        { error: 'Email es requerido' },
         { status: 400 }
       );
     }
@@ -92,7 +92,7 @@ export async function POST(request: NextRequest) {
           <div class="content">
             <p>Hola <strong>${name || 'Estudiante'}</strong>,</p>
 
-            <p>¡Bienvenido a <strong>SmartChatix</strong>! Nos complace confirmarte que tu inscripción al curso <strong>"${courseTitle}"</strong> ha sido exitosa.</p>
+            <p>¡Bienvenido a <strong>SmartChatix</strong>!${courseTitle ? ` Nos complace confirmarte que tu inscripción al curso <strong>"${courseTitle}"</strong> ha sido exitosa.` : ' Tu cuenta ha sido creada exitosamente.'}</p>
 
             ${isNewUser ? `
             <div class="credentials-box">
@@ -164,8 +164,8 @@ export async function POST(request: NextRequest) {
       from: 'SmartChatix <noreply@smartchatix.com>',
       to: [email],
       subject: isNewUser
-        ? `🎉 Bienvenido a ${courseTitle} - Tus credenciales de acceso`
-        : `🎉 Te inscribiste a ${courseTitle} - ¡Ya puedes acceder!`,
+        ? (courseTitle ? `🎉 Bienvenido a ${courseTitle} - Tus credenciales de acceso` : '🎉 Bienvenido a SmartChatix - Tus credenciales de acceso')
+        : (courseTitle ? `🎉 Te inscribiste a ${courseTitle} - ¡Ya puedes acceder!` : '🎉 Tu cuenta en SmartChatix está lista'),
       html: emailHTML,
     });
 
