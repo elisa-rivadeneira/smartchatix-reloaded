@@ -26,7 +26,7 @@ export default function SmartChatixPrincipalPage() {
   }, []);
 
   const getCoursePrice = (course: any, isOldPrice: boolean = false) => {
-    const isGrabado = parseFloat(course.priceGrabado) > 0;
+    const isGrabado = course.hasRecordedMode && parseFloat(course.priceGrabado) > 0;
 
     if (currency === 'USD') {
       const usdPrice = isOldPrice
@@ -922,17 +922,17 @@ export default function SmartChatixPrincipalPage() {
                           color: colors.accent
                         }}>
                           {loading
-                            ? 'S/ ' + (parseFloat(course.priceGrabado) > 0 ? course.priceGrabado : course.priceVivo)
+                            ? 'S/ ' + ((course.hasRecordedMode && parseFloat(course.priceGrabado) > 0) ? course.priceGrabado : course.priceVivo)
                             : symbol + ' ' + getCoursePrice(course, false)}
                         </span>
-                        {(parseFloat(course.priceGrabado) > 0 ? course.priceGrabadoOld : course.priceVivoOld) && (
+                        {((course.hasRecordedMode && parseFloat(course.priceGrabado) > 0) ? course.priceGrabadoOld : course.priceVivoOld) && (
                           <span style={{
                             fontSize: '0.9rem',
                             color: colors.gray[400],
                             textDecoration: 'line-through'
                           }}>
                             {loading
-                              ? 'S/ ' + (parseFloat(course.priceGrabado) > 0 ? course.priceGrabadoOld : course.priceVivoOld)
+                              ? 'S/ ' + ((course.hasRecordedMode && parseFloat(course.priceGrabado) > 0) ? course.priceGrabadoOld : course.priceVivoOld)
                               : symbol + ' ' + getCoursePrice(course, true)}
                           </span>
                         )}
