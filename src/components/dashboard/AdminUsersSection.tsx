@@ -712,6 +712,7 @@ export default function AdminUsersSection() {
         >
           <div
             style={{
+              position: 'relative',
               background: '#fff',
               borderRadius: '12px',
               padding: '1.5rem',
@@ -719,15 +720,35 @@ export default function AdminUsersSection() {
               width: '90%',
               maxHeight: '90vh',
               overflowY: 'auto',
+              overflowX: 'hidden',
               boxSizing: 'border-box'
             }}
             onClick={(e) => e.stopPropagation()}
           >
+            <button
+              onClick={() => setEditModalOpen(false)}
+              aria-label="Cerrar"
+              style={{
+                position: 'absolute',
+                top: '1rem',
+                right: '1rem',
+                background: 'transparent',
+                border: 'none',
+                fontSize: '20px',
+                lineHeight: 1,
+                color: '#9ca3af',
+                cursor: 'pointer',
+                padding: '0.25rem'
+              }}
+            >
+              ✕
+            </button>
             <h2 style={{
               fontSize: '1.5rem',
               fontWeight: '700',
               color: '#111827',
-              marginBottom: '1.5rem'
+              marginBottom: '1.5rem',
+              paddingRight: '1.5rem'
             }}>
               ✏️ Editar Usuario
             </h2>
@@ -1067,6 +1088,7 @@ export default function AdminUsersSection() {
         >
           <div
             style={{
+              position: 'relative',
               background: '#fff',
               borderRadius: '12px',
               padding: '1.5rem',
@@ -1074,15 +1096,35 @@ export default function AdminUsersSection() {
               width: '90%',
               maxHeight: '90vh',
               overflowY: 'auto',
+              overflowX: 'hidden',
               boxSizing: 'border-box'
             }}
             onClick={(e) => e.stopPropagation()}
           >
+            <button
+              onClick={() => setNewUserModalOpen(false)}
+              aria-label="Cerrar"
+              style={{
+                position: 'absolute',
+                top: '1rem',
+                right: '1rem',
+                background: 'transparent',
+                border: 'none',
+                fontSize: '20px',
+                lineHeight: 1,
+                color: '#9ca3af',
+                cursor: 'pointer',
+                padding: '0.25rem'
+              }}
+            >
+              ✕
+            </button>
             <h2 style={{
               fontSize: '1.5rem',
               fontWeight: '700',
               color: '#111827',
-              marginBottom: '1.5rem'
+              marginBottom: '1.5rem',
+              paddingRight: '1.5rem'
             }}>
               ➕ Nuevo Usuario
             </h2>
@@ -1276,6 +1318,7 @@ export default function AdminUsersSection() {
           zIndex: 9999
         }}>
           <div style={{
+            position: 'relative',
             backgroundColor: 'white',
             borderRadius: '12px',
             padding: '2rem',
@@ -1283,6 +1326,24 @@ export default function AdminUsersSection() {
             width: '90%',
             boxShadow: '0 8px 32px rgba(0,0,0,0.3)'
           }}>
+            <button
+              onClick={() => setShowEmailModal(false)}
+              aria-label="Cerrar"
+              style={{
+                position: 'absolute',
+                top: '1rem',
+                right: '1rem',
+                background: 'transparent',
+                border: 'none',
+                fontSize: '20px',
+                lineHeight: 1,
+                color: '#9ca3af',
+                cursor: 'pointer',
+                padding: '0.25rem'
+              }}
+            >
+              ✕
+            </button>
             <h2 style={{
               fontSize: '1.5rem',
               fontWeight: '700',

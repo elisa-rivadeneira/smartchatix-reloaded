@@ -70,7 +70,7 @@ CREATE TABLE IF NOT EXISTS lessons (
   module_id INT NOT NULL,
   title VARCHAR(255) NOT NULL,
   description TEXT,
-  content_type ENUM('video', 'document', 'quiz', 'assignment', 'markdown') DEFAULT 'video',
+  content_type ENUM('video', 'document', 'quiz', 'assignment', 'markdown', 'material') DEFAULT 'video',
   video_url VARCHAR(500), -- YouTube video ID
   main_content TEXT, -- Contenido principal de la lección (HTML)
   document_url VARCHAR(500), -- Path al PDF/archivo

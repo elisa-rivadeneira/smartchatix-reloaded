@@ -17,10 +17,9 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { course_id, title, description } = body;
 
-    const courseCheck = await query(
-      'SELECT id FROM courses WHERE id = ? AND instructor_id = ?',
-      [course_id, decoded.id]
-    );
+    const courseCheck = decoded.role === 'admin'
+      ? await query('SELECT id FROM courses WHERE id = ?', [course_id])
+      : await query('SELECT id FROM courses WHERE id = ? AND instructor_id = ?', [course_id, decoded.id]);
 
     if (!courseCheck || courseCheck.length === 0) {
       return NextResponse.json({ error: 'Curso no encontrado' }, { status: 404 });

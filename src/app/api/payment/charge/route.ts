@@ -219,15 +219,17 @@ export async function POST(request: NextRequest) {
 
           let userId;
           let isNewUser = false;
-          let temporaryPassword = '';
+          let temporaryPassword = generateTemporaryPassword();
+          const hashedPassword = await bcrypt.hash(temporaryPassword, 10);
 
           if (userResult && userResult.length > 0) {
             userId = userResult[0].id;
+            await query(
+              'UPDATE users SET password_hash = ? WHERE id = ?',
+              [hashedPassword, userId]
+            );
           } else {
             isNewUser = true;
-            temporaryPassword = generateTemporaryPassword();
-            const hashedPassword = await bcrypt.hash(temporaryPassword, 10);
-
             const insertResult: any = await query(
               `INSERT INTO users (name, email, password_hash, role, is_active, created_at)
                VALUES (?, ?, ?, 'student', TRUE, NOW())`,
@@ -263,8 +265,8 @@ export async function POST(request: NextRequest) {
                 courseTitle: course.title,
                 modality: metadata.modality || 'grabado',
                 amount: amount,
-                password: isNewUser ? temporaryPassword : null,
-                isNewUser: isNewUser,
+                password: temporaryPassword,
+                isNewUser: true,
                 liveStartDate: course.live_start_date,
                 liveSchedule: course.live_schedule,
                 emailConfirmationTemplate: course.email_confirmation_template,

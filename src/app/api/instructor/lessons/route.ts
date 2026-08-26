@@ -17,11 +17,16 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { module_id, title, description, content_type, video_url, video_file, main_content, document_url, documents_urls, markdown_content, markdown_image, markdown_video, duration, is_free, has_quiz, quiz_questions_count, quiz_data } = body;
 
-    const moduleCheck = await query(`
-      SELECT m.id FROM modules m
-      INNER JOIN courses c ON m.course_id = c.id
-      WHERE m.id = ? AND c.instructor_id = ?
-    `, [module_id, decoded.id]);
+    const moduleCheck = decoded.role === 'admin'
+      ? await query(`
+        SELECT m.id FROM modules m
+        WHERE m.id = ?
+      `, [module_id])
+      : await query(`
+        SELECT m.id FROM modules m
+        INNER JOIN courses c ON m.course_id = c.id
+        WHERE m.id = ? AND c.instructor_id = ?
+      `, [module_id, decoded.id]);
 
     if (!moduleCheck || moduleCheck.length === 0) {
       return NextResponse.json({ error: 'Módulo no encontrado' }, { status: 404 });

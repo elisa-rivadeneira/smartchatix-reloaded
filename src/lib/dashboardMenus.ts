@@ -74,7 +74,7 @@ export function getDashboardMenuItems(userRole: string, activeTab: string, setAc
       label: 'Mis Cursos',
       icon: '📚',
       onClick: () => setActiveTab('mis-cursos'),
-      roles: ['student', 'instructor']
+      roles: ['student']
     },
     {
       id: 'crear-curso',

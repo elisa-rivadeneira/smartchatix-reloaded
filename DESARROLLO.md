@@ -356,3 +356,254 @@ Cuando Culqi habilite pagos internacionales:
 - Es el flujo estándar de PayPal para no perder ventas
 
 ---
+
+## 🔧 Sesión 2026-08-25 - Estado Actual del Proyecto
+
+### ✅ Proyecto Funcionando Correctamente
+
+**Estado general:**
+- ✅ Plataforma LMS completa operativa
+- ✅ Sistema de pagos funcionando (PayPal + Yape/Plin)
+- ✅ IA integrada para generación de contenido
+- ✅ Cloudflare R2 para almacenamiento de archivos
+- ✅ Sistema de certificados automáticos
+- ✅ Deploy automático a producción (Easypanel)
+
+### 📋 Arquitectura Actual
+
+**Dashboard Unificado (en migración):**
+- ✅ **Ruta activa:** `/dashboard` → `/src/app/dashboard/page.tsx`
+- ✅ **Componentes:** `/src/components/dashboard/*`
+- ⚠️ **Legacy (no tocar):** `/admin`, `/instructor`, `/aula-virtual`
+- **Regla:** Todos los roles (Admin, Instructor, Student) usan `/dashboard`
+- **Diferenciación:** Por permisos y módulos según rol
+
+**Roles del sistema:**
+1. **Admin** - Control total de usuarios, cursos, estadísticas
+2. **Instructor** - Creación de cursos con IA, calificaciones, certificados
+3. **Student** - Acceso a cursos, quizzes, tareas, certificados
+
+### 🎯 Funcionalidades Implementadas
+
+**Instructor:**
+- ✅ Asistente IA para crear estructura de cursos (pegar contenido o chat)
+- ✅ Generación de contenido markdown con IA
+- ✅ Generación de quizzes con IA (GPT-4o)
+- ✅ Sistema de tareas con archivos adjuntos múltiples (R2)
+- ✅ Calificaciones ponderadas configurables
+- ✅ Certificados automáticos con QR verificable
+- ✅ Drag & drop para reordenar módulos/lecciones
+
+**Estudiante:**
+- ✅ Aula virtual con videos, markdown, PDFs
+- ✅ Quizzes interactivos con retroalimentación
+- ✅ Sistema de entregas de tareas
+- ✅ Descarga de certificados verificables
+- ✅ Tracking de progreso
+
+**Pagos:**
+- ✅ PayPal (Sandbox + Live) - Pagos en USD
+- ✅ Yape/Plin - Transferencias Perú
+- ⏳ Culqi (comentado) - Esperando habilitación pagos internacionales
+
+### 🔧 Infraestructura
+
+**Producción:**
+- **URL:** https://smartchatix.com
+- **Hosting:** Easypanel (VPS con auto-deploy)
+- **BD:** MariaDB (`automation_mariadbsmart`)
+- **CDN:** Cloudflare R2 (10GB gratis + bandwidth ilimitado)
+
+**Desarrollo:**
+- **Comando:** `./dev.sh` (puerto 3000)
+- **Hard refresh:** `Ctrl + Shift + R`
+- **Build antes de push:** `npm run build` ⚠️ OBLIGATORIO
+
+**Usuarios de prueba:**
+```
+Admin:
+- Email: admin@fluideka.com
+- Password: admin123
+
+Instructor:
+- Email: instructor@fluideka.com
+- Password: instructor123
+
+Estudiante:
+- Email: estudiante@test.com
+- Password: estudiante123
+```
+
+### 📦 Stack Tecnológico
+
+**Frontend:**
+- Next.js 15 (App Router)
+- React 19 + TypeScript
+- Tailwind CSS
+- Framer Motion
+
+**Backend:**
+- Next.js API Routes
+- MySQL/MariaDB
+- JWT (HttpOnly cookies)
+- bcrypt
+
+**IA:**
+- OpenAI GPT-4o (quizzes - mejor adherencia a instrucciones)
+- OpenAI GPT-4o-mini (estructura de cursos - económico)
+
+**Storage:**
+- Cloudflare R2 (S3-compatible)
+- Videos, imágenes, PDFs, archivos de tareas
+
+**Pagos:**
+- PayPal SDK oficial
+- Culqi (preparado, comentado)
+
+### 🎨 Filosofía de Diseño
+
+**Principios:**
+- La IA es un **medio**, la **persona** es el centro
+- Hablar de **transformación, productividad, aprendizaje**
+- **NO** hablar de IA, automatización, herramientas como protagonista
+- Diseño minimalista, mucho espacio en blanco
+- Evitar iconografía tecnológica excesiva
+
+**Header segmentado por audiencia:**
+- **B2B (Servicios):** Instituciones → Aulas Virtuales
+- **B2C (Cursos):** Profesionales → Cursos de IA
+- Componente: `/src/components/layout/Header.tsx`
+
+### 📊 Estado de Sesión
+
+**Trabajo reciente (2026-08-21):**
+- ✅ Integración completa PayPal
+- ✅ Fix precios USD vs PEN
+- ✅ Culqi comentado (listo para activar)
+
+**Próximos pasos posibles:**
+- [ ] Activar Culqi cuando esté disponible (descomentar código)
+- [ ] Migrar componentes legacy a `/dashboard`
+- [ ] Dominio custom para R2: `media.smartchatix.com`
+- [ ] Notificaciones por email
+- [ ] Gamificación (badges, leaderboards)
+
+### ⚠️ Reglas Críticas de Desarrollo
+
+1. **SIEMPRE ejecutar `npm run build` antes de push**
+   - TypeScript strict mode detecta errores
+   - Previene errores en producción
+
+2. **Usar `./dev.sh` para iniciar servidor**
+   - Mata procesos zombies
+   - Libera puerto 3000
+   - Inicia limpio
+
+3. **Confirmar cambios con líneas modificadas**
+   - Ejemplo: "✅ src/app/admin/page.tsx:532 - Título cambiado"
+   - NUNCA dejar al usuario sin respuesta
+
+4. **Dashboard unificado:**
+   - ✅ Editar: `/src/app/dashboard/page.tsx`
+   - ❌ NO editar: `/src/app/admin/page.tsx` (legacy)
+
+5. **Hot reload automático en desarrollo**
+   - NO reiniciar servidor manualmente
+   - Usuario debe hacer hard refresh: `Ctrl + Shift + R`
+
+### 📚 Documentación Clave
+
+- `CLAUDE.md` - Guía principal para Claude Code
+- `DESARROLLO.md` - Este archivo (desarrollo y sesiones)
+- `AULAVIRTUAL.md` - Detalles técnicos del aula virtual
+- `FUNCIONALIDADES_COMPLETAS.md` - Catálogo completo de features
+- `README.md` - Descripción general del proyecto
+- `CLOUDFLARE_R2.md` - Configuración CDN
+- `CULQI_TESTING.md` - Testing de pagos
+
+### 🔑 Variables de Entorno Importantes
+
+```env
+# Base de datos
+DATABASE_URL=mysql://mariadbsmart:PASSWORD@automation_mariadbsmart:3306/mariadbsmart
+
+# Auth
+JWT_SECRET=...
+NEXTAUTH_SECRET=...
+
+# OpenAI
+OPENAI_API_KEY=sk-proj-...
+
+# Cloudflare R2
+R2_ACCOUNT_ID=94c75028ea4d361827fdc3d08f8a3bc5
+R2_ACCESS_KEY_ID=a703707a46667566149dc938cd7f1863
+R2_SECRET_ACCESS_KEY=a196f85159c0d280be81213aefd2f43087f6be69aef5ef50aa528d92c8ba25cf
+R2_BUCKET_NAME=smartchatix-media
+R2_PUBLIC_URL=https://pub-39582e519f204b8799b03d63e07c0b67.r2.dev
+
+# PayPal
+NEXT_PUBLIC_PAYPAL_CLIENT_ID=...
+PAYPAL_SECRET_KEY=...
+PAYPAL_MODE=sandbox  # o "live" en producción
+
+# Culqi (comentado, listo para activar)
+# NEXT_PUBLIC_CULQI_PUBLIC_KEY=pk_live_...
+# CULQI_SECRET_KEY=sk_live_...
+```
+
+### 🚀 Deploy a Producción
+
+**Proceso:**
+1. `npm run build` ✅ (verificar que pase)
+2. `git add .`
+3. `git commit -m "mensaje"`
+4. `git push origin main`
+5. Easypanel detecta push y redeploya automáticamente
+6. Verificar en https://smartchatix.com
+
+**NUNCA hacer push sin verificar build.**
+
+---
+
+## 🔧 Sesión 2026-08-26 - Bugs de Producción y Material Adjunto
+
+### 🐛 Bugs Corregidos
+
+**1. CRUD de Instructores confundía "cursos que imparte" con "cursos inscrito como alumno"**
+- `src/components/dashboard/AdminInstructorsSection.tsx`: el modal "Editar Instructor" mostraba/editaba matrículas de la tabla `enrollments` (alumno) bajo el título "Cursos Inscritos", mientras la tabla listaba `courses.instructor_id` (cursos que dicta). Se reemplazó por un editor real de "Cursos que Imparte" que asigna/desasigna `instructor_id` vía `PATCH /api/admin/courses/[id]`.
+- Se corrigió además un desborde horizontal del modal (el `<select>` de cursos empujaba el botón "Asignar" fuera de la ventana).
+
+**2. Menú del instructor mostraba "Mis Cursos" duplicado y con datos equivocados**
+- `src/lib/dashboardMenus.ts`: el ítem "Mis Cursos" (`StudentCoursesSection`, matrícula como alumno) aparecía también para `role: 'instructor'`, duplicando "Cursos como Instructor". Ahora "Mis Cursos" es solo para `student`.
+
+**3. Modales sin botón de cerrar (X)**
+- Agregada X de cierre en los 4 modales de `AdminInstructorsSection.tsx` y los 3 de `AdminUsersSection.tsx`.
+
+**4. 404 al crear/editar/eliminar módulos y lecciones como admin**
+- Varios endpoints de `/api/instructor/*` validaban propiedad del curso con `WHERE c.instructor_id = ?` usando el ID del usuario autenticado, sin excepción para `admin`. Un admin editando el curso de OTRO instructor recibía "no encontrado" (404) en vez de poder operar.
+- Corregido con bypass para `role === 'admin'` en:
+  - `api/instructor/modules/route.ts` (crear módulo)
+  - `api/instructor/modules/[id]/route.ts` (editar/eliminar módulo)
+  - `api/instructor/lessons/route.ts` (crear lección)
+  - `api/instructor/lessons/[id]/route.ts` (editar/eliminar lección)
+- **Pendiente del mismo patrón** (no bloqueaban nada al momento de escribir esto): `api/instructor/students/route.ts`, `api/instructor/courses/route.ts`.
+
+### ✨ Nueva Funcionalidad: Tipo de Lección "Material Adjunto"
+
+Cuarto tipo de lección (junto a Lección/Quiz/Tarea) pensado para que el instructor suba material de trabajo (ej. un .zip) sin que sea video, quiz ni tarea calificada.
+
+- **BD:** `content_type` de `lessons` ahora incluye `'material'` en el ENUM. Migración: `db/migrations/add-material-content-type.sql` (ya aplicada en local; **falta correrla en producción antes de crear lecciones de este tipo ahí**).
+- **Editor** (`src/app/dashboard/curso/[slug]/page.tsx`): nueva opción en el selector de tipo, reutiliza el widget de subida múltiple de archivos (`documents_urls`) ya existente para Tareas.
+- **Vista del estudiante** (`src/app/curso/[slug]/page.tsx`): nueva pantalla con título, descripción y lista de archivos descargables.
+
+### 📌 Nota: Límite práctico de subida de video
+
+No hay un límite de tamaño configurado en el código, pero `/api/upload` sube el archivo completo en un solo request (buffer en memoria, sin multipart ni reintentos vía `src/lib/r2.ts`). Videos de ~300MB son propensos a fallar por cortes de red o timeouts; videos livianos (~15MB) suben sin problema. **Recomendación mientras no se implemente multipart upload:** para videos pesados, subir a YouTube y pegar el link en el editor de lección.
+
+---
+
+**Última actualización:** 2026-08-26
+**Estado:** ✅ Proyecto operativo y funcional
+**Próximo agente:** Revisar este archivo completo antes de empezar cualquier tarea
+
+---

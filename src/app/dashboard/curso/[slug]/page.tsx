@@ -75,7 +75,7 @@ interface Lesson {
   module_id: number;
   title: string;
   description: string;
-  content_type: 'video' | 'document' | 'quiz' | 'assignment' | 'markdown';
+  content_type: 'video' | 'document' | 'quiz' | 'assignment' | 'markdown' | 'material';
   video_url: string;
   video_file: string;
   main_content: string;
@@ -922,7 +922,13 @@ function SortableLesson({ lesson, lessonIdx, onQuiz, onPreview, onEdit, onDelete
     isDragging,
   } = useSortable({ id: `lesson-${lesson.id}` });
 
-  const hasContent = lesson.video_url || lesson.video_file || lesson.document_url || lesson.markdown_content || lesson.main_content;
+  const hasAttachedFiles = (() => {
+    if (!lesson.documents_urls) return false;
+    const urls = typeof lesson.documents_urls === 'string' ? JSON.parse(lesson.documents_urls) : lesson.documents_urls;
+    return Array.isArray(urls) && urls.length > 0;
+  })();
+
+  const hasContent = lesson.video_url || lesson.video_file || lesson.document_url || lesson.markdown_content || lesson.main_content || hasAttachedFiles;
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -1022,7 +1028,7 @@ function SortableLesson({ lesson, lessonIdx, onQuiz, onPreview, onEdit, onDelete
             fontSize: '12px',
             color: '#6b7280'
           }}>
-            {lesson.content_type === 'video' ? '📚 Lección' : lesson.content_type === 'quiz' ? '❓ Quiz' : '📋 Tarea'}
+            {lesson.content_type === 'video' ? '📚 Lección' : lesson.content_type === 'quiz' ? '❓ Quiz' : lesson.content_type === 'material' ? '📎 Material Adjunto' : '📋 Tarea'}
           </span>
           {lesson.duration && (
             <span style={{
@@ -3303,6 +3309,7 @@ export default function InstructorCourseEditPage() {
                           {activeLesson.content_type === 'markdown' && '📝 Texto'}
                           {activeLesson.content_type === 'quiz' && '✅ Quiz'}
                           {activeLesson.content_type === 'assignment' && '📝 Tarea'}
+                          {activeLesson.content_type === 'material' && '📎 Material Adjunto'}
                         </div>
                       </div>
                     </div>
@@ -4299,6 +4306,69 @@ SmartChatix - Transformamos la forma en que las personas trabajan`}
                   })()}
                 </>
               )}
+
+              {/* Material Adjunto Content */}
+              {previewModal.lesson.content_type === 'material' && (() => {
+                const urls = previewModal.lesson.documents_urls
+                  ? (typeof previewModal.lesson.documents_urls === 'string' ? JSON.parse(previewModal.lesson.documents_urls) : previewModal.lesson.documents_urls)
+                  : [];
+                return (
+                  <div style={{
+                    padding: '20px',
+                    background: '#f0fdf4',
+                    borderRadius: '12px',
+                    marginBottom: '24px',
+                    border: '2px solid #10b981'
+                  }}>
+                    <h3 style={{
+                      fontSize: '18px',
+                      fontWeight: '700',
+                      color: '#111827',
+                      marginBottom: '12px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px'
+                    }}>
+                      📎 Material Descargable
+                    </h3>
+                    {urls.length > 0 ? (
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                        {urls.map((url: string, index: number) => {
+                          const fullFilename = url.split('/').pop() || `Archivo ${index + 1}`;
+                          const filename = fullFilename.replace(/^\d+_/, '');
+                          return (
+                            <a
+                              key={index}
+                              href={url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '10px',
+                                padding: '12px',
+                                background: 'white',
+                                borderRadius: '6px',
+                                border: '1px solid #10b981',
+                                textDecoration: 'none',
+                                color: '#047857',
+                                fontWeight: '600',
+                                fontSize: '14px'
+                              }}
+                            >
+                              <span style={{ fontSize: '20px' }}>📄</span>
+                              <span style={{ flex: 1 }}>{filename}</span>
+                              <span style={{ fontSize: '16px' }}>⬇️</span>
+                            </a>
+                          );
+                        })}
+                      </div>
+                    ) : (
+                      <p style={{ fontSize: '13px', color: '#6b7280', margin: 0 }}>Aún no has subido archivos.</p>
+                    )}
+                  </div>
+                );
+              })()}
             </div>
           </div>
         </div>
@@ -5184,6 +5254,7 @@ function LessonModal({ lesson, course, moduleId, onClose, onSave, onDelete, savi
             <option value="video">Lección</option>
             <option value="quiz">Quiz</option>
             <option value="assignment">Tarea</option>
+            <option value="material">Material Adjunto</option>
           </select>
         </div>
 
@@ -5411,6 +5482,64 @@ Genera el contenido completo.`;
               <label style={{ display: 'block', fontSize: '13px', fontWeight: '600', color: '#374151', marginBottom: '6px' }}>
                 Adjuntar Archivos
               </label>
+              <input
+                type="file"
+                multiple
+                onChange={handleFileUpload}
+                disabled={uploading}
+                style={{
+                  width: '100%',
+                  padding: '8px 12px',
+                  border: '2px solid #e5e7eb',
+                  borderRadius: '8px',
+                  fontSize: '13px',
+                  cursor: uploading ? 'not-allowed' : 'pointer',
+                  boxSizing: 'border-box'
+                }}
+              />
+              {uploading && (
+                <p style={{ fontSize: '11px', color: '#667eea', marginTop: '4px', fontWeight: '500' }}>
+                  📤 Subiendo archivos...
+                </p>
+              )}
+            </div>
+
+            {documentsUrls.length > 0 && (
+              <div style={{ marginBottom: '16px', padding: '12px', backgroundColor: '#f9fafb', borderRadius: '8px', border: '1px solid #e5e7eb' }}>
+                <p style={{ fontSize: '13px', fontWeight: '600', color: '#374151', marginBottom: '8px' }}>
+                  📎 Archivos subidos ({documentsUrls.length}):
+                </p>
+                {documentsUrls.map((url, index) => {
+                  const fullFilename = url.split('/').pop() || `Archivo ${index + 1}`;
+                  const filename = fullFilename.replace(/^\d+_/, '');
+                  return (
+                    <div key={index} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '6px 8px', backgroundColor: 'white', borderRadius: '6px', marginBottom: '6px', border: '1px solid #e5e7eb' }}>
+                      <a href={url} target="_blank" rel="noopener noreferrer" style={{ fontSize: '12px', color: '#667eea', textDecoration: 'none', flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        {filename}
+                      </a>
+                      <button
+                        onClick={() => setDocumentsUrls(prev => prev.filter((_, i) => i !== index))}
+                        style={{ marginLeft: '8px', padding: '4px 8px', fontSize: '11px', color: '#ef4444', backgroundColor: 'white', border: '1px solid #ef4444', borderRadius: '4px', cursor: 'pointer' }}
+                      >
+                        ✕
+                      </button>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </>
+        )}
+
+        {contentType === 'material' && (
+          <>
+            <div style={{ marginBottom: '12px' }}>
+              <label style={{ display: 'block', fontSize: '13px', fontWeight: '600', color: '#374151', marginBottom: '6px' }}>
+                Archivos para Descargar
+              </label>
+              <p style={{ fontSize: '12px', color: '#6b7280', marginBottom: '8px' }}>
+                Sube el material de trabajo (por ejemplo, un .zip) para que el estudiante lo descargue.
+              </p>
               <input
                 type="file"
                 multiple

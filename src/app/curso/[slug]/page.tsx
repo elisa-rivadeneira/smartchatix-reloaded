@@ -49,7 +49,7 @@ interface Lesson {
   module_id: number;
   title: string;
   description: string;
-  content_type: 'video' | 'document' | 'quiz' | 'assignment' | 'markdown';
+  content_type: 'video' | 'document' | 'quiz' | 'assignment' | 'markdown' | 'material';
   video_url: string | null;
   video_file: string | null;
   main_content: string | null;
@@ -973,7 +973,7 @@ export default function CoursePage({ params }: { params: Promise<{ slug: string 
                         }}
                       >
                         <span style={{ flexShrink: 0 }}>
-                          {lesson.content_type === 'video' ? '▶️' : lesson.content_type === 'markdown' ? '📝' : '📄'}
+                          {lesson.content_type === 'video' ? '▶️' : lesson.content_type === 'markdown' ? '📝' : lesson.content_type === 'material' ? '📎' : '📄'}
                         </span>
                         <div style={{ flex: 1 }}>
                           <div style={{
@@ -1787,6 +1787,80 @@ export default function CoursePage({ params }: { params: Promise<{ slug: string 
                     )}
                   </div>
                 </>
+              ) : selectedLesson.content_type === 'material' ? (
+                <div style={{
+                  background: 'white',
+                  borderRadius: '12px',
+                  padding: '40px',
+                  boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)'
+                }}>
+                  <div style={{
+                    borderLeft: '4px solid #667eea',
+                    marginBottom: '24px',
+                    background: '#f5f7ff',
+                    padding: '20px',
+                    borderRadius: '8px'
+                  }}>
+                    <h2 style={{
+                      fontSize: '24px',
+                      fontWeight: '700',
+                      color: '#1a202c',
+                      margin: 0
+                    }}>
+                      {selectedLesson.title}
+                    </h2>
+                    {selectedLesson.description && (
+                      <p style={{
+                        color: '#4a5568',
+                        lineHeight: '1.6',
+                        fontSize: '16px',
+                        margin: '8px 0 0 0'
+                      }}>
+                        {selectedLesson.description}
+                      </p>
+                    )}
+                  </div>
+                  {(() => {
+                    const urls = selectedLesson.documents_urls
+                      ? (typeof selectedLesson.documents_urls === 'string' ? JSON.parse(selectedLesson.documents_urls) : selectedLesson.documents_urls)
+                      : [];
+                    return urls.length > 0 ? (
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                        {urls.map((url: string, index: number) => {
+                          const fullFilename = url.split('/').pop() || `Archivo ${index + 1}`;
+                          const filename = fullFilename.replace(/^\d+_/, '');
+                          return (
+                            <a
+                              key={index}
+                              href={url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '12px',
+                                padding: '16px',
+                                background: '#f0fdf4',
+                                borderRadius: '8px',
+                                border: '2px solid #10b981',
+                                textDecoration: 'none',
+                                color: '#047857',
+                                fontWeight: '600',
+                                fontSize: '16px'
+                              }}
+                            >
+                              <span style={{ fontSize: '24px' }}>📄</span>
+                              <span style={{ flex: 1 }}>{filename}</span>
+                              <span style={{ fontSize: '20px' }}>⬇️</span>
+                            </a>
+                          );
+                        })}
+                      </div>
+                    ) : (
+                      <p style={{ color: '#6b7280', fontSize: '15px' }}>El instructor aún no ha subido archivos.</p>
+                    );
+                  })()}
+                </div>
               ) : (
                 <div style={{
                   background: 'white',

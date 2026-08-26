@@ -96,23 +96,29 @@ export async function POST(request: NextRequest) {
 
           let userId;
           let isNewUser = false;
-          let tempPassword = '';
+          let userName = email.split('@')[0];
+
+          const tempPassword = generateTemporaryPassword();
+          const hashedPassword = await bcrypt.hash(tempPassword, 10);
+
           const userResult = await query(
-            'SELECT id FROM users WHERE email = ?',
+            'SELECT id, name FROM users WHERE email = ?',
             [email]
           );
 
           if (userResult && userResult.length > 0) {
             userId = userResult[0].id;
+            userName = userResult[0].name || userName;
             console.log('👤 Usuario existente encontrado, ID:', userId);
-            console.log('📧 NO se enviará email de bienvenida (solo confirmación de pago)');
+            console.log('🔑 Generando nueva contraseña temporal');
+
+            await query(
+              'UPDATE users SET password_hash = ? WHERE id = ?',
+              [hashedPassword, userId]
+            );
           } else {
             console.log('👤 Creando nuevo usuario');
-            console.log('📧 SE ENVIARÁ email de bienvenida con credenciales');
             isNewUser = true;
-            tempPassword = generateTemporaryPassword();
-            const hashedPassword = await bcrypt.hash(tempPassword, 10);
-            const userName = email.split('@')[0];
 
             const insertUserResult: any = await query(
               `INSERT INTO users (name, email, password_hash, role, is_active, created_at)
@@ -121,36 +127,6 @@ export async function POST(request: NextRequest) {
             );
             userId = insertUserResult.insertId;
             console.log('✅ Nuevo usuario creado, ID:', userId);
-
-            try {
-              const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
-              const emailResponse = await fetch(`${baseUrl}/api/email/send-purchase-confirmation`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                  email: email,
-                  name: userName,
-                  courseTitle: courseTitle,
-                  modality: modality === 'vivo' ? 'En Vivo' : 'Grabado',
-                  amount: amount,
-                  password: tempPassword,
-                  isNewUser: true,
-                  liveStartDate: course.live_start_date,
-                  liveSchedule: course.live_schedule,
-                  emailConfirmationTemplate: course.email_confirmation_template,
-                  emailPaymentConfirmationTemplate: course.email_payment_confirmation_template
-                })
-              });
-
-              if (emailResponse.ok) {
-                console.log('✅ Email de bienvenida enviado exitosamente');
-              } else {
-                const errorText = await emailResponse.text();
-                console.error('❌ Error enviando email de bienvenida:', errorText);
-              }
-            } catch (emailError) {
-              console.error('❌ Error al enviar email de bienvenida:', emailError);
-            }
           }
 
           const enrollmentMode = modality || 'grabado';
@@ -168,40 +144,35 @@ export async function POST(request: NextRequest) {
 
           console.log('✅ Inscripción creada exitosamente:', insertEnrollmentResult);
 
-          if (!isNewUser) {
-            console.log('📧 Enviando email de confirmación a usuario existente');
-            try {
-              const userNameResult = await query('SELECT name FROM users WHERE id = ?', [userId]);
-              const userName = userNameResult && userNameResult.length > 0 ? userNameResult[0].name : email.split('@')[0];
+          console.log('📧 Enviando email con credenciales');
+          try {
+            const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+            const emailResponse = await fetch(`${baseUrl}/api/email/send-purchase-confirmation`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                email: email,
+                name: userName,
+                courseTitle: courseTitle,
+                modality: modality === 'vivo' ? 'En Vivo' : 'Grabado',
+                amount: amount,
+                password: tempPassword,
+                isNewUser: true,
+                liveStartDate: course.live_start_date,
+                liveSchedule: course.live_schedule,
+                emailConfirmationTemplate: course.email_confirmation_template,
+                emailPaymentConfirmationTemplate: course.email_payment_confirmation_template
+              })
+            });
 
-              const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
-              const emailResponse = await fetch(`${baseUrl}/api/email/send-purchase-confirmation`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                  email: email,
-                  name: userName,
-                  courseTitle: courseTitle,
-                  modality: modality === 'vivo' ? 'En Vivo' : 'Grabado',
-                  amount: amount,
-                  password: null,
-                  isNewUser: false,
-                  liveStartDate: course.live_start_date,
-                  liveSchedule: course.live_schedule,
-                  emailConfirmationTemplate: course.email_confirmation_template,
-                  emailPaymentConfirmationTemplate: course.email_payment_confirmation_template
-                })
-              });
-
-              if (emailResponse.ok) {
-                console.log('✅ Email de confirmación enviado exitosamente');
-              } else {
-                const errorText = await emailResponse.text();
-                console.error('❌ Error enviando email de confirmación:', errorText);
-              }
-            } catch (emailError) {
-              console.error('❌ Error al enviar email de confirmación:', emailError);
+            if (emailResponse.ok) {
+              console.log('✅ Email enviado exitosamente');
+            } else {
+              const errorText = await emailResponse.text();
+              console.error('❌ Error enviando email:', errorText);
             }
+          } catch (emailError) {
+            console.error('❌ Error al enviar email:', emailError);
           }
 
           return NextResponse.json({

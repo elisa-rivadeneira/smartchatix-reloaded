@@ -21,11 +21,13 @@ export async function PATCH(
     const body = await request.json();
     const { title, description } = body;
 
-    const moduleCheck = await query(`
-      SELECT m.id FROM modules m
-      INNER JOIN courses c ON m.course_id = c.id
-      WHERE m.id = ? AND c.instructor_id = ?
-    `, [moduleId, decoded.id]);
+    const moduleCheck = decoded.role === 'admin'
+      ? await query(`SELECT m.id FROM modules m WHERE m.id = ?`, [moduleId])
+      : await query(`
+        SELECT m.id FROM modules m
+        INNER JOIN courses c ON m.course_id = c.id
+        WHERE m.id = ? AND c.instructor_id = ?
+      `, [moduleId, decoded.id]);
 
     if (!moduleCheck || moduleCheck.length === 0) {
       return NextResponse.json({ error: 'Módulo no encontrado' }, { status: 404 });
@@ -60,11 +62,13 @@ export async function DELETE(
 
     const { id: moduleId } = await params;
 
-    const moduleCheck = await query(`
-      SELECT m.id FROM modules m
-      INNER JOIN courses c ON m.course_id = c.id
-      WHERE m.id = ? AND c.instructor_id = ?
-    `, [moduleId, decoded.id]);
+    const moduleCheck = decoded.role === 'admin'
+      ? await query(`SELECT m.id FROM modules m WHERE m.id = ?`, [moduleId])
+      : await query(`
+        SELECT m.id FROM modules m
+        INNER JOIN courses c ON m.course_id = c.id
+        WHERE m.id = ? AND c.instructor_id = ?
+      `, [moduleId, decoded.id]);
 
     if (!moduleCheck || moduleCheck.length === 0) {
       return NextResponse.json({ error: 'Módulo no encontrado' }, { status: 404 });

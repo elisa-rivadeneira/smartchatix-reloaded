@@ -13,19 +13,13 @@ interface User {
 
 interface Course {
   id: number;
-  instructor_id: number;
+  instructor_id: number | null;
   title: string;
-}
-
-interface Enrollment {
-  user_id: number;
-  course_id: number;
 }
 
 export default function AdminInstructorsSection() {
   const [instructors, setInstructors] = useState<User[]>([]);
   const [courses, setCourses] = useState<Course[]>([]);
-  const [enrollments, setEnrollments] = useState<Enrollment[]>([]);
   const [loading, setLoading] = useState(true);
   const [editingUser, setEditingUser] = useState<User | null>(null);
   const [editModalOpen, setEditModalOpen] = useState(false);
@@ -36,7 +30,7 @@ export default function AdminInstructorsSection() {
     is_active: true,
     password: ''
   });
-  const [userEnrollments, setUserEnrollments] = useState<number[]>([]);
+  const [assignedCourses, setAssignedCourses] = useState<number[]>([]);
   const [selectedCourseToAdd, setSelectedCourseToAdd] = useState<number | null>(null);
   const [newUserModalOpen, setNewUserModalOpen] = useState(false);
   const [newUserFormData, setNewUserFormData] = useState({
@@ -63,10 +57,9 @@ export default function AdminInstructorsSection() {
 
   const loadData = async () => {
     try {
-      const [usersRes, coursesRes, enrollmentsRes] = await Promise.all([
+      const [usersRes, coursesRes] = await Promise.all([
         fetch('/api/admin/users'),
-        fetch('/api/admin/courses'),
-        fetch('/api/admin/enrollments')
+        fetch('/api/admin/courses')
       ]);
 
       if (usersRes.ok) {
@@ -77,11 +70,6 @@ export default function AdminInstructorsSection() {
       if (coursesRes.ok) {
         const data = await coursesRes.json();
         setCourses(data.courses || []);
-      }
-
-      if (enrollmentsRes.ok) {
-        const data = await enrollmentsRes.json();
-        setEnrollments(data.enrollments || []);
       }
     } catch (error) {
       console.error('Error loading data:', error);
@@ -100,10 +88,10 @@ export default function AdminInstructorsSection() {
       password: ''
     });
 
-    const userCourses = enrollments
-      .filter(e => e.user_id === user.id)
-      .map(e => e.course_id);
-    setUserEnrollments(userCourses);
+    const coursesTaught = courses
+      .filter(c => c.instructor_id === user.id)
+      .map(c => c.id);
+    setAssignedCourses(coursesTaught);
 
     setEditModalOpen(true);
   };
@@ -176,53 +164,46 @@ export default function AdminInstructorsSection() {
     }
   };
 
-  const handleAddEnrollment = async () => {
+  const handleAssignCourse = async () => {
     if (!editingUser || !selectedCourseToAdd) return;
 
     try {
-      const response = await fetch('/api/admin/enrollments/add', {
-        method: 'POST',
+      const response = await fetch(`/api/admin/courses/${selectedCourseToAdd}`, {
+        method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          user_id: editingUser.id,
-          course_id: selectedCourseToAdd,
-          modality: 'grabado'
-        })
+        body: JSON.stringify({ instructor_id: editingUser.id })
       });
 
       if (response.ok) {
-        setUserEnrollments([...userEnrollments, selectedCourseToAdd]);
+        setAssignedCourses([...assignedCourses, selectedCourseToAdd]);
+        setCourses(courses.map(c => c.id === selectedCourseToAdd ? { ...c, instructor_id: editingUser.id } : c));
         setSelectedCourseToAdd(null);
-        setMessageModal({ open: true, type: 'success', message: 'Curso agregado correctamente' });
+        setMessageModal({ open: true, type: 'success', message: 'Curso asignado correctamente' });
       } else {
-        setMessageModal({ open: true, type: 'error', message: 'Error al agregar curso' });
+        setMessageModal({ open: true, type: 'error', message: 'Error al asignar curso' });
       }
     } catch (error) {
-      setMessageModal({ open: true, type: 'error', message: 'Error al agregar curso' });
+      setMessageModal({ open: true, type: 'error', message: 'Error al asignar curso' });
     }
   };
 
-  const handleRemoveEnrollment = async (courseId: number) => {
-    if (!editingUser) return;
-
+  const handleUnassignCourse = async (courseId: number) => {
     try {
-      const response = await fetch('/api/admin/enrollments/remove', {
-        method: 'POST',
+      const response = await fetch(`/api/admin/courses/${courseId}`, {
+        method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          user_id: editingUser.id,
-          course_id: courseId
-        })
+        body: JSON.stringify({ instructor_id: null })
       });
 
       if (response.ok) {
-        setUserEnrollments(userEnrollments.filter(id => id !== courseId));
-        setMessageModal({ open: true, type: 'success', message: 'Curso eliminado correctamente' });
+        setAssignedCourses(assignedCourses.filter(id => id !== courseId));
+        setCourses(courses.map(c => c.id === courseId ? { ...c, instructor_id: null } : c));
+        setMessageModal({ open: true, type: 'success', message: 'Curso desasignado correctamente' });
       } else {
-        setMessageModal({ open: true, type: 'error', message: 'Error al eliminar curso' });
+        setMessageModal({ open: true, type: 'error', message: 'Error al desasignar curso' });
       }
     } catch (error) {
-      setMessageModal({ open: true, type: 'error', message: 'Error al eliminar curso' });
+      setMessageModal({ open: true, type: 'error', message: 'Error al desasignar curso' });
     }
   };
 
@@ -379,20 +360,42 @@ export default function AdminInstructorsSection() {
           <div
             onClick={(e) => e.stopPropagation()}
             style={{
+              position: 'relative',
               background: '#fff',
               borderRadius: '12px',
               padding: '1.5rem',
               maxWidth: '500px',
               width: '90%',
               maxHeight: '90vh',
-              overflowY: 'auto'
+              overflowY: 'auto',
+              overflowX: 'hidden',
+              boxSizing: 'border-box'
             }}
           >
+            <button
+              onClick={() => setEditModalOpen(false)}
+              aria-label="Cerrar"
+              style={{
+                position: 'absolute',
+                top: '1rem',
+                right: '1rem',
+                background: 'transparent',
+                border: 'none',
+                fontSize: '20px',
+                lineHeight: 1,
+                color: '#9ca3af',
+                cursor: 'pointer',
+                padding: '0.25rem'
+              }}
+            >
+              ✕
+            </button>
             <h2 style={{
               fontSize: '1.5rem',
               fontWeight: '700',
               color: '#111827',
-              marginBottom: '1.5rem'
+              marginBottom: '1.5rem',
+              paddingRight: '1.5rem'
             }}>
               ✏️ Editar Instructor
             </h2>
@@ -482,12 +485,12 @@ export default function AdminInstructorsSection() {
                 borderTop: '2px solid #e5e7eb'
               }}>
                 <h3 style={{ fontSize: '1rem', fontWeight: '600', color: '#111827', marginBottom: '1rem' }}>
-                  📚 Cursos Inscritos
+                  📚 Cursos que Imparte
                 </h3>
 
-                {userEnrollments.length > 0 ? (
+                {assignedCourses.length > 0 ? (
                   <div style={{ marginBottom: '1rem' }}>
-                    {userEnrollments.map(courseId => {
+                    {assignedCourses.map(courseId => {
                       const course = courses.find(c => c.id === courseId);
                       return (
                         <div key={courseId} style={{
@@ -503,7 +506,7 @@ export default function AdminInstructorsSection() {
                             {course?.title || 'Curso desconocido'}
                           </span>
                           <button
-                            onClick={() => handleRemoveEnrollment(courseId)}
+                            onClick={() => handleUnassignCourse(courseId)}
                             style={{
                               padding: '0.25rem 0.75rem',
                               background: '#ef4444',
@@ -515,7 +518,7 @@ export default function AdminInstructorsSection() {
                               cursor: 'pointer'
                             }}
                           >
-                            ✕ Eliminar
+                            ✕ Quitar
                           </button>
                         </div>
                       );
@@ -523,16 +526,18 @@ export default function AdminInstructorsSection() {
                   </div>
                 ) : (
                   <p style={{ fontSize: '14px', color: '#6b7280', marginBottom: '1rem' }}>
-                    No hay inscripciones
+                    No tiene cursos asignados
                   </p>
                 )}
 
-                <div style={{ display: 'flex', gap: '0.5rem' }}>
+                <div style={{ display: 'flex', gap: '0.5rem', minWidth: 0 }}>
                   <select
                     value={selectedCourseToAdd || ''}
                     onChange={(e) => setSelectedCourseToAdd(parseInt(e.target.value) || null)}
                     style={{
                       flex: 1,
+                      minWidth: 0,
+                      maxWidth: '100%',
                       padding: '0.75rem',
                       border: '2px solid #e5e7eb',
                       borderRadius: '8px',
@@ -543,14 +548,19 @@ export default function AdminInstructorsSection() {
                   >
                     <option value="">Seleccionar curso...</option>
                     {courses
-                      .filter(c => !userEnrollments.includes(c.id))
-                      .map(c => (
-                        <option key={c.id} value={c.id}>{c.title}</option>
-                      ))
+                      .filter(c => !assignedCourses.includes(c.id))
+                      .map(c => {
+                        const currentInstructor = instructors.find(i => i.id === c.instructor_id);
+                        return (
+                          <option key={c.id} value={c.id}>
+                            {c.title}{currentInstructor ? ` (actual: ${currentInstructor.name})` : ''}
+                          </option>
+                        );
+                      })
                     }
                   </select>
                   <button
-                    onClick={handleAddEnrollment}
+                    onClick={handleAssignCourse}
                     disabled={!selectedCourseToAdd}
                     style={{
                       padding: '0.75rem 1rem',
@@ -564,7 +574,7 @@ export default function AdminInstructorsSection() {
                       whiteSpace: 'nowrap'
                     }}
                   >
-                    ➕ Agregar
+                    ➕ Asignar
                   </button>
                 </div>
               </div>
@@ -656,6 +666,7 @@ export default function AdminInstructorsSection() {
           <div
             onClick={(e) => e.stopPropagation()}
             style={{
+              position: 'relative',
               background: '#fff',
               borderRadius: '12px',
               padding: '1.5rem',
@@ -663,7 +674,25 @@ export default function AdminInstructorsSection() {
               width: '90%'
             }}
           >
-            <h2 style={{ fontSize: '1.5rem', fontWeight: '700', color: '#111827', marginBottom: '1.5rem' }}>
+            <button
+              onClick={() => setNewUserModalOpen(false)}
+              aria-label="Cerrar"
+              style={{
+                position: 'absolute',
+                top: '1rem',
+                right: '1rem',
+                background: 'transparent',
+                border: 'none',
+                fontSize: '20px',
+                lineHeight: 1,
+                color: '#9ca3af',
+                cursor: 'pointer',
+                padding: '0.25rem'
+              }}
+            >
+              ✕
+            </button>
+            <h2 style={{ fontSize: '1.5rem', fontWeight: '700', color: '#111827', marginBottom: '1.5rem', paddingRight: '1.5rem' }}>
               ➕ Nuevo Instructor
             </h2>
 
@@ -782,6 +811,7 @@ export default function AdminInstructorsSection() {
           <div
             onClick={(e) => e.stopPropagation()}
             style={{
+              position: 'relative',
               background: '#fff',
               borderRadius: '16px',
               padding: '2rem',
@@ -791,6 +821,24 @@ export default function AdminInstructorsSection() {
               boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)'
             }}
           >
+            <button
+              onClick={() => setConfirmDeleteModal({ open: false, userId: null, userName: '' })}
+              aria-label="Cerrar"
+              style={{
+                position: 'absolute',
+                top: '1rem',
+                right: '1rem',
+                background: 'transparent',
+                border: 'none',
+                fontSize: '20px',
+                lineHeight: 1,
+                color: '#9ca3af',
+                cursor: 'pointer',
+                padding: '0.25rem'
+              }}
+            >
+              ✕
+            </button>
             <div style={{
               width: '64px',
               height: '64px',
@@ -874,6 +922,7 @@ export default function AdminInstructorsSection() {
           <div
             onClick={(e) => e.stopPropagation()}
             style={{
+              position: 'relative',
               background: '#fff',
               borderRadius: '16px',
               padding: '2rem',
@@ -883,6 +932,24 @@ export default function AdminInstructorsSection() {
               boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)'
             }}
           >
+            <button
+              onClick={() => setMessageModal({ open: false, type: 'success', message: '' })}
+              aria-label="Cerrar"
+              style={{
+                position: 'absolute',
+                top: '1rem',
+                right: '1rem',
+                background: 'transparent',
+                border: 'none',
+                fontSize: '20px',
+                lineHeight: 1,
+                color: '#9ca3af',
+                cursor: 'pointer',
+                padding: '0.25rem'
+              }}
+            >
+              ✕
+            </button>
             <div style={{
               width: '64px',
               height: '64px',
