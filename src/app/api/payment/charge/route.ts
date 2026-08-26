@@ -191,12 +191,11 @@ export async function POST(request: NextRequest) {
         );
       }
 
-      if (!charge.outcome || charge.outcome.type !== 'venta_exitosa') {
-        console.error('❌ Pago no exitoso o pendiente de revisión:', charge);
+      if (charge.outcome && charge.outcome.type !== 'venta_exitosa') {
         return NextResponse.json(
           {
             error: 'El pago no fue exitoso',
-            details: charge.outcome?.user_message || charge.user_message || 'El pago no pudo completarse. Verifica los datos de tu tarjeta o intenta con otro método de pago.'
+            details: charge.outcome.user_message
           },
           { status: 400 }
         );
