@@ -14,11 +14,12 @@ interface Lesson {
   module_id: number;
   title: string;
   description: string;
-  content_type: 'video' | 'document' | 'quiz' | 'assignment' | 'markdown' | 'tarea';
+  content_type: 'video' | 'document' | 'quiz' | 'assignment' | 'markdown' | 'tarea' | 'material';
   video_url: string | null;
   video_file: string | null;
   main_content: string | null;
   document_url: string | null;
+  documents_urls: any;
   markdown_content: string | null;
   markdown_image: string | null;
   markdown_video: string | null;
@@ -106,6 +107,7 @@ export async function GET(
           SELECT
             l.id, l.module_id, l.title, l.description, l.content_type,
             l.video_url, l.video_file, l.main_content, l.document_url,
+            l.documents_urls,
             l.markdown_content, l.markdown_image, l.markdown_video,
             l.duration, l.order_index, l.is_free, l.has_quiz,
             l.quiz_questions_count, l.quiz_data,
