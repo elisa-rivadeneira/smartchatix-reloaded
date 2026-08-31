@@ -1,6 +1,9 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { CertificateTemplate, DEFAULT_CERTIFICATE_TEMPLATE, resolveCertificateTemplate } from '@/lib/certificate-template';
+import CertificateTemplateForm from '@/components/certificate/CertificateTemplateForm';
+import CertificatePreview from '@/components/certificate/CertificatePreview';
 
 interface Settings {
   show_courses_carousel: boolean;
@@ -14,8 +17,11 @@ export default function AdminSettingsSection() {
     show_currency_selector: true,
     exchange_rate: '3.80'
   });
+  const [certTemplate, setCertTemplate] = useState<CertificateTemplate>(DEFAULT_CERTIFICATE_TEMPLATE);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [savingCert, setSavingCert] = useState(false);
+  const [settingsTab, setSettingsTab] = useState<'general' | 'certificado'>('general');
 
   useEffect(() => {
     loadSettings();
@@ -27,11 +33,32 @@ export default function AdminSettingsSection() {
       if (response.ok) {
         const data = await response.json();
         setSettings(data.settings || settings);
+        setCertTemplate(resolveCertificateTemplate(data.settings?.certificate_template_default, null));
       }
     } catch (error) {
       console.error('Error loading settings:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleSaveCertificateTemplate = async () => {
+    setSavingCert(true);
+    try {
+      const response = await fetch('/api/admin/settings', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ setting_key: 'certificate_template_default', setting_value: JSON.stringify(certTemplate) })
+      });
+
+      if (response.ok) {
+        alert('✅ Diseño de certificado actualizado');
+      }
+    } catch (error) {
+      console.error('Error updating certificate template:', error);
+      alert('❌ Error al actualizar el diseño del certificado');
+    } finally {
+      setSavingCert(false);
     }
   };
 
@@ -111,6 +138,32 @@ export default function AdminSettingsSection() {
           ⚙️ Configuración del Sitio
         </h3>
 
+        <div style={{ display: 'flex', gap: '0.5rem', borderBottom: '1px solid #e5e7eb', marginBottom: '1.5rem' }}>
+          {[
+            { id: 'general' as const, label: 'General' },
+            { id: 'certificado' as const, label: '🎓 Certificado' },
+          ].map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => setSettingsTab(tab.id)}
+              style={{
+                padding: '0.75rem 1.25rem',
+                background: 'none',
+                border: 'none',
+                borderBottom: settingsTab === tab.id ? '2px solid #8b5cf6' : '2px solid transparent',
+                color: settingsTab === tab.id ? '#8b5cf6' : '#6b7280',
+                fontSize: '14px',
+                fontWeight: settingsTab === tab.id ? 600 : 500,
+                cursor: 'pointer',
+                marginBottom: '-1px'
+              }}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
+
+        {settingsTab === 'general' && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
           {/* Carrusel de cursos */}
           <div style={{
@@ -261,6 +314,44 @@ export default function AdminSettingsSection() {
             </p>
           </div>
         </div>
+        )}
+
+        {settingsTab === 'certificado' && (
+          <div>
+            <h4 style={{ fontSize: '15px', fontWeight: '600', color: '#111827', marginBottom: '0.25rem' }}>
+              Plantilla principal del certificado
+            </h4>
+            <p style={{ fontSize: '13px', color: '#6b7280', marginBottom: '1.25rem' }}>
+              Este es el diseño que usan por defecto los certificados de todos los cursos. Cada curso puede personalizarlo desde su propia sección "Certificado".
+            </p>
+
+            <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: '2rem', alignItems: 'start' }}>
+              <CertificateTemplateForm value={certTemplate} onChange={setCertTemplate} disabled={savingCert} />
+              <div>
+                <p style={{ fontSize: '12px', fontWeight: 600, color: '#6b7280', marginBottom: '0.5rem' }}>Vista previa</p>
+                <CertificatePreview template={certTemplate} />
+              </div>
+            </div>
+
+            <button
+              onClick={handleSaveCertificateTemplate}
+              disabled={savingCert}
+              style={{
+                marginTop: '1.25rem',
+                padding: '0.75rem 1.5rem',
+                background: savingCert ? '#9ca3af' : '#8b5cf6',
+                color: '#fff',
+                border: 'none',
+                borderRadius: '8px',
+                fontSize: '14px',
+                fontWeight: '600',
+                cursor: savingCert ? 'not-allowed' : 'pointer'
+              }}
+            >
+              {savingCert ? 'Guardando...' : 'Guardar diseño'}
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );

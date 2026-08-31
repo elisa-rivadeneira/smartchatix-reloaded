@@ -71,12 +71,22 @@ export default function ClaimForm() {
       guardianName: formData.isMinor ? formData.guardianName : undefined,
     };
 
-    const result = await createClaim(submitData);
+    try {
+      const result = await createClaim(submitData);
 
-    if (result.success && result.data && result.data.claimCode) {
-      router.push(`/libro-de-reclamaciones/exito?code=${result.data.claimCode}`);
-    } else {
+      if (result.success && result.data && result.data.claimCode) {
+        router.push(`/libro-de-reclamaciones/exito?code=${result.data.claimCode}`);
+        return;
+      }
+
       setError(result.error || 'Error al registrar');
+    } catch (err: any) {
+      if (err?.message?.includes('Failed to find Server Action')) {
+        setError('La página se actualizó en el servidor mientras la tenías abierta. Por favor, recarga la página (F5) y vuelve a enviar el formulario.');
+      } else {
+        setError('Ocurrió un error inesperado. Por favor, intenta de nuevo.');
+      }
+    } finally {
       setLoading(false);
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }

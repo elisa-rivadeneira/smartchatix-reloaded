@@ -11,6 +11,9 @@ import rehypeRaw from 'rehype-raw';
 import { marked } from 'marked';
 import Breadcrumb from '@/components/Breadcrumb';
 import UnifiedSidebar from '@/components/unified/UnifiedSidebar';
+import { CertificateTemplate, DEFAULT_CERTIFICATE_TEMPLATE, resolveCertificateTemplate } from '@/lib/certificate-template';
+import CertificateTemplateForm from '@/components/certificate/CertificateTemplateForm';
+import CertificatePreview from '@/components/certificate/CertificatePreview';
 
 function convertMarkdownToHtml(markdown: string): string {
   if (!markdown) return '';
@@ -106,6 +109,7 @@ interface Course {
   publication_status?: 'published' | 'coming_soon' | 'unpublished';
   email_confirmation_template?: string | null;
   email_payment_confirmation_template?: string | null;
+  certificate_template?: string | null;
   modules: Module[];
 }
 
@@ -2303,6 +2307,10 @@ export default function InstructorCourseEditPage() {
   const [user, setUser] = useState<any>(null);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [siteCertDefaultJson, setSiteCertDefaultJson] = useState<string | null>(null);
+  const [certCustomEnabled, setCertCustomEnabled] = useState(false);
+  const [certTemplateDraft, setCertTemplateDraft] = useState<CertificateTemplate>(DEFAULT_CERTIFICATE_TEMPLATE);
+  const [savingCertTemplate, setSavingCertTemplate] = useState(false);
 
   const showModal = (type: 'success' | 'error' | 'warning' | 'info', message: string) => {
     setModal({ show: true, type, message });
@@ -2318,10 +2326,26 @@ export default function InstructorCourseEditPage() {
   }, [slug]);
 
   useEffect(() => {
-    if (activeTab === 'configuracion') {
+    if (activeTab === 'configuracion' || activeTab === 'certificado') {
       loadCourse();
     }
+    if (activeTab === 'certificado' && siteCertDefaultJson === null) {
+      fetch('/api/public/settings')
+        .then((res) => res.json())
+        .then((data) => setSiteCertDefaultJson(data.settings?.certificate_template_default || null))
+        .catch((error) => console.error('Error loading site certificate default:', error));
+    }
   }, [activeTab]);
+
+  useEffect(() => {
+    if (!course) return;
+    setCertCustomEnabled(!!course.certificate_template);
+    setCertTemplateDraft(
+      course.certificate_template
+        ? resolveCertificateTemplate(siteCertDefaultJson, course.certificate_template)
+        : resolveCertificateTemplate(siteCertDefaultJson, null)
+    );
+  }, [course?.certificate_template, siteCertDefaultJson]);
 
   const loadUser = async () => {
     try {
@@ -2347,6 +2371,7 @@ export default function InstructorCourseEditPage() {
     { id: 'calificaciones-estudiantes', label: 'Calificaciones', icon: '📊', href: `/dashboard/curso/${slug}/calificaciones-estudiantes` },
     { id: 'calificaciones-quizzes', label: 'Quizzes', icon: '📝', href: `/dashboard/curso/${slug}/calificaciones-quizzes` },
     { id: 'calificaciones-tareas', label: 'Tareas', icon: '📋', href: `/dashboard/curso/${slug}/calificaciones-tareas` },
+    { id: 'certificado', label: 'Certificado', icon: '🎓', onClick: () => setActiveTab('certificado') },
     { id: 'configuracion', label: 'Configuración del curso', icon: '⚙️', onClick: () => setActiveTab('configuracion') },
   ];
 
@@ -2365,6 +2390,29 @@ export default function InstructorCourseEditPage() {
       router.push('/dashboard');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleSaveCertTemplate = async () => {
+    setSavingCertTemplate(true);
+    try {
+      const newValue = certCustomEnabled ? JSON.stringify(certTemplateDraft) : null;
+      const response = await fetch(`/api/instructor/course/${slug}/config`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ certificate_template: newValue })
+      });
+      if (response.ok) {
+        setCourse(prev => prev ? { ...prev, certificate_template: newValue } : null);
+        showModal('success', 'Diseño de certificado guardado');
+      } else {
+        showModal('error', 'Error al guardar el diseño del certificado');
+      }
+    } catch (error) {
+      console.error('Error saving certificate template:', error);
+      showModal('error', 'Error al guardar el diseño del certificado');
+    } finally {
+      setSavingCertTemplate(false);
     }
   };
 
@@ -2619,6 +2667,7 @@ export default function InstructorCourseEditPage() {
     const [newStudentEmail, setNewStudentEmail] = useState('');
     const [newStudentModality, setNewStudentModality] = useState('grabado');
     const [saving, setSaving] = useState(false);
+    const [issuingCertId, setIssuingCertId] = useState<number | null>(null);
 
     useEffect(() => {
       fetchStudents();
@@ -2692,6 +2741,33 @@ export default function InstructorCourseEditPage() {
         }
       } catch (error) {
         alert('Error al eliminar estudiante');
+      }
+    };
+
+    const handleIssueCertificate = async (studentId: number, studentName: string) => {
+      if (!confirm(`¿Emitir certificado a ${studentName} sin pasar por el quiz?\n\nEsto queda registrado como emisión manual del instructor.`)) {
+        return;
+      }
+
+      setIssuingCertId(studentId);
+      try {
+        const res = await fetch(`/api/instructor/course/${courseSlug}/students/${studentId}/issue-certificate`, {
+          method: 'POST'
+        });
+        const data = await res.json();
+
+        if (res.ok) {
+          if (!data.already_exists) {
+            alert('🎓 Certificado emitido exitosamente');
+          }
+          fetchStudents();
+        } else {
+          alert(data.error || 'Error al emitir el certificado');
+        }
+      } catch (error) {
+        alert('Error al emitir el certificado');
+      } finally {
+        setIssuingCertId(null);
       }
     };
 
@@ -2826,6 +2902,26 @@ export default function InstructorCourseEditPage() {
                       {new Date(student.enrolled_at).toLocaleDateString('es-ES')}
                     </td>
                     <td style={{ textAlign: 'center', padding: '1rem' }}>
+                      {course?.is_certification_enabled && (
+                        <button
+                          onClick={() => handleIssueCertificate(student.id, student.name)}
+                          disabled={issuingCertId === student.id}
+                          title="Emitir certificado manualmente, sin pasar por el quiz"
+                          style={{
+                            padding: '0.5rem 1rem',
+                            backgroundColor: issuingCertId === student.id ? '#9ca3af' : '#0f766e',
+                            color: 'white',
+                            border: 'none',
+                            borderRadius: '6px',
+                            cursor: issuingCertId === student.id ? 'not-allowed' : 'pointer',
+                            fontSize: '0.875rem',
+                            fontWeight: '500',
+                            marginRight: '0.5rem'
+                          }}
+                        >
+                          {issuingCertId === student.id ? 'Emitiendo...' : '🎓 Emitir certificado'}
+                        </button>
+                      )}
                       <button
                         onClick={() => handleRemoveStudent(student.id, student.name)}
                         style={{
@@ -3397,128 +3493,6 @@ export default function InstructorCourseEditPage() {
                 alignItems: 'center',
                 gap: '0.5rem'
               }}>
-                🎓 Sistema de Certificación
-              </h3>
-
-              <div style={{ marginBottom: '16px' }}>
-                <label style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '12px',
-                  cursor: 'pointer',
-                  fontSize: '14px',
-                  fontWeight: '500',
-                  color: '#374151'
-                }}>
-                  <input
-                    type="checkbox"
-                    checked={course?.is_certification_enabled || false}
-                    onChange={async (e) => {
-                      const enabled = e.target.checked;
-                      setSaving(true);
-                      try {
-                        const response = await fetch(`/api/instructor/course/${slug}/config`, {
-                          method: 'PATCH',
-                          headers: { 'Content-Type': 'application/json' },
-                          body: JSON.stringify({ is_certification_enabled: enabled })
-                        });
-                        if (response.ok) {
-                          setCourse(prev => prev ? { ...prev, is_certification_enabled: enabled } : null);
-                        }
-                      } catch (error) {
-                        console.error('Error:', error);
-                      } finally {
-                        setSaving(false);
-                      }
-                    }}
-                    style={{
-                      width: '20px',
-                      height: '20px',
-                      cursor: 'pointer'
-                    }}
-                  />
-                  <span>Habilitar emisión de certificados para este curso</span>
-                </label>
-                <p style={{
-                  fontSize: '12px',
-                  color: '#6b7280',
-                  marginTop: '8px',
-                  marginLeft: '32px'
-                }}>
-                  Los estudiantes recibirán un certificado automáticamente al completar todas las lecciones con quizzes y alcanzar el porcentaje mínimo.
-                </p>
-              </div>
-
-              {course?.is_certification_enabled ? (
-                <div style={{ marginTop: '20px', paddingTop: '20px', borderTop: '1px solid #e5e7eb' }}>
-                  <label style={{
-                    display: 'block',
-                    fontSize: '13px',
-                    fontWeight: '600',
-                    color: '#374151',
-                    marginBottom: '8px'
-                  }}>
-                    Porcentaje mínimo para aprobar (%)
-                  </label>
-                  <input
-                    type="number"
-                    min="0"
-                    max="100"
-                    value={course?.passing_score || 75}
-                    onChange={async (e) => {
-                      const score = parseInt(e.target.value) || 75;
-                      setSaving(true);
-                      try {
-                        const response = await fetch(`/api/instructor/course/${slug}/config`, {
-                          method: 'PATCH',
-                          headers: { 'Content-Type': 'application/json' },
-                          body: JSON.stringify({ passing_score: score })
-                        });
-                        if (response.ok) {
-                          setCourse(prev => prev ? { ...prev, passing_score: score } : null);
-                        }
-                      } catch (error) {
-                        console.error('Error:', error);
-                      } finally {
-                        setSaving(false);
-                      }
-                    }}
-                    style={{
-                      width: '120px',
-                      padding: '8px 12px',
-                      border: '2px solid #e5e7eb',
-                      borderRadius: '8px',
-                      fontSize: '14px',
-                      boxSizing: 'border-box'
-                    }}
-                  />
-                  <p style={{
-                    fontSize: '12px',
-                    color: '#6b7280',
-                    marginTop: '8px'
-                  }}>
-                    Los estudiantes deben obtener al menos este porcentaje en el promedio general de todos los quizzes para recibir el certificado.
-                  </p>
-                </div>
-              ) : null}
-            </div>
-
-            <div style={{
-              padding: '1.5rem',
-              background: '#f9fafb',
-              borderRadius: '8px',
-              border: '1px solid #e5e7eb',
-              marginBottom: '1.5rem'
-            }}>
-              <h3 style={{
-                fontSize: '15px',
-                fontWeight: '600',
-                color: '#111827',
-                marginBottom: '1rem',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '0.5rem'
-              }}>
                 🌐 Estado de Publicación
               </h3>
 
@@ -3809,6 +3783,204 @@ SmartChatix - Transformamos la forma en que las personas trabajan`}
                   🗑️ Eliminar Curso
                 </button>
               </div>
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'certificado' && (
+          <div style={{
+            background: 'white',
+            borderRadius: '12px',
+            border: '1px solid #e5e7eb',
+            padding: '2rem'
+          }}>
+            <h2 style={{
+              fontSize: '1.5rem',
+              fontWeight: '600',
+              color: '#111827',
+              marginBottom: '1.5rem'
+            }}>
+              🎓 Certificado
+            </h2>
+
+            <div style={{
+              padding: '1.5rem',
+              background: '#f9fafb',
+              borderRadius: '8px',
+              border: '1px solid #e5e7eb',
+              marginBottom: '1.5rem'
+            }}>
+              <h3 style={{
+                fontSize: '15px',
+                fontWeight: '600',
+                color: '#111827',
+                marginBottom: '1rem',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.5rem'
+              }}>
+                🎓 Sistema de Certificación
+              </h3>
+
+              <div style={{ marginBottom: '16px' }}>
+                <label style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '12px',
+                  cursor: 'pointer',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  color: '#374151'
+                }}>
+                  <input
+                    type="checkbox"
+                    checked={course?.is_certification_enabled || false}
+                    onChange={async (e) => {
+                      const enabled = e.target.checked;
+                      setSaving(true);
+                      try {
+                        const response = await fetch(`/api/instructor/course/${slug}/config`, {
+                          method: 'PATCH',
+                          headers: { 'Content-Type': 'application/json' },
+                          body: JSON.stringify({ is_certification_enabled: enabled })
+                        });
+                        if (response.ok) {
+                          setCourse(prev => prev ? { ...prev, is_certification_enabled: enabled } : null);
+                        }
+                      } catch (error) {
+                        console.error('Error:', error);
+                      } finally {
+                        setSaving(false);
+                      }
+                    }}
+                    style={{
+                      width: '20px',
+                      height: '20px',
+                      cursor: 'pointer'
+                    }}
+                  />
+                  <span>Habilitar emisión de certificados para este curso</span>
+                </label>
+                <p style={{
+                  fontSize: '12px',
+                  color: '#6b7280',
+                  marginTop: '8px',
+                  marginLeft: '32px'
+                }}>
+                  Los estudiantes recibirán un certificado automáticamente al completar todas las lecciones con quizzes y alcanzar el porcentaje mínimo.
+                </p>
+              </div>
+
+              {course?.is_certification_enabled ? (
+                <div style={{ marginTop: '20px', paddingTop: '20px', borderTop: '1px solid #e5e7eb' }}>
+                  <label style={{
+                    display: 'block',
+                    fontSize: '13px',
+                    fontWeight: '600',
+                    color: '#374151',
+                    marginBottom: '8px'
+                  }}>
+                    Porcentaje mínimo para aprobar (%)
+                  </label>
+                  <input
+                    type="number"
+                    min="0"
+                    max="100"
+                    value={course?.passing_score || 75}
+                    onChange={async (e) => {
+                      const score = parseInt(e.target.value) || 75;
+                      setSaving(true);
+                      try {
+                        const response = await fetch(`/api/instructor/course/${slug}/config`, {
+                          method: 'PATCH',
+                          headers: { 'Content-Type': 'application/json' },
+                          body: JSON.stringify({ passing_score: score })
+                        });
+                        if (response.ok) {
+                          setCourse(prev => prev ? { ...prev, passing_score: score } : null);
+                        }
+                      } catch (error) {
+                        console.error('Error:', error);
+                      } finally {
+                        setSaving(false);
+                      }
+                    }}
+                    style={{
+                      width: '120px',
+                      padding: '8px 12px',
+                      border: '2px solid #e5e7eb',
+                      borderRadius: '8px',
+                      fontSize: '14px',
+                      boxSizing: 'border-box'
+                    }}
+                  />
+                  <p style={{
+                    fontSize: '12px',
+                    color: '#6b7280',
+                    marginTop: '8px'
+                  }}>
+                    Los estudiantes deben obtener al menos este porcentaje en el promedio general de todos los quizzes para recibir el certificado.
+                  </p>
+                </div>
+              ) : null}
+            </div>
+
+            <div style={{
+              padding: '1.5rem',
+              background: '#f9fafb',
+              borderRadius: '8px',
+              border: '1px solid #e5e7eb'
+            }}>
+              <h3 style={{
+                fontSize: '15px',
+                fontWeight: '600',
+                color: '#111827',
+                marginBottom: '0.25rem'
+              }}>
+                Diseño del certificado
+              </h3>
+              <p style={{ fontSize: '13px', color: '#6b7280', marginBottom: '1rem' }}>
+                Por defecto este curso usa el diseño general del sitio (definido en Configuración del sitio). Puedes personalizarlo solo para este curso.
+              </p>
+
+              <label style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '14px', color: '#374151', cursor: 'pointer', marginBottom: '1.25rem' }}>
+                <input
+                  type="checkbox"
+                  checked={certCustomEnabled}
+                  onChange={(e) => setCertCustomEnabled(e.target.checked)}
+                  style={{ width: '18px', height: '18px', cursor: 'pointer' }}
+                />
+                Usar un diseño personalizado para este curso
+              </label>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: '2rem', alignItems: 'start' }}>
+                <CertificateTemplateForm value={certTemplateDraft} onChange={setCertTemplateDraft} disabled={!certCustomEnabled} />
+                <div>
+                  <p style={{ fontSize: '12px', fontWeight: 600, color: '#6b7280', marginBottom: '0.5rem' }}>Vista previa</p>
+                  <CertificatePreview
+                    template={certTemplateDraft}
+                    courseTitle={course?.title}
+                  />
+                </div>
+              </div>
+
+              <button
+                onClick={handleSaveCertTemplate}
+                disabled={savingCertTemplate}
+                style={{
+                  marginTop: '1.25rem',
+                  padding: '0.75rem 1.5rem',
+                  background: savingCertTemplate ? '#9ca3af' : '#8b5cf6',
+                  color: '#fff',
+                  border: 'none',
+                  borderRadius: '8px',
+                  fontSize: '14px',
+                  fontWeight: '600',
+                  cursor: savingCertTemplate ? 'not-allowed' : 'pointer'
+                }}
+              >
+                {savingCertTemplate ? 'Guardando...' : 'Guardar diseño'}
+              </button>
             </div>
           </div>
         )}

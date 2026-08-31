@@ -40,6 +40,9 @@ export async function GET(
         e.modality,
         e.enrolled_at,
         e.payment_status,
+        c.certificate_url,
+        c.verification_code,
+        c.issue_type,
         COALESCE(
           (SELECT
             ROUND((COUNT(DISTINCT CASE WHEN p.completed = 1 THEN p.lesson_id END) * 100.0 / COUNT(DISTINCT l.id)), 0)
@@ -51,6 +54,7 @@ export async function GET(
         ) as progress
       FROM enrollments e
       INNER JOIN users u ON e.user_id = u.id
+      LEFT JOIN certificates c ON c.student_id = u.id AND c.course_id = e.course_id
       WHERE e.course_id = ? AND e.payment_status = 'completed'
       ORDER BY e.enrolled_at DESC
     `, [course.id, course.id]);

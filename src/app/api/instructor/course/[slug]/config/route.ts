@@ -271,6 +271,18 @@ export async function PATCH(
       values.push(body.email_payment_confirmation_template || null);
     }
 
+    if (body.certificate_template !== undefined) {
+      if (body.certificate_template !== null) {
+        try {
+          JSON.parse(body.certificate_template);
+        } catch {
+          return NextResponse.json({ error: 'Plantilla de certificado inválida' }, { status: 400 });
+        }
+      }
+      updates.push('certificate_template = ?');
+      values.push(body.certificate_template);
+    }
+
     if (body.language !== undefined) {
       updates.push('language = ?');
       values.push(body.language);
