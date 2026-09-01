@@ -6,7 +6,7 @@ import Link from 'next/link';
 interface Certificate {
   student_name: string;
   course_title: string;
-  final_score: number;
+  final_score: number | null;
   issue_date: string;
   is_valid: boolean;
   verification_code: string;
@@ -292,7 +292,7 @@ export default function VerificarCertificadoPage({ params }: { params: Promise<{
                 fontWeight: '700',
                 color: '#10b981'
               }}>
-                {certificate.final_score.toFixed(2)}%
+                {certificate.final_score !== null ? `${certificate.final_score.toFixed(2)}%` : '—'}
               </p>
             </div>
 

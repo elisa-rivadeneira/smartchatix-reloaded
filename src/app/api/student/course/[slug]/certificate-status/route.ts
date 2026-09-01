@@ -45,6 +45,25 @@ export async function GET(
       });
     }
 
+    const existingManualCertificate: any = await query(
+      'SELECT verification_code, certificate_url, final_score FROM certificates WHERE student_id = ? AND course_id = ?',
+      [user.id, course.id]
+    );
+
+    if (existingManualCertificate && existingManualCertificate.length > 0) {
+      return NextResponse.json({
+        eligible: true,
+        already_issued: true,
+        certificate: {
+          verification_code: existingManualCertificate[0].verification_code,
+          url: existingManualCertificate[0].certificate_url,
+          score: existingManualCertificate[0].final_score
+        },
+        score: existingManualCertificate[0].final_score,
+        passing_score: course.passing_score || 75
+      });
+    }
+
     const lessonsWithQuiz: any = await query(
       `SELECT
         l.id,
@@ -119,28 +138,6 @@ export async function GET(
 
     const passingScoreOn20 = ((course.passing_score || 75) / 100) * 20;
     const passesRequirement = notaSobre20 >= passingScoreOn20;
-
-    const existingCertificate: any = await query(
-      'SELECT verification_code, certificate_url, final_score FROM certificates WHERE student_id = ? AND course_id = ?',
-      [user.id, course.id]
-    );
-
-    if (existingCertificate && existingCertificate.length > 0) {
-      return NextResponse.json({
-        eligible: true,
-        already_issued: true,
-        certificate: {
-          verification_code: existingCertificate[0].verification_code,
-          url: existingCertificate[0].certificate_url,
-          score: existingCertificate[0].final_score
-        },
-        score: notaSobre20.toFixed(1),
-        passing_score: passingScoreOn20.toFixed(1),
-        total_quizzes: lessonsWithQuiz.length,
-        completed_quizzes: completedLessons.size,
-        lesson_scores: lessonScores
-      });
-    }
 
     if (!allQuizzesCompleted) {
       const missingLessons = lessonsWithQuiz

@@ -829,7 +829,9 @@ export default function CoursePage({ params }: { params: Promise<{ slug: string 
                   margin: 0
                 }}>
                   {certificateStatus.already_issued
-                    ? `Calificación final: ${certificateStatus.certificate.score}/20`
+                    ? (certificateStatus.certificate.score !== null
+                        ? `Calificación final: ${certificateStatus.certificate.score}/20`
+                        : 'Certificado emitido por tu instructor')
                     : `Calificación final: ${certificateStatus.score}/20 - Descarga tu certificado ahora`}
                 </p>
               </div>
