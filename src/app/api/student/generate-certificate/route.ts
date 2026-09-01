@@ -44,7 +44,7 @@ export async function POST(request: NextRequest) {
     }
 
     const courses: any = await query(
-      'SELECT id, title, duration, certificate_template FROM courses WHERE slug = ?',
+      'SELECT id, title, duration, recorded_features, certificate_template FROM courses WHERE slug = ?',
       [courseSlug]
     );
 
@@ -53,6 +53,10 @@ export async function POST(request: NextRequest) {
     }
 
     const course = courses[0];
+    const recordedFeatures = typeof course.recorded_features === 'string'
+      ? JSON.parse(course.recorded_features)
+      : (course.recorded_features || {});
+    const courseDuration = course.duration || (recordedFeatures.duration_hours ? `${recordedFeatures.duration_hours}h` : null);
 
     const enrollmentRows: any = await query(
       'SELECT modality FROM enrollments WHERE user_id = ? AND course_id = ? ORDER BY enrolled_at DESC LIMIT 1',
@@ -82,7 +86,7 @@ export async function POST(request: NextRequest) {
     const pdfBytes = await buildCertificatePdf({
       studentName: user.name || user.email,
       courseTitle: course.title,
-      courseDuration: course.duration,
+      courseDuration,
       modalityLabel,
       moduleCount,
       issueDate,

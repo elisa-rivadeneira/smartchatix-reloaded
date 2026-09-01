@@ -26,7 +26,7 @@ export async function POST(
     const studentIdNum = parseInt(studentId, 10);
 
     const courses: any = await query(
-      'SELECT id, title, duration, certificate_template, instructor_id, is_certification_enabled FROM courses WHERE slug = ?',
+      'SELECT id, title, duration, recorded_features, certificate_template, instructor_id, is_certification_enabled FROM courses WHERE slug = ?',
       [slug]
     );
 
@@ -35,6 +35,10 @@ export async function POST(
     }
 
     const course = courses[0];
+    const recordedFeatures = typeof course.recorded_features === 'string'
+      ? JSON.parse(course.recorded_features)
+      : (course.recorded_features || {});
+    const courseDuration = course.duration || (recordedFeatures.duration_hours ? `${recordedFeatures.duration_hours}h` : null);
 
     if (decoded.role === 'instructor' && course.instructor_id !== decoded.id) {
       return NextResponse.json({ error: 'No tienes permiso sobre este curso' }, { status: 403 });
@@ -100,7 +104,7 @@ export async function POST(
     const pdfBytes = await buildCertificatePdf({
       studentName: student.name || student.email,
       courseTitle: course.title,
-      courseDuration: course.duration,
+      courseDuration,
       modalityLabel,
       moduleCount,
       issueDate,
@@ -138,5 +142,50 @@ export async function POST(
   } catch (error) {
     console.error('Error issuing manual certificate:', error);
     return NextResponse.json({ error: 'Error al emitir el certificado' }, { status: 500 });
+  }
+}
+
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: Promise<{ slug: string; studentId: string }> }
+) {
+  try {
+    const token = request.cookies.get('auth_token')?.value;
+    if (!token) {
+      return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
+    }
+
+    const decoded = verifyToken(token);
+    if (!decoded || (decoded.role !== 'instructor' && decoded.role !== 'admin')) {
+      return NextResponse.json({ error: 'Acceso denegado' }, { status: 403 });
+    }
+
+    const { slug, studentId } = await params;
+    const studentIdNum = parseInt(studentId, 10);
+
+    const courses: any = await query(
+      'SELECT id, instructor_id FROM courses WHERE slug = ?',
+      [slug]
+    );
+
+    if (!courses || courses.length === 0) {
+      return NextResponse.json({ error: 'Curso no encontrado' }, { status: 404 });
+    }
+
+    const course = courses[0];
+
+    if (decoded.role === 'instructor' && course.instructor_id !== decoded.id) {
+      return NextResponse.json({ error: 'No tienes permiso sobre este curso' }, { status: 403 });
+    }
+
+    await query(
+      'DELETE FROM certificates WHERE student_id = ? AND course_id = ?',
+      [studentIdNum, course.id]
+    );
+
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    console.error('Error deleting certificate:', error);
+    return NextResponse.json({ error: 'Error al eliminar el certificado' }, { status: 500 });
   }
 }

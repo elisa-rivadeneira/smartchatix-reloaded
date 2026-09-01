@@ -2771,6 +2771,30 @@ export default function InstructorCourseEditPage() {
       }
     };
 
+    const handleDeleteCertificate = async (studentId: number, studentName: string) => {
+      if (!confirm(`¿Eliminar el certificado de ${studentName}?\n\nPodrás emitirle uno nuevo después.`)) {
+        return;
+      }
+
+      setIssuingCertId(studentId);
+      try {
+        const res = await fetch(`/api/instructor/course/${courseSlug}/students/${studentId}/issue-certificate`, {
+          method: 'DELETE'
+        });
+        const data = await res.json();
+
+        if (res.ok) {
+          fetchStudents();
+        } else {
+          alert(data.error || 'Error al eliminar el certificado');
+        }
+      } catch (error) {
+        alert('Error al eliminar el certificado');
+      } finally {
+        setIssuingCertId(null);
+      }
+    };
+
     if (loadingStudents) {
       return (
         <div style={{ padding: '2rem', textAlign: 'center' }}>
@@ -2904,25 +2928,49 @@ export default function InstructorCourseEditPage() {
                     <td style={{ textAlign: 'center', padding: '1rem' }}>
                       {course?.is_certification_enabled && (
                         student.certificate_url ? (
-                          <a
-                            href={student.certificate_url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            style={{
-                              display: 'inline-block',
-                              padding: '0.5rem 1rem',
-                              backgroundColor: '#059669',
-                              color: 'white',
-                              border: 'none',
-                              borderRadius: '6px',
-                              textDecoration: 'none',
-                              fontSize: '0.875rem',
-                              fontWeight: '500',
-                              marginRight: '0.5rem'
-                            }}
-                          >
-                            📄 Ver certificado
-                          </a>
+                          <span style={{ display: 'inline-flex', gap: '0.4rem', marginRight: '0.5rem' }}>
+                            <a
+                              href={student.certificate_url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              title="Ver certificado"
+                              style={{
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                width: '2.25rem',
+                                height: '2.25rem',
+                                backgroundColor: '#059669',
+                                color: 'white',
+                                border: 'none',
+                                borderRadius: '6px',
+                                textDecoration: 'none',
+                                fontSize: '1rem'
+                              }}
+                            >
+                              👁️
+                            </a>
+                            <button
+                              onClick={() => handleDeleteCertificate(student.id, student.name)}
+                              disabled={issuingCertId === student.id}
+                              title="Eliminar certificado"
+                              style={{
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                width: '2.25rem',
+                                height: '2.25rem',
+                                backgroundColor: issuingCertId === student.id ? '#9ca3af' : '#b91c1c',
+                                color: 'white',
+                                border: 'none',
+                                borderRadius: '6px',
+                                cursor: issuingCertId === student.id ? 'not-allowed' : 'pointer',
+                                fontSize: '1rem'
+                              }}
+                            >
+                              🗑️
+                            </button>
+                          </span>
                         ) : (
                           <button
                             onClick={() => handleIssueCertificate(student.id, student.name)}
