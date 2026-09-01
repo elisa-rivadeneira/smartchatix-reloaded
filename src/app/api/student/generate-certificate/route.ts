@@ -80,7 +80,7 @@ export async function POST(request: NextRequest) {
     const verificationCode = generateVerificationCode();
     const issueDate = new Date();
 
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || request.nextUrl.origin;
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://smartchatix.com';
     const verificationUrl = `${baseUrl}/verificar/${verificationCode}`;
 
     const pdfBytes = await buildCertificatePdf({
