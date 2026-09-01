@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { usePathname } from 'next/navigation';
 import { useCurrency, Currency } from '@/hooks/useCurrency';
 
 interface HeaderProps {
@@ -26,6 +27,7 @@ const Header: React.FC<HeaderProps> = ({
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
+  const pathname = usePathname();
   const { currency, setCurrency } = useCurrency();
   const [showCurrencySelector, setShowCurrencySelector] = useState(false);
 
@@ -656,7 +658,7 @@ const Header: React.FC<HeaderProps> = ({
                       href={item.href}
                       onClick={(e) => {
                         setIsOpen(false);
-                        if (item.href.startsWith('/#')) {
+                        if (item.href.startsWith('/#') && pathname === '/') {
                           e.preventDefault();
                           const id = item.href.substring(2);
                           setTimeout(() => {

@@ -13,7 +13,6 @@ import * as fbPixel from '@/lib/fbPixel';
 export default function CursoPage({ params }: { params: Promise<{ slug: string }> }) {
   const { currency, symbol, exchangeRate } = useCurrency();
   const [showModal, setShowModal] = React.useState(false);
-  const [showMobileMenu, setShowMobileMenu] = React.useState(false);
   const [slug, setSlug] = React.useState<string>('');
   const [curso, setCurso] = React.useState<any>(undefined);
   const [stickyPosition, setStickyPosition] = React.useState<'fixed' | 'absolute'>('fixed');
@@ -210,15 +209,6 @@ export default function CursoPage({ params }: { params: Promise<{ slug: string }
         @media (max-width: 768px) {
           .mobile-hidden { display: none !important; }
           .certificate-icons { display: none !important; }
-          .mobile-hamburger {
-            display: flex !important;
-            position: fixed !important;
-            top: 15px !important;
-            right: 15px !important;
-            z-index: 99999 !important;
-            width: 45px !important;
-            height: 45px !important;
-          }
           .hero-grid {
             grid-template-columns: 1fr !important;
             gap: 1.5rem !important;
@@ -266,106 +256,6 @@ export default function CursoPage({ params }: { params: Promise<{ slug: string }
       `}</style>
 
       <Header showCursos={true} showServicios={false} courses={allCourses} />
-
-      {/* Menú Hamburguesa Móvil */}
-      <button
-        className="mobile-hamburger"
-        onClick={() => setShowMobileMenu(!showMobileMenu)}
-        style={{
-          display: 'none',
-          backgroundColor: colors.accent,
-          color: colors.white,
-          border: 'none',
-          borderRadius: '6px',
-          alignItems: 'center',
-          justifyContent: 'center',
-          fontSize: '1.5rem',
-          cursor: 'pointer',
-          boxShadow: '0 4px 8px rgba(0,0,0,0.2)'
-        }}
-      >
-        {showMobileMenu ? '✕' : '☰'}
-      </button>
-
-      {/* Overlay Menú Móvil */}
-      {showMobileMenu && (
-        <div
-          style={{
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            width: '100%',
-            height: '100%',
-            backgroundColor: 'rgba(0, 0, 0, 0.9)',
-            zIndex: 99998,
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: spacing.lg,
-            padding: spacing.xl,
-            overflowY: 'auto'
-          }}
-          onClick={() => setShowMobileMenu(false)}
-        >
-          <Link href="/" style={{
-            color: colors.white,
-            fontSize: '1.5rem',
-            fontWeight: '600',
-            textDecoration: 'none'
-          }}>
-            Inicio
-          </Link>
-          <Link href="/programas" style={{
-            color: colors.white,
-            fontSize: '1.5rem',
-            fontWeight: '600',
-            textDecoration: 'none'
-          }}>
-            Programas
-          </Link>
-          <Link href="/cursos" style={{
-            color: colors.white,
-            fontSize: '1.5rem',
-            fontWeight: '600',
-            textDecoration: 'none'
-          }}>
-            Cursos
-          </Link>
-          <Link href="/capacitacion" style={{
-            color: colors.white,
-            fontSize: '1.5rem',
-            fontWeight: '600',
-            textDecoration: 'none'
-          }}>
-            Capacitación Empresarial
-          </Link>
-          <Link href="/mentorias" style={{
-            color: colors.white,
-            fontSize: '1.5rem',
-            fontWeight: '600',
-            textDecoration: 'none'
-          }}>
-            Mentorías
-          </Link>
-          <Link href="/blog" style={{
-            color: colors.white,
-            fontSize: '1.5rem',
-            fontWeight: '600',
-            textDecoration: 'none'
-          }}>
-            Blog
-          </Link>
-          <Link href="/contacto" style={{
-            color: colors.white,
-            fontSize: '1.5rem',
-            fontWeight: '600',
-            textDecoration: 'none'
-          }}>
-            Contacto
-          </Link>
-        </div>
-      )}
 
       {/* Módulo lateral - Absolute position */}
       {sidebarVisible && (
@@ -883,7 +773,8 @@ export default function CursoPage({ params }: { params: Promise<{ slug: string }
           }}>
             <div style={{
               display: 'flex',
-              flexDirection: 'column'
+              flexDirection: 'column',
+              minWidth: 0
             }}>
               <div style={{
                 textAlign: 'left',
@@ -899,7 +790,7 @@ export default function CursoPage({ params }: { params: Promise<{ slug: string }
                 }}>
                   🎓
                 </div>
-                <div>
+                <div style={{ minWidth: 0 }}>
                   <h2 style={{
                     fontSize: '1.6rem',
                     fontWeight: '700',
@@ -1031,7 +922,8 @@ export default function CursoPage({ params }: { params: Promise<{ slug: string }
 
             <div style={{
               display: 'flex',
-              flexDirection: 'column'
+              flexDirection: 'column',
+              minWidth: 0
             }}>
               <div style={{
                 background: 'linear-gradient(135deg, #003366 0%, #0066CC 100%)',
@@ -1154,14 +1046,15 @@ export default function CursoPage({ params }: { params: Promise<{ slug: string }
                       backgroundColor: colors.accent,
                       color: colors.white,
                       border: 'none',
-                      padding: `${spacing.md} ${spacing.lg}`,
+                      padding: `${spacing.md} ${spacing.sm}`,
                       borderRadius: '8px',
-                      fontSize: '1rem',
+                      fontSize: 'clamp(0.8rem, 3.5vw, 1rem)',
                       fontWeight: '700',
+                      textAlign: 'center',
+                      lineHeight: '1.3',
                       cursor: 'pointer',
                       boxShadow: '0 4px 16px rgba(255,102,0,0.4)',
-                      transition: 'all 0.2s',
-                      whiteSpace: 'nowrap'
+                      transition: 'all 0.2s'
                     }}
                     onMouseEnter={(e) => {
                       e.currentTarget.style.transform = 'scale(1.03)';
@@ -1182,14 +1075,15 @@ export default function CursoPage({ params }: { params: Promise<{ slug: string }
                         backgroundColor: colors.accent,
                         color: colors.white,
                         border: 'none',
-                        padding: `${spacing.md} ${spacing.lg}`,
+                        padding: `${spacing.md} ${spacing.sm}`,
                         borderRadius: '8px',
-                        fontSize: '1rem',
+                        fontSize: 'clamp(0.8rem, 3.5vw, 1rem)',
                         fontWeight: '700',
+                        textAlign: 'center',
+                        lineHeight: '1.3',
                         cursor: 'pointer',
                         boxShadow: '0 4px 16px rgba(255,102,0,0.4)',
-                        transition: 'all 0.2s',
-                        whiteSpace: 'nowrap'
+                        transition: 'all 0.2s'
                       }}
                       onMouseEnter={(e) => {
                         e.currentTarget.style.transform = 'scale(1.03)';
@@ -1211,14 +1105,15 @@ export default function CursoPage({ params }: { params: Promise<{ slug: string }
                         backgroundColor: colors.accent,
                         color: colors.white,
                         border: 'none',
-                        padding: `${spacing.md} ${spacing.lg}`,
+                        padding: `${spacing.md} ${spacing.sm}`,
                         borderRadius: '8px',
-                        fontSize: '1rem',
+                        fontSize: 'clamp(0.8rem, 3.5vw, 1rem)',
                         fontWeight: '700',
+                        textAlign: 'center',
+                        lineHeight: '1.3',
                         cursor: 'pointer',
                         boxShadow: '0 4px 16px rgba(255,102,0,0.4)',
-                        transition: 'all 0.2s',
-                        whiteSpace: 'nowrap'
+                        transition: 'all 0.2s'
                       }}
                       onMouseEnter={(e) => {
                         e.currentTarget.style.transform = 'scale(1.03)';
