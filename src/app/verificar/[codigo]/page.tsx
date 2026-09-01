@@ -274,27 +274,29 @@ export default function VerificarCertificadoPage({ params }: { params: Promise<{
 
           <div style={{
             display: 'grid',
-            gridTemplateColumns: '1fr 1fr',
+            gridTemplateColumns: certificate.final_score !== null ? '1fr 1fr' : '1fr',
             gap: '20px'
           }}>
-            <div>
-              <p style={{
-                fontSize: '12px',
-                color: '#9ca3af',
-                marginBottom: '4px',
-                textTransform: 'uppercase',
-                letterSpacing: '0.5px'
-              }}>
-                Calificación
-              </p>
-              <p style={{
-                fontSize: '24px',
-                fontWeight: '700',
-                color: '#10b981'
-              }}>
-                {certificate.final_score !== null ? `${certificate.final_score.toFixed(2)}%` : '—'}
-              </p>
-            </div>
+            {certificate.final_score !== null && (
+              <div>
+                <p style={{
+                  fontSize: '12px',
+                  color: '#9ca3af',
+                  marginBottom: '4px',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.5px'
+                }}>
+                  Calificación
+                </p>
+                <p style={{
+                  fontSize: '24px',
+                  fontWeight: '700',
+                  color: '#10b981'
+                }}>
+                  {certificate.final_score.toFixed(2)}%
+                </p>
+              </div>
+            )}
 
             <div>
               <p style={{
