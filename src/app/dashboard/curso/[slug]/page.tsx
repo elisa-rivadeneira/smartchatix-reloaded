@@ -2903,24 +2903,46 @@ export default function InstructorCourseEditPage() {
                     </td>
                     <td style={{ textAlign: 'center', padding: '1rem' }}>
                       {course?.is_certification_enabled && (
-                        <button
-                          onClick={() => handleIssueCertificate(student.id, student.name)}
-                          disabled={issuingCertId === student.id}
-                          title="Emitir certificado manualmente, sin pasar por el quiz"
-                          style={{
-                            padding: '0.5rem 1rem',
-                            backgroundColor: issuingCertId === student.id ? '#9ca3af' : '#0f766e',
-                            color: 'white',
-                            border: 'none',
-                            borderRadius: '6px',
-                            cursor: issuingCertId === student.id ? 'not-allowed' : 'pointer',
-                            fontSize: '0.875rem',
-                            fontWeight: '500',
-                            marginRight: '0.5rem'
-                          }}
-                        >
-                          {issuingCertId === student.id ? 'Emitiendo...' : '🎓 Emitir certificado'}
-                        </button>
+                        student.certificate_url ? (
+                          <a
+                            href={student.certificate_url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            style={{
+                              display: 'inline-block',
+                              padding: '0.5rem 1rem',
+                              backgroundColor: '#059669',
+                              color: 'white',
+                              border: 'none',
+                              borderRadius: '6px',
+                              textDecoration: 'none',
+                              fontSize: '0.875rem',
+                              fontWeight: '500',
+                              marginRight: '0.5rem'
+                            }}
+                          >
+                            📄 Ver certificado
+                          </a>
+                        ) : (
+                          <button
+                            onClick={() => handleIssueCertificate(student.id, student.name)}
+                            disabled={issuingCertId === student.id}
+                            title="Emitir certificado manualmente, sin pasar por el quiz"
+                            style={{
+                              padding: '0.5rem 1rem',
+                              backgroundColor: issuingCertId === student.id ? '#9ca3af' : '#0f766e',
+                              color: 'white',
+                              border: 'none',
+                              borderRadius: '6px',
+                              cursor: issuingCertId === student.id ? 'not-allowed' : 'pointer',
+                              fontSize: '0.875rem',
+                              fontWeight: '500',
+                              marginRight: '0.5rem'
+                            }}
+                          >
+                            {issuingCertId === student.id ? 'Emitiendo...' : '🎓 Emitir certificado'}
+                          </button>
+                        )
                       )}
                       <button
                         onClick={() => handleRemoveStudent(student.id, student.name)}

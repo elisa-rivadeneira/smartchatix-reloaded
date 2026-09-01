@@ -6,6 +6,7 @@ import Image from 'next/image';
 import { notFound } from 'next/navigation';
 import Footer from '@/components/Footer';
 import Header from '@/components/layout/Header';
+import CertificatePreview from '@/components/certificate/CertificatePreview';
 import { useCurrency } from '@/hooks/useCurrency';
 import * as fbPixel from '@/lib/fbPixel';
 
@@ -536,7 +537,7 @@ export default function CursoPage({ params }: { params: Promise<{ slug: string }
             </h1>
 
             {/* Temas clave */}
-            {curso.keyTopics && curso.keyTopics.length > 0 && (
+            {curso.keyTopics && curso.keyTopics.filter((topic: string) => topic && topic.trim()).length > 0 && (
               <div style={{
                 backgroundColor: 'rgba(255, 255, 255, 0.15)',
                 borderLeft: `4px solid ${colors.accent}`,
@@ -562,7 +563,7 @@ export default function CursoPage({ params }: { params: Promise<{ slug: string }
                   gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
                   gap: spacing.xs
                 }}>
-                  {curso.keyTopics.map((topic: string, idx: number) => (
+                  {curso.keyTopics.filter((topic: string) => topic && topic.trim()).map((topic: string, idx: number) => (
                     <li key={idx} style={{
                       fontSize: '0.9rem',
                       display: 'flex',
@@ -926,18 +927,26 @@ export default function CursoPage({ params }: { params: Promise<{ slug: string }
                 boxShadow: '0 4px 20px rgba(0,0,0,0.1)',
                 marginBottom: spacing.lg
               }}>
-                <Image
-                  src="/images/certificado-aprobacion.jpeg"
-                  alt="Certificado de Aprobación"
-                  width={800}
-                  height={566}
-                  style={{
-                    width: '100%',
-                    height: 'auto',
-                    borderRadius: '8px'
-                  }}
-                  priority
-                />
+                {curso.certificateTemplate ? (
+                  <CertificatePreview
+                    template={curso.certificateTemplate}
+                    studentName="Nombre y Apellido"
+                    courseTitle={curso.title}
+                  />
+                ) : (
+                  <Image
+                    src="/images/certificado-aprobacion.jpeg"
+                    alt="Certificado de Aprobación"
+                    width={800}
+                    height={566}
+                    style={{
+                      width: '100%',
+                      height: 'auto',
+                      borderRadius: '8px'
+                    }}
+                    priority
+                  />
+                )}
               </div>
 
               <div className="certificate-icons" style={{
@@ -1081,27 +1090,36 @@ export default function CursoPage({ params }: { params: Promise<{ slug: string }
                     </div>
 
                     <div style={{
-                      fontSize: '2.4rem',
-                      fontWeight: '700',
-                      color: colors.white,
+                      display: 'flex',
+                      flexWrap: 'wrap',
+                      alignItems: 'baseline',
+                      justifyContent: 'center',
+                      gap: spacing.sm,
                       marginBottom: spacing.xs
                     }}>
-                      {symbol} {getPrice(
-                        curso.hasLiveMode ? curso.priceVivo : curso.priceGrabado,
-                        curso.hasLiveMode ? curso.priceVivoUsd : curso.priceGrabadoUsd
-                      ).toFixed(2)}
-                    </div>
-
-                    {currency === 'USD' && curso.price_pen && (
-                      <div style={{
-                        fontSize: '1rem',
-                        color: 'rgba(255,255,255,0.5)',
-                        textDecoration: 'line-through',
-                        marginBottom: spacing.sm
+                      <span style={{
+                        fontSize: '2.4rem',
+                        fontWeight: '700',
+                        color: colors.white
                       }}>
-                        S/ {curso.price_pen}
-                      </div>
-                    )}
+                        {symbol} {getPrice(
+                          curso.hasLiveMode ? curso.priceVivo : curso.priceGrabado,
+                          curso.hasLiveMode ? curso.priceVivoUsd : curso.priceGrabadoUsd
+                        ).toFixed(2)}
+                      </span>
+                      {(curso.hasLiveMode ? curso.priceVivoOld : curso.priceGrabadoOld) && (
+                        <span style={{
+                          fontSize: '1.2rem',
+                          color: 'rgba(255,255,255,0.5)',
+                          textDecoration: 'line-through'
+                        }}>
+                          {symbol} {getPrice(
+                            curso.hasLiveMode ? curso.priceVivoOld : curso.priceGrabadoOld,
+                            curso.hasLiveMode ? curso.priceVivoUsdOld : curso.priceGrabadoUsdOld
+                          ).toFixed(2)}
+                        </span>
+                      )}
+                    </div>
 
                     <p style={{
                       fontSize: '0.9rem',

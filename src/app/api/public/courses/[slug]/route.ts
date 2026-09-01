@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { query } from '@/lib/db';
+import { resolveCertificateTemplate } from '@/lib/certificate-template';
 
 export async function GET(
   request: NextRequest,
@@ -33,7 +34,9 @@ export async function GET(
         learning_outcomes,
         module_titles,
         module_descriptions,
-        publication_status
+        publication_status,
+        is_certification_enabled,
+        certificate_template
       FROM courses
       WHERE slug = ? AND publication_status IN ('published', 'coming_soon')
     `, [slug]);
@@ -43,6 +46,12 @@ export async function GET(
     }
 
     const course = courseData[0];
+
+    const siteSettings = await query(
+      `SELECT setting_value FROM site_settings WHERE setting_key = 'certificate_template_default'`
+    );
+    const siteDefaultJson = siteSettings?.[0]?.setting_value || null;
+    const certificateTemplate = resolveCertificateTemplate(siteDefaultJson, course.certificate_template);
 
     const modules = await query(`
       SELECT id, title, description, order_index
@@ -90,6 +99,8 @@ export async function GET(
       learning_outcomes: learningOutcomes,
       module_titles: moduleTitles,
       publication_status: course.publication_status,
+      isCertificationEnabled: Boolean(course.is_certification_enabled),
+      certificateTemplate,
       modules: moduleTitles.map((title: string, idx: number) => ({
         num: idx + 1,
         title: title,
