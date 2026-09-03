@@ -540,7 +540,8 @@ export default function CursoPage({ params }: { params: Promise<{ slug: string }
                         {new Date(curso.live_start_date).toLocaleDateString('es-ES', {
                           day: 'numeric',
                           month: 'long',
-                          year: 'numeric'
+                          year: 'numeric',
+                          timeZone: 'UTC'
                         })}
                       </div>
                     </div>

@@ -316,7 +316,8 @@ export default function VerificarCertificadoPage({ params }: { params: Promise<{
                 {issueDate.toLocaleDateString('es-ES', {
                   day: '2-digit',
                   month: 'long',
-                  year: 'numeric'
+                  year: 'numeric',
+                  timeZone: 'UTC'
                 })}
               </p>
             </div>
