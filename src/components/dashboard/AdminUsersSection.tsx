@@ -47,12 +47,14 @@ export default function AdminUsersSection() {
   });
   const [userEnrollments, setUserEnrollments] = useState<number[]>([]);
   const [selectedCourseToAdd, setSelectedCourseToAdd] = useState<number | null>(null);
+  const [selectedModalityToAdd, setSelectedModalityToAdd] = useState<'vivo' | 'grabado'>('grabado');
   const [showEmailModal, setShowEmailModal] = useState(false);
   const [enrollmentEmailData, setEnrollmentEmailData] = useState<{
     user: { id: number; email: string; name: string } | null;
     course: { id: number; title: string; slug: string; emailTemplate?: string } | null;
     hasPassword: boolean;
-  }>({ user: null, course: null, hasPassword: true });
+    modality: 'vivo' | 'grabado';
+  }>({ user: null, course: null, hasPassword: true, modality: 'grabado' });
   const [sendingEmail, setSendingEmail] = useState(false);
 
   useEffect(() => {
@@ -174,7 +176,7 @@ export default function AdminUsersSection() {
         body: JSON.stringify({
           user_id: editingUser.id,
           course_id: selectedCourseToAdd,
-          modality: 'grabado',
+          modality: selectedModalityToAdd,
           payment_amount: 0,
           payment_status: 'completed'
         })
@@ -190,7 +192,8 @@ export default function AdminUsersSection() {
           setEnrollmentEmailData({
             user: data.user,
             course: data.course,
-            hasPassword: data.hasPassword || false
+            hasPassword: data.hasPassword || false,
+            modality: selectedModalityToAdd
           });
           setShowEmailModal(true);
         } else {
@@ -233,7 +236,7 @@ export default function AdminUsersSection() {
           email: enrollmentEmailData.user.email,
           name: enrollmentEmailData.user.name,
           courseTitle: enrollmentEmailData.course.title,
-          modality: 'grabado',
+          modality: enrollmentEmailData.modality,
           amount: 0,
           password: tempPassword,
           isNewUser: true,
@@ -969,6 +972,22 @@ export default function AdminUsersSection() {
                         <option key={c.id} value={c.id}>{c.title}</option>
                       ))
                     }
+                  </select>
+                  <select
+                    value={selectedModalityToAdd}
+                    onChange={(e) => setSelectedModalityToAdd(e.target.value as 'vivo' | 'grabado')}
+                    style={{
+                      padding: '0.75rem',
+                      border: '2px solid #e5e7eb',
+                      borderRadius: '8px',
+                      fontSize: '14px',
+                      cursor: 'pointer',
+                      boxSizing: 'border-box',
+                      flexShrink: 0
+                    }}
+                  >
+                    <option value="grabado">Grabado</option>
+                    <option value="vivo">En Vivo</option>
                   </select>
                   <button
                     onClick={handleAddEnrollment}

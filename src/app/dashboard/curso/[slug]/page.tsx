@@ -2668,6 +2668,7 @@ export default function InstructorCourseEditPage() {
     const [newStudentModality, setNewStudentModality] = useState('grabado');
     const [saving, setSaving] = useState(false);
     const [issuingCertId, setIssuingCertId] = useState<number | null>(null);
+    const [updatingModalityId, setUpdatingModalityId] = useState<number | null>(null);
 
     useEffect(() => {
       fetchStudents();
@@ -2741,6 +2742,28 @@ export default function InstructorCourseEditPage() {
         }
       } catch (error) {
         alert('Error al eliminar estudiante');
+      }
+    };
+
+    const handleChangeModality = async (studentId: number, newModality: string) => {
+      setUpdatingModalityId(studentId);
+      try {
+        const res = await fetch(`/api/instructor/course/${courseSlug}/students/${studentId}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ modality: newModality })
+        });
+
+        if (res.ok) {
+          setStudents(prev => prev.map(s => s.id === studentId ? { ...s, modality: newModality } : s));
+        } else {
+          const data = await res.json();
+          alert(data.error || 'Error al actualizar la modalidad');
+        }
+      } catch (error) {
+        alert('Error al actualizar la modalidad');
+      } finally {
+        setUpdatingModalityId(null);
       }
     };
 
@@ -2890,16 +2913,24 @@ export default function InstructorCourseEditPage() {
                       {student.email}
                     </td>
                     <td style={{ textAlign: 'center', padding: '1rem' }}>
-                      <span style={{
-                        padding: '0.25rem 0.75rem',
-                        borderRadius: '12px',
-                        backgroundColor: student.modality === 'vivo' ? '#dbeafe' : '#f3f4f6',
-                        color: student.modality === 'vivo' ? '#1e40af' : '#6b7280',
-                        fontWeight: '600',
-                        fontSize: '0.75rem'
-                      }}>
-                        {student.modality === 'vivo' ? 'En Vivo' : 'Grabado'}
-                      </span>
+                      <select
+                        value={student.modality === 'vivo' ? 'vivo' : 'grabado'}
+                        disabled={updatingModalityId === student.id}
+                        onChange={(e) => handleChangeModality(student.id, e.target.value)}
+                        style={{
+                          padding: '0.25rem 0.5rem',
+                          borderRadius: '12px',
+                          border: 'none',
+                          backgroundColor: student.modality === 'vivo' ? '#dbeafe' : '#f3f4f6',
+                          color: student.modality === 'vivo' ? '#1e40af' : '#6b7280',
+                          fontWeight: '600',
+                          fontSize: '0.75rem',
+                          cursor: updatingModalityId === student.id ? 'wait' : 'pointer'
+                        }}
+                      >
+                        <option value="grabado">Grabado</option>
+                        <option value="vivo">En Vivo</option>
+                      </select>
                     </td>
                     <td style={{ textAlign: 'center', padding: '1rem' }}>
                       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}>
