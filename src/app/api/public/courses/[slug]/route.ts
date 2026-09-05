@@ -60,12 +60,14 @@ export async function GET(
       ORDER BY order_index ASC
     `, [course.id]);
 
-    const moduleTitles = typeof course.module_titles === 'string'
+    const jsonModuleTitles = typeof course.module_titles === 'string'
       ? JSON.parse(course.module_titles)
-      : (course.module_titles || modules.map((m: any) => m.title));
-    const moduleDescriptions = typeof course.module_descriptions === 'string'
+      : (course.module_titles || []);
+    const jsonModuleDescriptions = typeof course.module_descriptions === 'string'
       ? JSON.parse(course.module_descriptions)
-      : (course.module_descriptions || modules.map((m: any) => m.description || ''));
+      : (course.module_descriptions || []);
+    const moduleTitles = modules.length > 0 ? modules.map((m: any) => m.title) : jsonModuleTitles;
+    const moduleDescriptions = modules.length > 0 ? modules.map((m: any) => m.description || '') : jsonModuleDescriptions;
     const recordedFeatures = typeof course.recorded_features === 'string'
       ? JSON.parse(course.recorded_features)
       : (course.recorded_features || {});
