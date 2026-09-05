@@ -80,6 +80,11 @@ export default function CertificatePreview({
           </div>
         ))}
         <div style={centered(84.77, 47.36, 24, 1.9, 700, '#021248')}>XXXX-XXXX-XXXX</div>
+        {template.footnoteText && (
+          <div style={{ ...centered(93.0, 50, 85, 1.3, 400, '#374151'), fontStyle: 'italic', whiteSpace: 'normal' }}>
+            {template.footnoteText}
+          </div>
+        )}
       </div>
     );
   }

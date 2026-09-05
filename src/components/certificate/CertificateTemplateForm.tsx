@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { CertificateTemplate } from '@/lib/certificate-template';
+import { CertificateTemplate, CERTIFICATE_TYPE_PRESETS } from '@/lib/certificate-template';
 
 interface CertificateTemplateFormProps {
   value: CertificateTemplate;
@@ -31,6 +31,7 @@ const fieldWrapStyle: React.CSSProperties = { marginBottom: '16px' };
 export default function CertificateTemplateForm({ value, onChange, disabled }: CertificateTemplateFormProps) {
   const [uploadingLogo, setUploadingLogo] = useState(false);
   const [uploadingBackground, setUploadingBackground] = useState(false);
+  const [selectedCertType, setSelectedCertType] = useState('');
 
   const set = <K extends keyof CertificateTemplate>(key: K, val: CertificateTemplate[K]) => {
     onChange({ ...value, [key]: val });
@@ -65,6 +66,28 @@ export default function CertificateTemplateForm({ value, onChange, disabled }: C
 
   return (
     <div style={{ opacity: disabled ? 0.6 : 1, pointerEvents: disabled ? 'none' : 'auto' }}>
+      <div style={{ ...fieldWrapStyle, padding: '12px', background: '#f5f3ff', border: '2px solid #c4b5fd', borderRadius: '8px' }}>
+        <label style={labelStyle}>Tipo de certificado</label>
+        <p style={{ fontSize: '12px', color: '#6b7280', marginBottom: '8px' }}>
+          Elige un tipo para autocompletar el título y el texto según sea un curso o un webinar. Puedes seguir editando el texto libremente después.
+        </p>
+        <select
+          value={selectedCertType}
+          onChange={(e) => {
+            const key = e.target.value;
+            setSelectedCertType(key);
+            const preset = CERTIFICATE_TYPE_PRESETS[key];
+            if (preset) onChange({ ...value, ...preset.values });
+          }}
+          style={inputStyle}
+        >
+          <option value="" disabled>Aplicar plantilla de texto...</option>
+          {Object.entries(CERTIFICATE_TYPE_PRESETS).map(([key, preset]) => (
+            <option key={key} value={key}>{preset.label}</option>
+          ))}
+        </select>
+      </div>
+
       <div style={{ ...fieldWrapStyle, padding: '12px', background: '#fff', border: '2px dashed #c4b5fd', borderRadius: '8px' }}>
         <label style={labelStyle}>Imagen de fondo del certificado (opcional)</label>
         <p style={{ fontSize: '12px', color: '#6b7280', marginBottom: '8px' }}>
@@ -201,6 +224,19 @@ export default function CertificateTemplateForm({ value, onChange, disabled }: C
       <div style={fieldWrapStyle}>
         <label style={labelStyle}>Texto de pie de página</label>
         <input type="text" value={value.footerText} onChange={(e) => set('footerText', e.target.value)} style={inputStyle} />
+      </div>
+
+      <div style={fieldWrapStyle}>
+        <label style={labelStyle}>Nota al pie (cursiva, opcional)</label>
+        <p style={{ fontSize: '12px', color: '#6b7280', marginBottom: '8px' }}>
+          Aparece en letra cursiva, centrada, en la parte inferior del certificado. Útil para una aclaración legal o una frase corta.
+        </p>
+        <input
+          type="text"
+          value={value.footnoteText}
+          onChange={(e) => set('footnoteText', e.target.value)}
+          style={{ ...inputStyle, fontStyle: 'italic' }}
+        />
       </div>
 
       <label style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '14px', color: '#374151', cursor: 'pointer' }}>

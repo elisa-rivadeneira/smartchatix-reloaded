@@ -75,6 +75,7 @@ export async function buildCertificatePdf(params: CertificatePdfParams): Promise
 
   const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
   const fontBold = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
+  const fontItalic = await pdfDoc.embedFont(StandardFonts.HelveticaOblique);
 
   if (backgroundImage) {
     page.drawImage(backgroundImage, { x: 0, y: 0, width, height });
@@ -157,6 +158,11 @@ export async function buildCertificatePdf(params: CertificatePdfParams): Promise
       width: qrBoxSize,
       height: qrBoxSize,
     });
+
+    if (template.footnoteText) {
+      const footnoteSize = fitSize(template.footnoteText, fontItalic, 10, 7, 1200);
+      drawCenteredAt(template.footnoteText, width / 2, 945, footnoteSize, fontItalic, gray, 1200);
+    }
   } else {
     page.drawRectangle({
       x: 20,

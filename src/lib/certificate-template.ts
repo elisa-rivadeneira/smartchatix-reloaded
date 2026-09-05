@@ -8,6 +8,7 @@ export interface CertificateTemplate {
   introText: string;
   completionText: string;
   footerText: string;
+  footnoteText: string;
   showScore: boolean;
 }
 
@@ -21,7 +22,38 @@ export const DEFAULT_CERTIFICATE_TEMPLATE: CertificateTemplate = {
   introText: 'Se otorga a:',
   completionText: 'Por completar exitosamente el curso:',
   footerText: 'Verifica la autenticidad en:',
+  footnoteText: '',
   showScore: true,
+};
+
+export const CERTIFICATE_TYPE_PRESETS: Record<string, { label: string; values: Pick<CertificateTemplate, 'titleText' | 'subtitleText' | 'completionText' | 'showScore'> }> = {
+  curso: {
+    label: 'Curso',
+    values: {
+      titleText: 'CERTIFICADO',
+      subtitleText: 'DE FINALIZACIÓN',
+      completionText: 'Por completar exitosamente el curso:',
+      showScore: true,
+    },
+  },
+  webinar: {
+    label: 'Webinar',
+    values: {
+      titleText: 'CERTIFICADO',
+      subtitleText: 'DE PARTICIPACIÓN',
+      completionText: 'Por su participación en el webinar:',
+      showScore: false,
+    },
+  },
+  constancia: {
+    label: 'Constancia de participación',
+    values: {
+      titleText: 'CONSTANCIA',
+      subtitleText: 'DE PARTICIPACIÓN',
+      completionText: 'Por su participación en:',
+      showScore: false,
+    },
+  },
 };
 
 export function hexToRgb01(hex: string): { r: number; g: number; b: number } {
