@@ -61,6 +61,22 @@ export async function GET(
       const lessons = await query(`
         SELECT * FROM lessons WHERE module_id = ? ORDER BY order_index ASC
       `, [module.id]);
+      for (const lesson of lessons) {
+        if (typeof lesson.quiz_data === 'string') {
+          try {
+            lesson.quiz_data = JSON.parse(lesson.quiz_data);
+          } catch {
+            lesson.quiz_data = null;
+          }
+        }
+        if (typeof lesson.documents_urls === 'string') {
+          try {
+            lesson.documents_urls = JSON.parse(lesson.documents_urls);
+          } catch {
+            lesson.documents_urls = null;
+          }
+        }
+      }
       module.lessons = lessons;
     }
 

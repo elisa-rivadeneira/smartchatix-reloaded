@@ -119,6 +119,23 @@ export async function GET(
           ORDER BY l.order_index ASC
         `, [payload.id, module.id]);
 
+        for (const lesson of lessons) {
+          if (typeof lesson.quiz_data === 'string') {
+            try {
+              lesson.quiz_data = JSON.parse(lesson.quiz_data as unknown as string);
+            } catch {
+              lesson.quiz_data = null;
+            }
+          }
+          if (typeof lesson.documents_urls === 'string') {
+            try {
+              lesson.documents_urls = JSON.parse(lesson.documents_urls as unknown as string);
+            } catch {
+              lesson.documents_urls = null;
+            }
+          }
+        }
+
         return {
           ...module,
           lessons
