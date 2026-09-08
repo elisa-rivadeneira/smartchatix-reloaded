@@ -2,7 +2,7 @@
   "name": "SmartChatix",
   "short_name": "SmartChatix",
   "description": "Transformamos la forma en que las personas trabajan",
-  "start_url": "/",
+  "start_url": "/login",
   "scope": "/",
   "display": "standalone",
   "orientation": "portrait-primary",
