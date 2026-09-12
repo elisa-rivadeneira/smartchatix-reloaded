@@ -1,0 +1,1408 @@
+/* ============================================================
+   Sistema visual v3 — tokens
+   Fuente de verdad: demo-entrada-salida.html (paleta) +
+   demo-landing-cfd.html (patrones de hero / tarjetas / tilt)
+   ============================================================ */
+
+.page {
+  --navy-deep: #0a1230;
+  --navy-mid: #101d42;
+  --cream: #f6f3ec;
+  --blue: #1a5fd6;
+  --cyan: #35c6f0;
+  --amber: #d98c3d;
+  --ink: #f3f6fc;
+  --ink-dark: #12161f;
+  --muted: #94a3c2;
+  --line: rgba(255, 255, 255, 0.1);
+  --glass: rgba(255, 255, 255, 0.03);
+  --glass-strong: rgba(255, 255, 255, 0.05);
+
+  position: relative;
+  background: var(--navy-deep);
+  color: var(--ink);
+  font-family: var(--font-inter), 'Inter', sans-serif;
+  /* clip, no hidden: hidden fuerza overflow-y:auto implícito (regla de pares CSS)
+     y eso rompe position:sticky en el header, que cuelga directo de .page. */
+  overflow-x: clip;
+  /* la barra de urgencia es position:fixed (siempre visible al hacer scroll,
+     para empujar la compra) — este padding le hace espacio para que no tape
+     el hero. */
+  padding-top: 52px;
+}
+
+.page :global(h1),
+.page :global(h2),
+.page :global(h3) {
+  font-family: var(--font-space-grotesk), 'Space Grotesk', sans-serif;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.mono {
+  font-family: var(--font-plex-mono), 'IBM Plex Mono', monospace;
+}
+
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--font-plex-mono), 'IBM Plex Mono', monospace;
+  font-size: 0.72rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--cyan);
+  margin-bottom: 18px;
+}
+.eyebrow::before {
+  content: '';
+  width: 22px;
+  height: 1px;
+  background: currentColor;
+  opacity: 0.7;
+}
+.eyebrowAmber { color: var(--amber); }
+.eyebrowInk { color: var(--muted); }
+
+/* ---------------- Aurora de fondo ---------------- */
+.aurora {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+.auroraBlob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(90px);
+  will-change: transform;
+}
+@media (max-width: 720px) {
+  .auroraBlob { filter: blur(60px); }
+}
+@keyframes auroraDrift1 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(4%, 6%) scale(1.08); }
+}
+@keyframes auroraDrift2 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(-5%, -4%) scale(1.05); }
+}
+@keyframes auroraDrift3 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(-3%, 5%) scale(1.1); }
+}
+
+/* ---------------- estructura general ---------------- */
+.section {
+  position: relative;
+  z-index: 1;
+  padding: 7rem 6vw;
+}
+.sectionDeep { background: rgba(10, 18, 48, 0.88); }
+.sectionMid { background: rgba(16, 29, 66, 0.9); }
+.sectionCream {
+  background: var(--cream);
+  color: var(--ink-dark);
+}
+.sectionInner {
+  max-width: 1040px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 2;
+}
+.sectionHead {
+  max-width: 620px;
+  margin: 0 auto 3.5rem;
+  text-align: center;
+}
+.sectionHeadLeft {
+  max-width: 560px;
+  margin: 0 0 3rem;
+  text-align: left;
+}
+.sectionTitle {
+  font-size: clamp(1.7rem, 2.6vw, 2.3rem);
+  margin-bottom: 0.8rem;
+}
+.sectionText {
+  color: var(--muted);
+  line-height: 1.65;
+  font-size: 0.98rem;
+}
+.sectionCream .sectionText { color: #5b5648; }
+
+/* ---------------- header ---------------- */
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 6vw;
+  background: transparent;
+  border-bottom: 1px solid transparent;
+  transition: background 0.35s ease, border-color 0.35s ease, backdrop-filter 0.35s ease, padding 0.35s ease;
+}
+.headerScrolled {
+  background: rgba(10, 18, 48, 0.72);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom-color: var(--line);
+  padding: 12px 6vw;
+}
+.headerLogo { display: flex; align-items: center; }
+.headerLogo img { display: block; border-radius: 6px; }
+.headerCta {
+  font-family: var(--font-inter), sans-serif;
+  font-weight: 600;
+  font-size: 0.85rem;
+  color: var(--ink);
+  background: var(--glass-strong);
+  border: 1px solid var(--line);
+  padding: 9px 18px;
+  border-radius: 8px;
+  text-decoration: none;
+  transition: border-color 0.25s ease, background 0.25s ease;
+  white-space: nowrap;
+}
+.headerCta:hover { border-color: var(--cyan); background: rgba(53, 198, 240, 0.1); }
+
+/* ---------------- barra de urgencia ---------------- */
+.urgencyBar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.2rem;
+  flex-wrap: wrap;
+  text-align: center;
+  padding: 0.65rem 6vw;
+  background: linear-gradient(90deg, #ff7a1a, #ff4d00);
+  box-shadow: 0 2px 16px rgba(255, 90, 0, 0.45);
+  color: white;
+  font-size: 0.82rem;
+}
+.urgencyBar strong { color: white; font-weight: 800; }
+.urgencyCountdown { color: var(--navy-deep); font-weight: 700; }
+.urgencyBtn {
+  background: var(--navy-deep);
+  color: white;
+  border: none;
+  padding: 7px 16px;
+  border-radius: 6px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-decoration: none;
+  white-space: nowrap;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.25);
+}
+
+/* ---------------- HERO ---------------- */
+.hero {
+  position: relative;
+  z-index: 1;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  padding: 4.5rem 6vw 2rem;
+  overflow: hidden;
+  background: var(--navy-deep);
+}
+/* Video del hero como tarjeta pequeña en la esquina inferior derecha (no de
+   fondo a pantalla completa) — la fuente es 1280x720, y estirarla a todo el
+   hero la hacía verse borrosa. A este tamaño nunca se escala hacia arriba,
+   así que se ve nítida. */
+.heroImageBg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  /* Sin espejar: esta imagen trae texto real (leyenda "Velocidad [m/s]") a
+     la izquierda, y espejarla lo volvería ilegible. El degradado oscuro de
+     .heroVideoOverlay ya lo tapa lo suficiente del lado del texto. */
+  object-position: center;
+}
+.heroVideoOverlay {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background:
+    linear-gradient(100deg, rgba(10, 18, 48, 0.82) 0%, rgba(10, 18, 48, 0.55) 42%, rgba(10, 18, 48, 0.25) 100%),
+    radial-gradient(circle at 85% 75%, rgba(53, 198, 240, 0.12), transparent 50%);
+}
+.heroInner {
+  max-width: 1260px;
+  width: 100%;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 3.5rem;
+  align-items: center;
+  position: relative;
+  z-index: 2;
+}
+.heroTextBlock {
+  max-width: 640px;
+  background: rgba(10, 18, 48, 0.55);
+  border: 1px solid rgba(53, 198, 240, 0.18);
+  border-radius: 20px;
+  padding: 2rem 2.25rem;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+.heroTitle {
+  font-size: clamp(2.1rem, 4vw, 3.1rem);
+  line-height: 1.1;
+  margin-bottom: 0.9rem;
+}
+.heroTitle .accent { color: var(--cyan); }
+.heroText {
+  color: var(--muted);
+  font-size: 1.02rem;
+  line-height: 1.6;
+  max-width: 46ch;
+  margin-bottom: 1.1rem;
+}
+
+/* panel de specs tipo instrumento */
+.specPanel {
+  display: flex;
+  gap: 0;
+  margin-bottom: 1.2rem;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  overflow: hidden;
+  background: var(--glass);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  width: fit-content;
+}
+.specItem {
+  padding: 0.9rem 1.3rem;
+  border-right: 1px solid var(--line);
+  text-align: left;
+}
+.specItem:last-child { border-right: none; }
+.specValue {
+  font-family: var(--font-plex-mono), monospace;
+  color: var(--cyan);
+  font-size: 1.05rem;
+  display: block;
+  line-height: 1.2;
+}
+.specLabel {
+  color: var(--muted);
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-top: 3px;
+  display: block;
+}
+
+.heroPriceCard {
+  display: flex;
+  align-items: center;
+  gap: 1.4rem;
+  flex-wrap: wrap;
+}
+.priceNow {
+  font-family: var(--font-plex-mono), monospace;
+  font-size: 2rem;
+  color: var(--ink);
+}
+.priceOld {
+  font-family: var(--font-plex-mono), monospace;
+  font-size: 1.05rem;
+  color: var(--muted);
+  text-decoration: line-through;
+  margin-left: 8px;
+}
+.btnPrimary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: linear-gradient(120deg, var(--blue), var(--cyan));
+  color: white;
+  border: none;
+  padding: 0.95rem 1.9rem;
+  border-radius: 9px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  text-decoration: none;
+  cursor: pointer;
+  box-shadow: 0 10px 30px -10px rgba(26, 95, 214, 0.6);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+.btnPrimary:hover { transform: translateY(-1px); box-shadow: 0 14px 36px -10px rgba(53, 198, 240, 0.55); }
+.heroFinePrint {
+  margin-top: 0.7rem;
+  font-size: 0.78rem;
+  color: var(--muted);
+}
+
+/* Términos flotantes sobre la animación de flujo del video (lado derecho del
+   hero, ver CALLOUT_SLOTS): aparecen y desaparecen solos, sin apuntar a nada
+   fijo — es ambientación, no un diagrama de partes. */
+.callout {
+  position: absolute;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  pointer-events: none;
+  font-family: var(--font-plex-mono), monospace;
+  font-size: 0.7rem;
+  color: var(--muted);
+  letter-spacing: 0.03em;
+  opacity: 0;
+  transform: translateY(4px);
+  transition: opacity 1s ease, transform 1s ease;
+}
+.calloutVisible { opacity: 1; transform: translateY(0); }
+.calloutLine { width: 34px; height: 1px; background: rgba(148, 163, 194, 0.5); flex-shrink: 0; }
+.calloutDot {
+  width: 5px; height: 5px; border-radius: 50%; background: var(--cyan);
+  box-shadow: 0 0 8px rgba(53, 198, 240, 0.8);
+  flex-shrink: 0;
+}
+.calloutRight { flex-direction: row-reverse; }
+
+/* ---------------- glass card base ---------------- */
+.glassCard {
+  background: linear-gradient(160deg, rgba(16, 29, 66, 0.7), rgba(10, 18, 48, 0.35));
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  transform-style: preserve-3d;
+  transition: border-color 0.25s ease;
+}
+.glassCard:hover { border-color: rgba(53, 198, 240, 0.4); }
+
+/* beneficios — fila dentro del hero (refuerzo inmediato, no una sección aparte) */
+.heroBenefitsRow {
+  grid-column: 1 / -1;
+  margin-top: 1.25rem;
+}
+.benefitsGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.8rem;
+}
+.benefitCard {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 0.7rem 0.9rem;
+}
+.benefitIcon { font-size: 1.15rem; line-height: 1; flex-shrink: 0; }
+.benefitText { font-size: 0.8rem; font-weight: 600; color: var(--ink); }
+
+/* ====================================================================
+   SECCIÓN 02 — "El desafío": escena a pantalla completa, autocontenida
+   (no usa .section/.sectionCream/.sectionInner — sus reglas de padding
+   y max-width están pensadas para bloques normales, no full-screen).
+   ==================================================================== */
+.eyebrowBlue { color: var(--blue); }
+
+.challengeSection {
+  position: relative;
+  min-height: 100svh;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  background: #F7F9FC;
+  color: var(--navy-deep);
+  padding: 5rem 4vw;
+}
+
+/* fondo: degradés muy suaves + grid técnico casi invisible + glow radial
+   ambiental detrás del visual + un par de líneas de flujo abstractas */
+.challengeBgBase {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 70% 60% at 78% 45%, rgba(53, 198, 240, 0.10), transparent 65%),
+    radial-gradient(ellipse 55% 50% at 15% 85%, rgba(26, 95, 214, 0.05), transparent 70%),
+    linear-gradient(180deg, #F7F9FC 0%, #F4F7FB 100%);
+}
+.challengeBgGrid {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(rgba(26, 95, 214, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(26, 95, 214, 0.035) 1px, transparent 1px);
+  background-size: 46px 46px;
+  -webkit-mask-image: radial-gradient(ellipse 65% 70% at 68% 50%, black 30%, transparent 75%);
+  mask-image: radial-gradient(ellipse 65% 70% at 68% 50%, black 30%, transparent 75%);
+}
+.challengeBgLines {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  opacity: 0.55;
+}
+.challengeBgLines path { stroke: var(--blue); }
+
+.challengeContainer {
+  position: relative;
+  z-index: 1;
+  max-width: 1500px;
+  width: 100%;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 45% 55%;
+  grid-template-areas: "intro visual" "text visual" "benefits visual";
+  align-items: center;
+  column-gap: 2.25rem;
+  row-gap: 0.9rem;
+}
+
+.challengeIntro { grid-area: intro; }
+/* .challengeIntro .challengeHeadline (2 clases) para ganarle en especificidad
+   a la regla global ".page :global(h1,h2,h3)" (1 clase + tipo) que si no,
+   pisa el font-family aquí. */
+.challengeIntro .challengeHeadline {
+  font-family: var(--font-inter), 'Inter', sans-serif;
+  /* width (no max-width): el bloque del título necesita ser más ancho que
+     su celda de grid (45%) para caber en 2 líneas — se le permite desbordar
+     a propósito hacia el espacio vacío de la columna del visual, que no
+     tiene overflow:hidden. Un max-width no puede lograr esto: un hijo de
+     bloque nunca crece más allá del ancho de su padre solo con max-width. */
+  width: 800px;
+  max-width: 62vw;
+  font-size: clamp(42px, 3.4vw, 56px);
+  font-weight: 700;
+  line-height: 1.02;
+  letter-spacing: -0.035em;
+  margin-top: 0.5rem;
+}
+.challengeLine2 { color: var(--blue); }
+
+.challengeParagraph {
+  grid-area: text;
+  font-size: 18px;
+  line-height: 1.5;
+  max-width: 560px;
+  color: #4b5875;
+  margin-top: 0.9rem;
+}
+
+.challengeBenefits {
+  grid-area: benefits;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.25rem;
+  margin-top: 1.1rem;
+}
+.challengeBenefitItem {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+.challengeIconWrap {
+  width: 30px;
+  height: 30px;
+  color: var(--blue);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.challengeBenefitTitle { font-weight: 700; color: var(--navy-deep); font-size: 0.88rem; }
+.challengeBenefitDesc { font-size: 0.8rem; color: #4b5875; line-height: 1.4; }
+
+/* visual — el protagonista: nunca una tarjeta, nunca chico */
+.challengeVisualWrap {
+  grid-area: visual;
+  position: relative;
+  width: 100%;
+}
+.challengeGlow {
+  position: absolute;
+  z-index: 0;
+  top: 50%;
+  left: 50%;
+  width: 85%;
+  aspect-ratio: 1 / 1;
+  transform: translate(-50%, -50%);
+  background: radial-gradient(circle, rgba(53, 198, 240, 0.22), rgba(26, 95, 214, 0.08) 45%, transparent 72%);
+  filter: blur(6px);
+}
+.challengeImg {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* ====================================================================
+   SECCIÓN 03 — "Plan de estudios": galería técnica a pantalla completa.
+   Autocontenida (no usa .section/.sectionMid/.sectionInner/.sectionHead),
+   deliberadamente distinta de la sección 02 (esa es clara; esta es navy
+   oscuro con los 4 renders CFD como protagonistas).
+   ==================================================================== */
+.plansSection {
+  position: relative;
+  min-height: 100svh;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  padding: 5rem 4vw;
+  background:
+    radial-gradient(ellipse 60% 55% at 50% 8%, rgba(53, 198, 240, 0.05), transparent 65%),
+    linear-gradient(160deg, #071426 0%, #081A32 55%, #0A2038 100%);
+  color: var(--ink);
+}
+.plansBgGrid {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(rgba(53, 198, 240, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(53, 198, 240, 0.04) 1px, transparent 1px);
+  background-size: 44px 44px;
+  -webkit-mask-image: radial-gradient(ellipse 80% 70% at 50% 45%, black 25%, transparent 75%);
+  mask-image: radial-gradient(ellipse 80% 70% at 50% 45%, black 25%, transparent 75%);
+}
+.plansBgLines {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  opacity: 0.4;
+}
+.plansBgLines path { stroke: var(--cyan); }
+
+.plansContainer {
+  position: relative;
+  z-index: 1;
+  max-width: 1500px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.plansHeader {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 2rem;
+  flex-wrap: wrap;
+  margin-bottom: 2.75rem;
+}
+.plansTitle {
+  font-size: clamp(32px, 3.6vw, 56px);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.05;
+  margin-top: 0.6rem;
+  color: var(--ink);
+}
+.plansSubtitle {
+  color: var(--muted);
+  font-size: 1rem;
+  line-height: 1.5;
+  max-width: 420px;
+}
+
+.plansGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.25rem;
+}
+
+.planCard {
+  position: relative;
+  height: 480px;
+  padding: 1.6rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  background: rgba(10, 35, 58, 0.70);
+  border: 1px solid rgba(0, 180, 255, 0.18);
+  border-radius: 18px;
+  box-shadow: 0 8px 30px -14px rgba(0, 0, 0, 0.5);
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+.planCard:hover {
+  border-color: rgba(53, 198, 240, 0.4);
+  box-shadow: 0 14px 40px -12px rgba(53, 198, 240, 0.22), 0 8px 30px -14px rgba(0, 0, 0, 0.55);
+}
+.planCardNum {
+  font-family: var(--font-plex-mono), monospace;
+  color: var(--cyan);
+  font-size: 0.85rem;
+  flex-shrink: 0;
+}
+.planCardTitle {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--ink);
+  margin-top: 0.5rem;
+  line-height: 1.3;
+  flex-shrink: 0;
+  min-height: 2.6em;
+}
+
+/* el render 3D — protagonista, ~45-50% de la altura de la card */
+.planCardVisual {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0.4rem 0;
+}
+.planCardGlow {
+  position: absolute;
+  z-index: 0;
+  top: 50%;
+  left: 50%;
+  width: 90%;
+  aspect-ratio: 1 / 1;
+  transform: translate(-50%, -50%);
+  background: radial-gradient(circle, rgba(53, 198, 240, 0.20), rgba(26, 95, 214, 0.06) 45%, transparent 72%);
+  filter: blur(4px);
+  opacity: 0.7;
+  transition: opacity 0.3s ease;
+}
+.planCard:hover .planCardGlow { opacity: 1; }
+.planCardImg {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  filter: drop-shadow(0 6px 18px rgba(0, 0, 0, 0.35));
+}
+
+.planCardChecklist {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 1rem;
+  flex-shrink: 0;
+}
+.planCardChecklist li {
+  display: flex;
+  gap: 8px;
+  font-size: 0.8rem;
+  color: var(--muted);
+  line-height: 1.4;
+}
+.planCardDuration {
+  align-self: flex-start;
+  font-family: var(--font-plex-mono), monospace;
+  font-size: 0.75rem;
+  color: var(--muted);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 4px 10px;
+  flex-shrink: 0;
+}
+
+/* ====================================================================
+   SECCIÓN 04 — "Curso grabado": foto real de fondo (blend a claro por la
+   izquierda) + panel flotante de beneficios sobre la foto. Autocontenida,
+   como las secciones 02/03.
+   ==================================================================== */
+.recordedSection {
+  position: relative;
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 2.5rem;
+  overflow: hidden;
+  padding: 4rem 4vw 2rem;
+  background-image: url('https://pub-39582e519f204b8799b03d63e07c0b67.r2.dev/assets/ansys-cfd/recorded-bg.png');
+  background-size: cover;
+  background-position: right center;
+  color: var(--ink-dark);
+}
+.recordedOverlay {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: linear-gradient(90deg, #F7F9FC 0%, #F7F9FC 40%, rgba(247, 249, 252, 0.78) 50%, rgba(247, 249, 252, 0.18) 62%, transparent 72%);
+}
+.recordedContainer {
+  position: relative;
+  z-index: 1;
+  max-width: 1500px;
+  width: 100%;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  gap: 2rem;
+}
+.recordedText { max-width: 540px; }
+.recordedTitle {
+  font-family: var(--font-inter), 'Inter', sans-serif;
+  font-size: clamp(30px, 3vw, 44px);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1.15;
+  color: var(--navy-deep);
+  margin-top: 0.6rem;
+  margin-bottom: 1rem;
+}
+.recordedParagraph {
+  font-size: 1rem;
+  line-height: 1.55;
+  color: #4b5875;
+  margin-bottom: 1.75rem;
+}
+.recordedStats {
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+  margin-bottom: 2rem;
+}
+
+/* panel flotante sobre la foto — pegado hacia el centro/izquierda de la columna
+   de la imagen para que no se pierda contra el borde derecho */
+.recordedPanel {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  max-width: 340px;
+  margin: 0 auto 0 0;
+  background: rgba(7, 20, 38, 0.72);
+  border: 1px solid rgba(53, 198, 240, 0.18);
+  border-radius: 18px;
+  padding: 1.5rem;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  box-shadow: 0 20px 50px -20px rgba(0, 0, 0, 0.5);
+}
+.recordedPanelItem {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  padding: 0.6rem 0;
+}
+.recordedPanelItem + .recordedPanelItem { border-top: 1px solid rgba(255, 255, 255, 0.08); }
+.recordedPanelIcon {
+  flex-shrink: 0;
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  background: rgba(53, 198, 240, 0.12);
+  color: #35c6f0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.recordedPanelText { font-size: 0.88rem; font-weight: 600; color: var(--ink); }
+
+/* barra de features blanca flotante — reutilizada por "Curso grabado" (04)
+   e "Instructor" (05), cada una integrada dentro de su propia pantalla */
+.featuresBar {
+  position: relative;
+  z-index: 1;
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(10, 18, 48, 0.06);
+  border-radius: 18px;
+  box-shadow: 0 12px 40px -20px rgba(10, 18, 48, 0.25);
+  padding: 1.5rem 2rem;
+  max-width: 1500px;
+  width: 100%;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.5rem;
+}
+.featureBarItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.9rem;
+}
+.featureBarIcon {
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: rgba(26, 95, 214, 0.1);
+  color: var(--blue);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.featureBarTitle { font-weight: 700; color: var(--navy-deep); font-size: 0.92rem; margin-bottom: 0.25rem; }
+.featureBarDesc { font-size: 0.82rem; color: #4b5875; line-height: 1.4; }
+
+/* variante de una sola línea (icono + texto), para "Instructor" (05) */
+.featureBarItemSingle { display: flex; align-items: center; gap: 0.7rem; }
+.featureBarIconSmall {
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: rgba(26, 95, 214, 0.1);
+  color: var(--blue);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.featureBarTextSmall { font-size: 0.85rem; font-weight: 600; color: var(--navy-deep); }
+
+/* ====================================================================
+   SECCIÓN 05 — "Instructor": mismo lenguaje visual que "Curso grabado"
+   (04) — foto real de fondo + contenido a pantalla completa — pero con
+   una foto recortada (sin fondo) del instructor y dos tarjetas flotantes
+   (identidad + cita) en vez de un único panel de beneficios.
+   ==================================================================== */
+.instructorSection {
+  position: relative;
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0;
+  overflow: hidden;
+  padding: 4rem 4vw 2rem;
+  background-image: url('/images/ansys-cfd-instructor-bg.png');
+  background-size: cover;
+  background-position: center;
+  color: var(--ink-dark);
+}
+.instructorOverlay {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: linear-gradient(90deg, rgba(247, 249, 252, 0.65) 0%, rgba(247, 249, 252, 0.32) 38%, transparent 60%);
+}
+.instructorContainer {
+  position: relative;
+  z-index: 1;
+  max-width: 1500px;
+  width: 100%;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  gap: 2rem;
+}
+.instructorTextCol { max-width: 540px; }
+.instructorHeading {
+  font-family: var(--font-inter), 'Inter', sans-serif;
+  font-size: clamp(30px, 3vw, 44px);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1.15;
+  color: var(--navy-deep);
+  margin-top: 0.6rem;
+  margin-bottom: 1rem;
+}
+.instructorLead {
+  font-size: 1rem;
+  line-height: 1.55;
+  color: #4b5875;
+  margin-bottom: 1.5rem;
+}
+.instructorCredList {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+.instructorCredItem { display: flex; align-items: center; gap: 0.8rem; }
+.instructorCredIcon {
+  flex-shrink: 0;
+  width: 30px;
+  height: 30px;
+  color: var(--blue);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.instructorCredText { font-size: 0.88rem; color: var(--navy-deep); line-height: 1.4; }
+
+/* visual: foto recortada + tarjetas flotantes */
+.instructorVisual {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  align-self: end;
+  min-height: 420px;
+}
+.instructorPhotoImg {
+  max-height: 440px;
+  width: auto;
+  object-fit: contain;
+  filter: drop-shadow(0 24px 40px rgba(10, 18, 48, 0.25));
+}
+.instructorNameCard {
+  position: absolute;
+  left: 50%;
+  bottom: 6%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  background: rgba(255, 255, 255, 0.94);
+  border: 1px solid rgba(10, 18, 48, 0.08);
+  border-radius: 14px;
+  padding: 0.7rem 1.1rem;
+  box-shadow: 0 12px 30px -14px rgba(10, 18, 48, 0.3);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  white-space: nowrap;
+}
+.instructorNameAvatar {
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(26, 95, 214, 0.12);
+  color: var(--blue);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.instructorNameText strong { display: block; font-size: 0.85rem; color: var(--navy-deep); }
+.instructorNameText span { display: block; font-size: 0.72rem; color: #4b5875; white-space: normal; max-width: 260px; }
+.instructorQuoteCard {
+  position: absolute;
+  right: 2%;
+  top: 10%;
+  max-width: 250px;
+  background: rgba(255, 255, 255, 0.94);
+  border: 1px solid rgba(10, 18, 48, 0.08);
+  border-radius: 16px;
+  padding: 1.3rem 1.4rem;
+  box-shadow: 0 16px 40px -18px rgba(10, 18, 48, 0.3);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+.instructorQuoteMark {
+  font-family: Georgia, serif;
+  font-size: 2.2rem;
+  color: var(--blue);
+  line-height: 1;
+  margin-bottom: 0.2rem;
+}
+.instructorQuoteText { font-size: 0.88rem; color: #33405c; line-height: 1.5; }
+
+.credCheck { color: var(--amber); font-weight: 700; }
+
+/* video */
+.videoPanel {
+  padding: 1rem;
+  border-radius: 18px;
+}
+.videoFrame {
+  position: relative;
+  padding-bottom: 56.25%;
+  height: 0;
+  border-radius: 12px;
+  overflow: hidden;
+}
+.videoFrame iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: none; }
+
+/* ====================================================================
+   SECCIÓN 06 — "Clase gratuita": webinar real embebido, sobre fondo
+   navy con el rodete de turbina de fondo. Columna centrada, mismo
+   lenguaje de tarjetas/iconos que el resto de la página.
+   ==================================================================== */
+.classSection {
+  position: relative;
+  overflow: hidden;
+  padding: 6rem 4vw;
+  background-image: url('/images/ansys-cfd-class-bg.png');
+  background-size: cover;
+  background-position: left center;
+  background-color: var(--navy-deep);
+}
+.classContainer {
+  position: relative;
+  z-index: 1;
+  max-width: 900px;
+  margin: 0 auto;
+}
+.classHeading {
+  font-size: clamp(1.9rem, 3vw, 2.6rem);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  color: var(--ink);
+  margin-bottom: 0.8rem;
+}
+.classMetaRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  max-width: 800px;
+  margin: 2rem auto 3rem;
+  text-align: left;
+}
+.classMetaItem { display: flex; align-items: center; gap: 0.8rem; }
+.classMetaIcon {
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: rgba(53, 198, 240, 0.12);
+  color: var(--cyan);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.classMetaTitle { display: block; font-weight: 700; color: var(--ink); font-size: 0.92rem; }
+.classMetaDesc { display: block; font-size: 0.8rem; color: var(--muted); margin-top: 2px; }
+.classMetaLabel { display: block; font-size: 0.72rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 2px; }
+
+.classFeaturesRow {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.5rem;
+  margin-bottom: 4rem;
+}
+.classFeatureItem { display: flex; align-items: center; gap: 0.7rem; }
+.classFeatureIcon {
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: rgba(53, 198, 240, 0.12);
+  color: var(--cyan);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.classFeatureText { font-size: 0.85rem; font-weight: 600; color: var(--ink); line-height: 1.3; }
+
+.classCtaBlock {
+  text-align: center;
+  border-top: 1px solid var(--line);
+  padding-top: 2.75rem;
+}
+.classCtaTitle { font-size: 1.5rem; font-weight: 700; color: var(--ink); margin-bottom: 0.6rem; }
+.classCtaText { color: var(--muted); max-width: 560px; margin: 0 auto 1.75rem; line-height: 1.55; }
+
+/* ====================================================================
+   SECCIÓN 07 — "Testimonios": fondo claro con ondas azules muy sutiles,
+   mismo lenguaje de tarjeta blanca flotante que las secciones 04/05/06.
+   ==================================================================== */
+.testimonialsSection {
+  position: relative;
+  overflow: hidden;
+  background-image: url('/images/ansys-cfd-testimonials-bg.png');
+  background-size: cover;
+  background-position: center;
+  background-color: #eef4fb;
+  color: var(--navy-deep);
+}
+.testimonialsSection .sectionText { color: #4b5875; }
+
+.testimonialGrid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.3rem; }
+.testimonialCard {
+  position: relative;
+  padding: 2rem 1.8rem 1.7rem;
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(10, 18, 48, 0.06);
+  border-radius: 18px;
+  box-shadow: 0 12px 40px -20px rgba(10, 18, 48, 0.25);
+}
+.testimonialQuoteMark {
+  font-family: Georgia, serif;
+  font-size: 2.6rem;
+  color: rgba(26, 95, 214, 0.22);
+  line-height: 1;
+  margin-bottom: 0.3rem;
+}
+.testimonialText { color: var(--navy-deep); line-height: 1.6; font-size: 0.98rem; margin-bottom: 1.3rem; }
+.testimonialDivider { width: 32px; height: 2px; background: var(--blue); opacity: 0.4; margin-bottom: 1rem; }
+.testimonialFooter { display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
+.testimonialName { font-weight: 700; color: var(--navy-deep); font-size: 0.9rem; }
+.testimonialRole { font-size: 0.78rem; color: #4b5875; }
+.stars { color: var(--amber); font-size: 0.95rem; letter-spacing: 2px; }
+.starsOff { color: rgba(148, 163, 194, 0.3); }
+
+/* certificado (panel claro) */
+.certGrid {
+  display: grid;
+  grid-template-columns: 1fr 380px;
+  gap: 2.6rem;
+  align-items: center;
+}
+.certIcon { font-size: 2rem; margin-bottom: 0.6rem; }
+.certPanel {
+  background: rgba(255, 255, 255, 0.6);
+  border: 1px solid rgba(18, 22, 31, 0.08);
+  border-radius: 16px;
+  padding: 0.8rem;
+  backdrop-filter: blur(6px);
+}
+.certImage {
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+  display: block;
+}
+
+/* FAQ */
+.faqList { display: flex; flex-direction: column; gap: 0.65rem; }
+.faqItem { padding: 1.1rem 1.3rem; }
+.faqQ { font-weight: 600; color: var(--ink); font-size: 0.95rem; margin-bottom: 6px; }
+.faqA { font-size: 0.88rem; color: var(--muted); line-height: 1.6; }
+
+/* ====================================================================
+   SECCIÓN 08 — "CTA final": la conversión más importante de la página.
+   Mismo lenguaje que el Hero (foto real de fondo + columna de beneficios)
+   pero cerrando el recorrido: precio, botón principal y barra de confianza.
+   ==================================================================== */
+.ctaSection {
+  position: relative;
+  z-index: 1;
+  overflow: hidden;
+  padding: 6rem 4vw 0;
+  background-image: url('/images/ansys-cfd-enroll-bg.png');
+  background-size: cover;
+  background-position: right center;
+  background-color: var(--navy-deep);
+}
+.ctaBgParallax {
+  position: absolute;
+  inset: -15% 0;
+  background:
+    radial-gradient(circle at 15% 20%, rgba(53, 198, 240, 0.22), transparent 55%),
+    linear-gradient(90deg, rgba(10, 18, 48, 0.75) 0%, rgba(10, 18, 48, 0.35) 45%, transparent 68%);
+  pointer-events: none;
+}
+.ctaContainer {
+  position: relative;
+  z-index: 1;
+  max-width: 1500px;
+  width: 100%;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  align-items: center;
+  gap: 2rem;
+  padding-bottom: 4rem;
+}
+.ctaTextCol { max-width: 560px; }
+.ctaHeading {
+  font-family: var(--font-inter), 'Inter', sans-serif;
+  font-size: clamp(2.1rem, 3.4vw, 3rem);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  color: white;
+  margin: 0.6rem 0 1rem;
+}
+.ctaHeadingAccent { color: var(--cyan); }
+.ctaLead { color: rgba(255, 255, 255, 0.82); font-size: 1.05rem; line-height: 1.6; margin-bottom: 1.75rem; }
+
+.ctaPriceCard {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  background: rgba(53, 198, 240, 0.09);
+  border: 1.5px solid var(--cyan);
+  border-radius: 14px;
+  padding: 1.3rem 1.6rem;
+  margin-bottom: 1.5rem;
+  width: 100%;
+  box-shadow: 0 0 12px rgba(53, 198, 240, 0.8), 0 0 40px rgba(53, 198, 240, 0.4), inset 0 0 24px rgba(53, 198, 240, 0.1);
+}
+.ctaPriceLabel { font-size: 0.78rem; color: #fff; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; }
+.ctaPriceMainRow { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.75rem; }
+.ctaPriceRow { display: flex; align-items: baseline; gap: 0.6rem; }
+.ctaPriceNow { font-family: var(--font-plex-mono), monospace; font-size: 2rem; font-weight: 700; color: white; }
+.ctaPriceOld { font-size: 1.05rem; color: rgba(255, 255, 255, 0.55); text-decoration: line-through; }
+.ctaDiscountBadge { display: flex; flex-direction: column; align-items: flex-start; gap: 0.35rem; }
+.ctaDiscountTag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: rgba(53, 198, 240, 0.15);
+  color: var(--cyan);
+  font-weight: 700;
+  font-size: 0.8rem;
+  padding: 0.35rem 0.8rem;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+.ctaDiscountNote { font-size: 0.74rem; color: rgba(255, 255, 255, 0.6); }
+
+.btnCta {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: linear-gradient(120deg, var(--blue), var(--cyan));
+  color: white;
+  border: none;
+  padding: 1.05rem 2.6rem;
+  border-radius: 10px;
+  font-weight: 700;
+  font-size: 1.02rem;
+  text-decoration: none;
+  cursor: pointer;
+  box-shadow: 0 0 20px rgba(53, 198, 240, 0.45), 0 16px 40px -12px rgba(26, 95, 214, 0.7);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+.btnCta:hover { transform: translateY(-1px); box-shadow: 0 0 28px rgba(53, 198, 240, 0.6), 0 18px 44px -10px rgba(26, 95, 214, 0.75); }
+.ctaFinePrint { margin-top: 1rem; font-size: 0.85rem; color: rgba(255, 255, 255, 0.75); }
+
+/* pegado al borde derecho real de la sección (no del contenedor de 1500px)
+   para quedar sobre la zona oscura de la foto, lejos de las líneas de
+   colores del flujo — si no, el texto se pierde contra el arcoíris CFD */
+.ctaBenefitsCol {
+  position: absolute;
+  z-index: 1;
+  top: 50%;
+  left: 44%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1rem;
+  max-width: 250px;
+}
+.ctaBenefitsCol .classMetaItem {
+  background: rgba(7, 20, 38, 0.55);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  border-radius: 10px;
+  padding: 0.6rem 0.8rem;
+}
+.ctaBenefitsCol .classMetaTitle,
+.ctaBenefitsCol .classMetaDesc {
+  text-align: left;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.7);
+}
+
+.ctaTrustBar {
+  position: relative;
+  z-index: 1;
+  max-width: 1500px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.5rem;
+  padding: 2rem 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+/* whatsapp */
+.waBar {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.7rem;
+  background: #1f9d5a;
+  color: white;
+  padding: 1rem;
+  font-weight: 700;
+  text-decoration: none;
+  font-size: 0.92rem;
+}
+.waFloat {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: #1f9d5a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+  font-size: 1.5rem;
+  z-index: 60;
+  text-decoration: none;
+}
+
+/* ---------------- responsive ---------------- */
+/* tablet: se mantienen las dos columnas de "El desafío" mientras alcance el espacio */
+@media (max-width: 1100px) {
+  .challengeContainer { grid-template-columns: 40% 60%; column-gap: 2.25rem; }
+  .challengeSection { padding: 5rem 5vw; }
+  /* tablet: 2 x 2 */
+  .plansGrid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 900px) {
+  .callout { display: none; }
+  /* mobile: se reordena a una sola columna — headline, descripción, visual, beneficios */
+  .challengeContainer {
+    grid-template-columns: 1fr;
+    grid-template-areas: "intro" "text" "visual" "benefits";
+    row-gap: 2rem;
+  }
+  .challengeBenefits { grid-template-columns: 1fr; gap: 1.1rem; }
+  .plansSection { padding: 4.5rem 5vw; }
+  .plansHeader { flex-direction: column; align-items: flex-start; gap: 1rem; }
+  .plansGrid { grid-template-columns: 1fr; gap: 1.1rem; }
+  .planCard { height: auto; min-height: 420px; }
+  .recordedSection { background-position: center 20%; padding: 4.5rem 5vw; }
+  .recordedOverlay { background: linear-gradient(180deg, rgba(247, 249, 252, 0.2) 0%, #F7F9FC 38%, #F7F9FC 100%); }
+  .recordedContainer { grid-template-columns: 1fr; }
+  .recordedText { max-width: 100%; }
+  .recordedPanel { margin: 0; max-width: 100%; }
+  .featuresBar { grid-template-columns: 1fr 1fr; gap: 1.5rem; padding: 1.5rem; }
+  .benefitsGrid { grid-template-columns: repeat(2, 1fr); }
+  .testimonialGrid { grid-template-columns: 1fr; }
+  .certGrid { grid-template-columns: 1fr; }
+  .section { padding: 4.5rem 6vw; }
+  .hero { padding: 8rem 6vw 3.5rem; }
+  .specPanel { width: 100%; }
+  .instructorSection { background-position: center 30%; padding: 4.5rem 5vw 2rem; }
+  .instructorOverlay { background: linear-gradient(180deg, rgba(247, 249, 252, 0.5) 0%, #F7F9FC 45%, #F7F9FC 100%); }
+  .instructorContainer { grid-template-columns: 1fr; }
+  .instructorTextCol { max-width: 100%; }
+  .instructorVisual { flex-direction: column; align-items: center; gap: 0.75rem; min-height: auto; margin-top: 1rem; }
+  .instructorPhotoImg { max-height: 300px; }
+  .instructorNameCard { position: static; transform: none; white-space: normal; }
+  .instructorQuoteCard { position: static; max-width: 100%; }
+  .classSection { padding: 4.5rem 6vw; }
+  .classMetaRow { flex-direction: column; align-items: flex-start; gap: 1.25rem; margin: 1.75rem auto 2.5rem; }
+  .classFeaturesRow { grid-template-columns: 1fr 1fr; gap: 1.25rem; margin-bottom: 3rem; }
+  .ctaSection { background-position: center 25%; padding: 4.5rem 6vw 0; }
+  .ctaContainer { grid-template-columns: 1fr; padding-bottom: 2.5rem; }
+  .ctaTextCol { max-width: 100%; }
+  .ctaBenefitsCol { position: static; transform: none; max-width: 100%; margin-top: 1.5rem; padding: 0; }
+  .ctaTrustBar { grid-template-columns: 1fr 1fr; gap: 1.25rem; }
+}
+@media (max-width: 560px) {
+  .benefitsGrid { grid-template-columns: 1fr 1fr; }
+  .urgencyBar { font-size: 0.74rem; }
+  .page { padding-top: 84px; }
+  .classFeaturesRow { grid-template-columns: 1fr; }
+  .ctaTrustBar { grid-template-columns: 1fr; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .auroraBlob { animation: none !important; }
+}
