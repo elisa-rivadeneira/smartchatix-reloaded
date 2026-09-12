@@ -1398,7 +1398,7 @@
 @media (max-width: 560px) {
   .benefitsGrid { grid-template-columns: 1fr 1fr; }
   .urgencyBar { font-size: 0.74rem; }
-  .page { padding-top: 84px; }
+  .page { padding-top: 118px; }
   .classFeaturesRow { grid-template-columns: 1fr; }
   .ctaTrustBar { grid-template-columns: 1fr; }
 }
