@@ -219,16 +219,16 @@
    fondo a pantalla completa) — la fuente es 1280x720, y estirarla a todo el
    hero la hacía verse borrosa. A este tamaño nunca se escala hacia arriba,
    así que se ve nítida. */
-.heroImageBg {
+.heroVideoBg {
   position: absolute;
   inset: 0;
   z-index: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
-  /* Sin espejar: esta imagen trae texto real (leyenda "Velocidad [m/s]") a
-     la izquierda, y espejarla lo volvería ilegible. El degradado oscuro de
-     .heroVideoOverlay ya lo tapa lo suficiente del lado del texto. */
+  /* Sin espejar: el flujo del venturi es simétrico y el resto de fragmento
+     de leyenda que queda en el borde izquierdo del clip lo tapa el
+     degradado oscuro de .heroVideoOverlay. */
   object-position: center;
 }
 .heroVideoOverlay {

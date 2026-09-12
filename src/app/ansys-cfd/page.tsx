@@ -746,10 +746,13 @@ export default function AnsysCfdLandingPage() {
 
         {/* HERO */}
         <section className={`${styles.hero} hero-section`}>
-          <img
-            className={styles.heroImageBg}
-            src="/images/ansys-cfd-hero-venturi.jpeg"
-            alt=""
+          <video
+            className={styles.heroVideoBg}
+            src="https://pub-39582e519f204b8799b03d63e07c0b67.r2.dev/assets/ansys-cfd/hero-venturi.mp4"
+            autoPlay
+            muted
+            loop
+            playsInline
             aria-hidden="true"
           />
           <div className={styles.heroVideoOverlay} aria-hidden="true" />
