@@ -65,6 +65,7 @@ const Header: React.FC<HeaderProps> = ({
       show: showServicios,
       children: [
         { name: 'Aulas Virtuales con IA', href: '/servicios/aulas-virtuales' },
+        { name: 'Capacitación de IA para Empresas', href: '/capacitacion-ia-empresas' },
         { name: 'Alertas SEACE', href: '/servicios/alertas-seace' },
       ],
     },
