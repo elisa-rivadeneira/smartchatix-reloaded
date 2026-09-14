@@ -49,6 +49,13 @@ export function getDashboardMenuItems(userRole: string, activeTab: string, setAc
       roles: ['admin']
     },
     {
+      id: 'masterclass',
+      label: 'Masterclasses',
+      icon: '🎓',
+      onClick: () => setActiveTab('masterclass'),
+      roles: ['admin']
+    },
+    {
       id: 'reportes',
       label: 'Reportes',
       icon: '📈',

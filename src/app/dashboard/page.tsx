@@ -11,6 +11,7 @@ import AdminUsersSection from '@/components/dashboard/AdminUsersSection';
 import StudentCoursesSection from '@/components/dashboard/StudentCoursesSection';
 import AdminCoursesSection from '@/components/dashboard/AdminCoursesSection';
 import AdminEnrollmentsSection from '@/components/dashboard/AdminEnrollmentsSection';
+import AdminMasterclassSection from '@/components/dashboard/AdminMasterclassSection';
 import AdminInstructorsSection from '@/components/dashboard/AdminInstructorsSection';
 import AdminSettingsSection from '@/components/dashboard/AdminSettingsSection';
 import CourseStructureAssistant from '@/components/instructor/CourseStructureAssistant';
@@ -239,6 +240,10 @@ function DashboardContent() {
 
             {activeTab === 'instructores' && (
               <AdminInstructorsSection />
+            )}
+
+            {activeTab === 'masterclass' && (
+              <AdminMasterclassSection />
             )}
 
             {activeTab === 'reportes' && (
