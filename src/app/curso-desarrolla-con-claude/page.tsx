@@ -9,7 +9,6 @@ import {
   Clock,
   ShieldCheck,
   CheckCircle2,
-  KeyRound,
   GraduationCap,
   MonitorPlay,
   Package,
@@ -108,38 +107,39 @@ interface CursoData {
 }
 
 const FALLBACK = {
-  price: 200,
+  price: 250,
   priceOld: 400,
   fecha: '28 de septiembre',
   horario: 'Lunes, miércoles y viernes de 8:00 pm a 10:00 pm',
   duracion: '12 horas en 2 semanas',
 };
 
-// Oferta 50% OFF válida hasta el día de inicio del curso; desde el día siguiente vuelve a precio completo.
-const PROMO_END = new Date('2026-09-28T23:59:59-05:00');
+// Countdown "últimos 3 días" en bucle: cuenta hasta 0 y vuelve a arrancar en 3 días,
+// sin fecha de fin real — la oferta siempre se ve como si estuviera por terminar.
+// CYCLE_ANCHOR fija en qué momento arranca cada ciclo (ajústala si quieres que el
+// contador esté "recién reiniciado" en una fecha/hora puntual, ej. al lanzar la publicidad).
+const PROMO_CYCLE_HOURS = 72;
+const CYCLE_ANCHOR = new Date('2026-09-14T00:00:00-05:00').getTime();
 
-function useCountdown(target: Date) {
-  const [remaining, setRemaining] = React.useState({ d: 0, h: 0, m: 0, s: 0, ended: false });
+function useRollingCountdown(cycleHours: number, anchor: number) {
+  const cycleMs = cycleHours * 60 * 60 * 1000;
+  const [remaining, setRemaining] = React.useState({ d: 0, h: 0, m: 0, s: 0 });
 
   React.useEffect(() => {
     const tick = () => {
-      const diff = target.getTime() - Date.now();
-      if (diff <= 0) {
-        setRemaining({ d: 0, h: 0, m: 0, s: 0, ended: true });
-        return;
-      }
+      const elapsed = ((Date.now() - anchor) % cycleMs + cycleMs) % cycleMs;
+      const diff = cycleMs - elapsed;
       setRemaining({
         d: Math.floor(diff / (1000 * 60 * 60 * 24)),
         h: Math.floor((diff / (1000 * 60 * 60)) % 24),
         m: Math.floor((diff / (1000 * 60)) % 60),
         s: Math.floor((diff / 1000) % 60),
-        ended: false,
       });
     };
     tick();
     const interval = setInterval(tick, 1000);
     return () => clearInterval(interval);
-  }, [target]);
+  }, [cycleMs, anchor]);
 
   return remaining;
 }
@@ -175,7 +175,7 @@ export default function CursoDesarrollaConClaudePage() {
   const [scrolled, setScrolled] = React.useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
   const [curso, setCurso] = React.useState<CursoData | null>(null);
-  const countdown = useCountdown(PROMO_END);
+  const countdown = useRollingCountdown(PROMO_CYCLE_HOURS, CYCLE_ANCHOR);
   const pad = (n: number) => n.toString().padStart(2, '0');
 
   React.useEffect(() => {
@@ -223,21 +223,19 @@ export default function CursoDesarrollaConClaudePage() {
   return (
     <div className={styles.page}>
       {/* BARRA DE URGENCIA */}
-      {!countdown.ended && (
-        <div className={styles.urgencyBar}>
-          <span className={styles.urgencyBadge}>50% OFF · Oferta por tiempo limitado</span>
-          <span>
-            <span className={styles.urgencyOld}>S/ {priceOld}</span>
-            {' '}<strong>S/ {price}</strong>
-            {' · vuelve a S/ '}{priceOld}{' en '}
-            <span className={styles.urgencyCountdown}>
-              {countdown.d > 0 && `${countdown.d}d `}
-              {pad(countdown.h)}h {pad(countdown.m)}m {pad(countdown.s)}s
-            </span>
+      <div className={styles.urgencyBar}>
+        <span className={styles.urgencyBadge}>Ahorra S/ {priceOld - price} · Oferta por tiempo limitado</span>
+        <span>
+          <span className={styles.urgencyOld}>S/ {priceOld}</span>
+          {' '}<strong>S/ {price}</strong>
+          {' · vuelve a S/ '}{priceOld}{' en '}
+          <span className={styles.urgencyCountdown}>
+            {countdown.d > 0 && `${countdown.d}d `}
+            {pad(countdown.h)}h {pad(countdown.m)}m {pad(countdown.s)}s
           </span>
-          <a href={checkoutHref} className={styles.urgencyBtn}>Inscribirme ahora</a>
-        </div>
-      )}
+        </span>
+        <a href={checkoutHref} className={styles.urgencyBtn}>Inscribirme ahora</a>
+      </div>
 
       {/* NAVBAR */}
       <nav className={`${styles.navbar} ${scrolled ? styles.navbarScrolled : ''}`}>
@@ -282,22 +280,22 @@ export default function CursoDesarrollaConClaudePage() {
           <div>
             <div className={styles.heroLabel}>TALLER EN VIVO · 6 SESIONES</div>
             <h1 className={styles.heroTitle}>
-              Construye tu propia app con IA.<br />
-              <span className={styles.brandText}>De punta a punta.</span>
+              Construye el software que necesitas.<br />
+              <span className={styles.brandText}>Con Claude, desde cero.</span>
             </h1>
             <p className={styles.heroText}>
-              Seis sesiones en vivo en las que vas desarrollando tu propio sistema — desde la primera idea hasta publicarlo en producción, sin experiencia técnica previa.
+              Aprende a desarrollar tu propia herramienta utilizando Claude como copiloto. Desde la idea hasta una aplicación funcional que tú mismo podrás utilizar, modificar y seguir mejorando.
             </p>
             <div className={styles.heroActions}>
               <a href={checkoutHref} className={styles.btnPrimary}>
-                Quiero inscribirme <ArrowRight size={17} />
+                Quiero crear mi propia herramienta <ArrowRight size={17} />
               </a>
             </div>
             <div className={styles.heroFeatureRow}>
               <div className={styles.heroFeatureItem}><Calendar size={17} /><span>Inicia el {fecha}</span></div>
               <div className={styles.heroFeatureItem}><Clock size={17} /><span>{horario}</span></div>
               <div className={styles.heroFeatureItem}><ShieldCheck size={17} /><span>Certificado incluido</span></div>
-              <div className={styles.heroFeatureItem}><KeyRound size={17} /><span>Requiere cuenta Claude Pro</span></div>
+              <div className={styles.heroFeatureItem}><Target size={17} /><span>Clases 100% prácticas</span></div>
             </div>
           </div>
 
@@ -334,8 +332,14 @@ export default function CursoDesarrollaConClaudePage() {
                 ))}
               </div>
               <div className={styles.requisitoNote}>
-                <KeyRound size={16} />
-                <span><strong>Requisito:</strong> necesitas una cuenta Claude Pro (de pago) para seguir el taller.</span>
+                <Target size={16} />
+                <span>
+                  <strong>100% práctico:</strong> no te sientas a escuchar — tú mismo construyes tu propia
+                  aplicación, sesión a sesión, aunque nunca hayas programado. En dos semanas sales con tu
+                  app completamente desarrollada.
+                  <br /><br />
+                  <strong>Requisito:</strong> cuenta Claude Pro.
+                </span>
               </div>
             </Reveal>
 
@@ -445,20 +449,18 @@ export default function CursoDesarrollaConClaudePage() {
           </p>
 
           <div className={styles.offerCard}>
-            {!countdown.ended && <span className={styles.offerTag}>50% OFF</span>}
+            <span className={styles.offerTag}>Ahorra S/ {priceOld - price}</span>
             <div className={styles.offerPriceRow}>
-              {!countdown.ended && <span className={styles.offerPriceOld}>S/ {priceOld}</span>}
+              <span className={styles.offerPriceOld}>S/ {priceOld}</span>
               <span className={styles.offerPriceNew}>S/ {price}</span>
             </div>
-            {!countdown.ended && (
-              <span className={styles.offerNote}>
-                Oferta por tiempo limitado — vuelve a S/ {priceOld} en{' '}
-                <span className={styles.urgencyCountdown}>
-                  {countdown.d > 0 && `${countdown.d}d `}
-                  {pad(countdown.h)}h {pad(countdown.m)}m {pad(countdown.s)}s
-                </span>
+            <span className={styles.offerNote}>
+              Oferta por tiempo limitado — vuelve a S/ {priceOld} en{' '}
+              <span className={styles.urgencyCountdown}>
+                {countdown.d > 0 && `${countdown.d}d `}
+                {pad(countdown.h)}h {pad(countdown.m)}m {pad(countdown.s)}s
               </span>
-            )}
+            </span>
             <a href={checkoutHref} className={styles.btnPrimary}>
               Quiero mi lugar <ArrowRight size={17} />
             </a>
