@@ -139,7 +139,32 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    const isDemoMode = process.env.PAYMENT_DEMO_MODE === 'true' || metadata?.demo_mode === true;
+    if (metadata?.course_slug) {
+      const priceResult = await query(
+        'SELECT price_vivo, price_grabado, price_vivo_usd, price_grabado_usd FROM courses WHERE slug = ?',
+        [metadata.course_slug]
+      );
+
+      if (!priceResult || priceResult.length === 0) {
+        return NextResponse.json({ error: 'Curso no encontrado' }, { status: 404 });
+      }
+
+      const coursePrices = priceResult[0];
+      const isVivo = metadata?.modality === 'vivo';
+      const expectedPrice = currency === 'USD'
+        ? (isVivo ? coursePrices.price_vivo_usd : coursePrices.price_grabado_usd)
+        : (isVivo ? coursePrices.price_vivo : coursePrices.price_grabado);
+
+      if (expectedPrice != null && Number(amount) < Number(expectedPrice) - 0.01) {
+        console.error('❌ Monto insuficiente respecto al precio real:', { amount, expectedPrice, currency, modality: metadata?.modality });
+        return NextResponse.json(
+          { error: 'El monto no corresponde al precio del curso' },
+          { status: 400 }
+        );
+      }
+    }
+
+    const isDemoMode = process.env.PAYMENT_DEMO_MODE === 'true';
     let charge: any;
 
     if (isDemoMode) {
@@ -180,22 +205,21 @@ export async function POST(request: NextRequest) {
       charge = await culqiResponse.json();
       console.log('🔍 Respuesta de Culqi:', JSON.stringify(charge, null, 2));
 
-      if (!culqiResponse.ok) {
-        console.error('Culqi charge error:', charge);
-        return NextResponse.json(
-          {
-            error: 'Error al procesar el pago',
-            details: charge.user_message || charge.merchant_message || 'Error desconocido'
-          },
-          { status: 400 }
-        );
-      }
+      const isSuccessfulCharge =
+        culqiResponse.ok &&
+        charge.object === 'charge' &&
+        charge.outcome?.type === 'venta_exitosa';
 
-      if (charge.outcome && charge.outcome.type !== 'venta_exitosa') {
+      if (!isSuccessfulCharge) {
+        console.error('Culqi charge rechazado o inesperado:', charge);
         return NextResponse.json(
           {
             error: 'El pago no fue exitoso',
-            details: charge.outcome.user_message
+            details:
+              charge.user_message ||
+              charge.merchant_message ||
+              charge.outcome?.user_message ||
+              'Pago rechazado'
           },
           { status: 400 }
         );
