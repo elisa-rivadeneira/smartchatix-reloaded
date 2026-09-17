@@ -91,6 +91,7 @@ interface Lesson {
   order_index: number;
   is_free: boolean;
   has_quiz: boolean;
+  quiz_source: 'lesson' | 'video' | 'material' | null;
   quiz_questions_count: number;
   quiz_data: any;
 }
@@ -116,8 +117,28 @@ interface Course {
 function QuizManagementModal({ lesson, onClose }: { lesson: Lesson; onClose: () => void }) {
   console.log('QuizManagementModal rendered with lesson:', lesson);
 
+  const lessonHasText = !!(lesson.main_content || lesson.markdown_content);
+  const lessonHasVideo = (lesson.content_type === 'video' || lesson.content_type === 'quiz') && !!lesson.video_url;
+  const lessonPdfUrls = ((typeof lesson.documents_urls === 'string'
+    ? JSON.parse(lesson.documents_urls || '[]')
+    : lesson.documents_urls) || []
+  ).filter((u: string) => /\.pdf($|\?)/i.test(u));
+  const lessonHasMaterial = (lesson.content_type === 'material' || lesson.content_type === 'quiz') && lessonPdfUrls.length > 0;
+
+  const availableSources: Array<{ value: 'lesson' | 'video' | 'material'; label: string }> = [
+    ...(lessonHasText ? [{ value: 'lesson' as const, label: lesson.content_type === 'quiz' ? '📝 Texto de referencia' : '📝 Lección (texto)' }] : []),
+    ...(lessonHasVideo ? [{ value: 'video' as const, label: '🎬 Video (transcripción de YouTube)' }] : []),
+    ...(lessonHasMaterial ? [{ value: 'material' as const, label: '📎 Material (PDF)' }] : [])
+  ];
+
+  const defaultSource: 'lesson' | 'video' | 'material' =
+    lesson.quiz_source && availableSources.some((s) => s.value === lesson.quiz_source)
+      ? lesson.quiz_source
+      : (lessonHasText ? 'lesson' : lessonHasVideo ? 'video' : 'material');
+
   const [quizData, setQuizData] = useState(lesson.quiz_data || null);
   const [quizQuestionsCount, setQuizQuestionsCount] = useState(lesson.quiz_questions_count || 2);
+  const [quizSource, setQuizSource] = useState<'lesson' | 'video' | 'material'>(defaultSource);
   const [generalInstructions, setGeneralInstructions] = useState('');
   const [generatingQuiz, setGeneratingQuiz] = useState(false);
   const [regenerateModal, setRegenerateModal] = useState<{ open: boolean; questionIndex: number; currentQuestion: any } | null>(null);
@@ -127,20 +148,24 @@ function QuizManagementModal({ lesson, onClose }: { lesson: Lesson; onClose: () 
   const [successModal, setSuccessModal] = useState(false);
   const [errorModal, setErrorModal] = useState<string>('');
 
-  const handleGenerateQuiz = async () => {
-    const content = lesson.main_content || lesson.markdown_content;
-    if (!content) {
-      setErrorModal('Esta lección no tiene contenido Markdown para generar preguntas');
-      return;
+  const buildSourcePayload = () => {
+    if (quizSource === 'video') {
+      return { source: 'video', videoUrl: lesson.video_url };
     }
+    if (quizSource === 'material') {
+      return { source: 'material', documentsUrls: lessonPdfUrls };
+    }
+    return { source: 'lesson', content: lesson.main_content || lesson.markdown_content };
+  };
 
+  const handleGenerateQuiz = async () => {
     setGeneratingQuiz(true);
     try {
       const response = await fetch('/api/instructor/generate-quiz', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          content,
+          ...buildSourcePayload(),
           questionsCount: quizQuestionsCount,
           generalInstructions: generalInstructions || undefined
         })
@@ -177,6 +202,7 @@ function QuizManagementModal({ lesson, onClose }: { lesson: Lesson; onClose: () 
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           ...lesson,
+          quiz_source: quizSource,
           quiz_questions_count: quizQuestionsCount,
           quiz_data: quizData
         })
@@ -319,6 +345,51 @@ function QuizManagementModal({ lesson, onClose }: { lesson: Lesson; onClose: () 
               </p>
             </div>
 
+            {availableSources.length > 0 && (
+              <div style={{ marginBottom: '16px' }}>
+                <label style={{ display: 'block', fontSize: '12px', fontWeight: '600', color: '#374151', marginBottom: '6px' }}>
+                  Fuente de las preguntas
+                </label>
+                <select
+                  value={quizSource}
+                  onChange={(e) => setQuizSource(e.target.value as 'lesson' | 'video' | 'material')}
+                  disabled={availableSources.length === 1}
+                  style={{
+                    width: '100%',
+                    maxWidth: '320px',
+                    padding: '8px 12px',
+                    border: '2px solid #d1d5db',
+                    borderRadius: '6px',
+                    fontSize: '14px',
+                    boxSizing: 'border-box'
+                  }}
+                >
+                  {availableSources.map((s) => (
+                    <option key={s.value} value={s.value}>{s.label}</option>
+                  ))}
+                </select>
+                {quizSource === 'video' && (
+                  <p style={{ fontSize: '11px', color: '#6b7280', marginTop: '6px', margin: 0 }}>
+                    💡 Se usará la transcripción de los subtítulos de YouTube. Si el video no tiene subtítulos, la generación fallará.
+                  </p>
+                )}
+              </div>
+            )}
+
+            {availableSources.length === 0 && (
+              <div style={{
+                marginBottom: '16px',
+                padding: '10px 12px',
+                background: '#fef2f2',
+                border: '1px solid #fecaca',
+                borderRadius: '8px',
+                fontSize: '12px',
+                color: '#991b1b'
+              }}>
+                ⚠️ Esta lección todavía no tiene texto de referencia ni un PDF subido. Cierra este modal, edita la lección y agrega uno de los dos antes de generar preguntas.
+              </div>
+            )}
+
             <div style={{ display: 'flex', gap: '12px', alignItems: 'end' }}>
               <div>
                 <label style={{ display: 'block', fontSize: '12px', fontWeight: '600', color: '#374151', marginBottom: '6px' }}>
@@ -342,15 +413,15 @@ function QuizManagementModal({ lesson, onClose }: { lesson: Lesson; onClose: () 
               {!quizData && (
               <button
                 onClick={handleGenerateQuiz}
-                disabled={generatingQuiz}
+                disabled={generatingQuiz || availableSources.length === 0}
                 style={{
                   padding: '8px 20px',
-                  background: generatingQuiz ? '#9ca3af' : 'linear-gradient(135deg, #0ea5e9 0%, #06b6d4 100%)',
+                  background: (generatingQuiz || availableSources.length === 0) ? '#9ca3af' : 'linear-gradient(135deg, #0ea5e9 0%, #06b6d4 100%)',
                   border: 'none',
                   borderRadius: '6px',
                   fontSize: '14px',
                   fontWeight: '600',
-                  cursor: generatingQuiz ? 'not-allowed' : 'pointer',
+                  cursor: (generatingQuiz || availableSources.length === 0) ? 'not-allowed' : 'pointer',
                   color: 'white'
                 }}
               >
@@ -677,13 +748,12 @@ function QuizManagementModal({ lesson, onClose }: { lesson: Lesson; onClose: () 
                   setGeneratingQuiz(true);
                   try {
                     const existingQuestions = quizData.filter((_: any, i: number) => i !== regenerateModal.questionIndex);
-                    const content = lesson.main_content || lesson.markdown_content;
 
                     const response = await fetch('/api/instructor/generate-quiz', {
                       method: 'POST',
                       headers: { 'Content-Type': 'application/json' },
                       body: JSON.stringify({
-                        content,
+                        ...buildSourcePayload(),
                         questionsCount: 1,
                         existingQuestions,
                         generalInstructions: generalInstructions || undefined,
@@ -5710,7 +5780,118 @@ Genera el contenido completo.`;
           </>
         )}
 
+        {contentType === 'quiz' && (
+          <>
+            <div style={{
+              marginBottom: '12px',
+              padding: '10px 12px',
+              background: '#fef9c3',
+              border: '1px solid #fde68a',
+              borderRadius: '8px',
+              fontSize: '12px',
+              color: '#854d0e'
+            }}>
+              📝 Esta lección es un examen (parcial/final). El estudiante solo verá las preguntas, sin video ni lectura previa. Agrega un video de YouTube, pega texto y/o sube un PDF de referencia: de ahí la IA generará las preguntas.
+            </div>
 
+            <div style={{ marginBottom: '12px' }}>
+              <label style={{ display: 'block', fontSize: '13px', fontWeight: '600', color: '#374151', marginBottom: '6px' }}>
+                URL de YouTube de referencia (opcional)
+              </label>
+              <input
+                type="text"
+                value={videoUrl}
+                onChange={(e) => setVideoUrl(e.target.value)}
+                style={{
+                  width: '100%',
+                  padding: '8px 12px',
+                  border: '2px solid #e5e7eb',
+                  borderRadius: '8px',
+                  fontSize: '14px',
+                  outline: 'none',
+                  boxSizing: 'border-box'
+                }}
+                onFocus={(e) => e.target.style.borderColor = '#667eea'}
+                onBlur={(e) => e.target.style.borderColor = '#e5e7eb'}
+                placeholder="dQw4w9WgXcQ o https://youtube.com/watch?v=..."
+              />
+              <p style={{ fontSize: '11px', color: '#6b7280', marginTop: '4px' }}>
+                No se muestra al estudiante, solo se usa para generar preguntas a partir de su transcripción.
+              </p>
+            </div>
+
+            <div style={{ marginBottom: '12px', textAlign: 'center', color: '#9ca3af', fontSize: '12px', fontWeight: '500' }}>
+              - Y/O -
+            </div>
+
+            <div style={{ marginBottom: '12px' }}>
+              <label style={{ display: 'block', fontSize: '13px', fontWeight: '600', color: '#374151', marginBottom: '6px' }}>
+                Texto de referencia del examen (opcional)
+              </label>
+              <MarkdownEditor
+                value={markdownContent}
+                onChange={setMarkdownContent}
+                placeholder="Pega aquí el contenido sobre el que debe versar el examen..."
+              />
+            </div>
+
+            <div style={{ marginBottom: '12px', textAlign: 'center', color: '#9ca3af', fontSize: '12px', fontWeight: '500' }}>
+              - Y/O -
+            </div>
+
+            <div style={{ marginBottom: '12px' }}>
+              <label style={{ display: 'block', fontSize: '13px', fontWeight: '600', color: '#374151', marginBottom: '6px' }}>
+                Subir PDF de referencia (opcional)
+              </label>
+              <input
+                type="file"
+                accept="application/pdf"
+                multiple
+                onChange={handleFileUpload}
+                disabled={uploading}
+                style={{
+                  width: '100%',
+                  padding: '8px 12px',
+                  border: '2px solid #e5e7eb',
+                  borderRadius: '8px',
+                  fontSize: '13px',
+                  cursor: uploading ? 'not-allowed' : 'pointer',
+                  boxSizing: 'border-box'
+                }}
+              />
+              {uploading && (
+                <p style={{ fontSize: '11px', color: '#667eea', marginTop: '4px', fontWeight: '500' }}>
+                  📤 Subiendo archivos...
+                </p>
+              )}
+            </div>
+
+            {documentsUrls.length > 0 && (
+              <div style={{ marginBottom: '16px', padding: '12px', backgroundColor: '#f9fafb', borderRadius: '8px', border: '1px solid #e5e7eb' }}>
+                <p style={{ fontSize: '13px', fontWeight: '600', color: '#374151', marginBottom: '8px' }}>
+                  📎 Archivos subidos ({documentsUrls.length}):
+                </p>
+                {documentsUrls.map((url, index) => {
+                  const fullFilename = url.split('/').pop() || `Archivo ${index + 1}`;
+                  const filename = fullFilename.replace(/^\d+_/, '');
+                  return (
+                    <div key={index} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '6px 8px', backgroundColor: 'white', borderRadius: '6px', marginBottom: '6px', border: '1px solid #e5e7eb' }}>
+                      <a href={url} target="_blank" rel="noopener noreferrer" style={{ fontSize: '12px', color: '#667eea', textDecoration: 'none', flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        {filename}
+                      </a>
+                      <button
+                        onClick={() => setDocumentsUrls(prev => prev.filter((_, i) => i !== index))}
+                        style={{ marginLeft: '8px', padding: '4px 8px', fontSize: '11px', color: '#ef4444', backgroundColor: 'white', border: '1px solid #ef4444', borderRadius: '4px', cursor: 'pointer' }}
+                      >
+                        ✕
+                      </button>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </>
+        )}
 
         {contentType === 'assignment' && (
           <>
@@ -5897,7 +6078,11 @@ Genera el contenido completo.`;
           </label>
         </div>
 
-        {(contentType === 'video' || contentType === 'assignment') && (mainContent || markdownContent) && (
+        {(
+          (contentType === 'video' && (videoUrl || mainContent || markdownContent)) ||
+          (contentType === 'assignment' && (mainContent || markdownContent)) ||
+          (contentType === 'material' && documentsUrls.length > 0)
+        ) && (
           <>
             <div style={{
               marginBottom: '12px',
@@ -5995,9 +6180,9 @@ Genera el contenido completo.`;
                 markdown_video: markdownVideo,
                 duration,
                 is_free: isFree,
-                has_quiz: hasQuiz,
-                quiz_questions_count: (hasQuiz || contentType === 'assignment') ? quizQuestionsCount : 0,
-                quiz_data: hasQuiz ? quizData : null
+                has_quiz: hasQuiz || contentType === 'quiz',
+                quiz_questions_count: (hasQuiz || contentType === 'assignment' || contentType === 'quiz') ? quizQuestionsCount : 0,
+                quiz_data: (hasQuiz || contentType === 'quiz') ? quizData : null
               })}
               disabled={saving || !title}
               style={{

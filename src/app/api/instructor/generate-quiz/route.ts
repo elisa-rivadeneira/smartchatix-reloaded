@@ -1,5 +1,74 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { verifyToken } from '@/lib/auth';
+import { YoutubeTranscript } from 'youtube-transcript';
+// Import directo al módulo interno: el index.js de pdf-parse ejecuta código
+// de debug al cargar (lee un PDF de prueba) cuando lo bundlean Webpack/Turbopack,
+// lo cual rompe el build. lib/pdf-parse.js no tiene ese problema.
+import pdfParse from 'pdf-parse/lib/pdf-parse.js';
+
+function extractYouTubeVideoId(url: string): string {
+  if (!url) return '';
+  if (url.includes('youtube.com/watch')) {
+    try {
+      return new URL(url).searchParams.get('v') || '';
+    } catch {
+      return '';
+    }
+  }
+  if (url.includes('youtu.be/')) {
+    return url.split('youtu.be/')[1]?.split('?')[0] || '';
+  }
+  if (url.includes('youtube.com/embed/')) {
+    return url.split('youtube.com/embed/')[1]?.split('?')[0] || '';
+  }
+  return url;
+}
+
+async function getVideoTranscriptContent(videoUrl: string): Promise<string> {
+  const videoId = extractYouTubeVideoId(videoUrl);
+  if (!videoId) {
+    throw new Error('URL de YouTube inválida');
+  }
+  let segments;
+  try {
+    segments = await YoutubeTranscript.fetchTranscript(videoId, { lang: 'es' });
+  } catch {
+    segments = await YoutubeTranscript.fetchTranscript(videoId);
+  }
+  const text = segments?.map((s) => s.text).join(' ').replace(/\s+/g, ' ').trim();
+  if (!text) {
+    throw new Error('Este video no tiene subtítulos disponibles en YouTube. Prueba con la fuente "Lección" o agrega texto a la lección.');
+  }
+  return text;
+}
+
+async function getMaterialContent(documentsUrls: string[]): Promise<string> {
+  const pdfUrls = (documentsUrls || []).filter((u) => /\.pdf($|\?)/i.test(u));
+  if (pdfUrls.length === 0) {
+    throw new Error('No se encontró ningún archivo PDF en el material de esta lección. Sube un .pdf para generar preguntas desde el material.');
+  }
+
+  const texts: string[] = [];
+  for (const url of pdfUrls) {
+    const fileResponse = await fetch(url);
+    if (!fileResponse.ok) continue;
+    const buffer = Buffer.from(await fileResponse.arrayBuffer());
+    try {
+      const parsed = await pdfParse(buffer);
+      if (parsed.text?.trim()) {
+        texts.push(parsed.text.trim());
+      }
+    } catch (err) {
+      console.error('Error parsing PDF:', url, err);
+    }
+  }
+
+  const combined = texts.join('\n\n---\n\n').trim();
+  if (!combined) {
+    throw new Error('No se pudo extraer texto de los PDFs subidos. Asegúrate de que no sean documentos escaneados como imagen.');
+  }
+  return combined;
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -13,9 +82,29 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Acceso denegado' }, { status: 403 });
     }
 
-    const { content, questionsCount, existingQuestions, improveQuestion, generalInstructions } = await request.json();
+    const body = await request.json();
+    const { source, videoUrl, documentsUrls, questionsCount, existingQuestions, improveQuestion, generalInstructions } = body;
+    let { content } = body;
 
-    if (!content || !questionsCount) {
+    if (!questionsCount) {
+      return NextResponse.json({ error: 'Número de preguntas requerido' }, { status: 400 });
+    }
+
+    if (source === 'video') {
+      try {
+        content = await getVideoTranscriptContent(videoUrl);
+      } catch (err: any) {
+        return NextResponse.json({ error: err.message || 'Error al obtener la transcripción del video' }, { status: 400 });
+      }
+    } else if (source === 'material') {
+      try {
+        content = await getMaterialContent(documentsUrls);
+      } catch (err: any) {
+        return NextResponse.json({ error: err.message || 'Error al leer el material PDF' }, { status: 400 });
+      }
+    }
+
+    if (!content) {
       return NextResponse.json({ error: 'Contenido y número de preguntas requeridos' }, { status: 400 });
     }
 

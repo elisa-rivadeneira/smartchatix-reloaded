@@ -19,7 +19,7 @@ export async function PATCH(
 
     const { id: lessonId } = await params;
     const body = await request.json();
-    const { title, description, content_type, video_url, video_file, main_content, document_url, documents_urls, markdown_content, markdown_image, markdown_video, duration, is_free, has_quiz, quiz_questions_count, quiz_data, module_id } = body;
+    const { title, description, content_type, video_url, video_file, main_content, document_url, documents_urls, markdown_content, markdown_image, markdown_video, duration, is_free, has_quiz, quiz_source, quiz_questions_count, quiz_data, module_id } = body;
 
     const lessonCheck = decoded.role === 'admin'
       ? await query(`SELECT l.id FROM lessons l WHERE l.id = ?`, [lessonId])
@@ -92,6 +92,10 @@ export async function PATCH(
     if (has_quiz !== undefined) {
       updateFields.push('has_quiz = ?');
       updateValues.push(has_quiz ? 1 : 0);
+    }
+    if (quiz_source !== undefined) {
+      updateFields.push('quiz_source = ?');
+      updateValues.push(quiz_source || null);
     }
     if (quiz_questions_count !== undefined) {
       updateFields.push('quiz_questions_count = ?');
