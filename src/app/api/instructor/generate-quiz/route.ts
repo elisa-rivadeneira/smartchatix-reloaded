@@ -24,20 +24,115 @@ function extractYouTubeVideoId(url: string): string {
   return url;
 }
 
+// Cachea el access_token en memoria del proceso: dura ~1h, no hace falta pedirlo en cada request.
+let cachedYouTubeAccessToken: { token: string; expiresAt: number } | null = null;
+
+async function getYouTubeAccessToken(): Promise<string | null> {
+  const clientId = process.env.YOUTUBE_OAUTH_CLIENT_ID;
+  const clientSecret = process.env.YOUTUBE_OAUTH_CLIENT_SECRET;
+  const refreshToken = process.env.YOUTUBE_OAUTH_REFRESH_TOKEN;
+  if (!clientId || !clientSecret || !refreshToken) return null;
+
+  if (cachedYouTubeAccessToken && cachedYouTubeAccessToken.expiresAt > Date.now()) {
+    return cachedYouTubeAccessToken.token;
+  }
+
+  const response = await fetch('https://oauth2.googleapis.com/token', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: new URLSearchParams({
+      client_id: clientId,
+      client_secret: clientSecret,
+      refresh_token: refreshToken,
+      grant_type: 'refresh_token',
+    }),
+  });
+  if (!response.ok) {
+    console.error('Error renovando access token de YouTube:', await response.text());
+    return null;
+  }
+  const data = await response.json();
+  if (!data.access_token) return null;
+
+  cachedYouTubeAccessToken = {
+    token: data.access_token,
+    expiresAt: Date.now() + (data.expires_in - 60) * 1000,
+  };
+  return data.access_token;
+}
+
+// Los .srt/.vtt traen números de secuencia, timestamps y tags de estilo; nos quedamos solo con el texto.
+function extractPlainTextFromCaptionFile(raw: string): string {
+  return raw
+    .split('\n')
+    .filter((line) => {
+      const trimmed = line.trim();
+      if (!trimmed || trimmed === 'WEBVTT') return false;
+      if (/^\d+$/.test(trimmed)) return false;
+      if (/\d{2}:\d{2}:\d{2}[.,]\d{3}\s*-->/.test(trimmed)) return false;
+      return true;
+    })
+    .join(' ')
+    .replace(/<[^>]+>/g, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+// Vía oficial: solo funciona para videos del canal que autorizó YOUTUBE_OAUTH_REFRESH_TOKEN
+// (ver youtube-oauth-setup.mjs). No depende de scraping, así que no se rompe cuando YouTube
+// cambia su página ni se bloquea por región/IP.
+async function getOfficialYouTubeTranscript(videoId: string): Promise<string | null> {
+  const accessToken = await getYouTubeAccessToken();
+  if (!accessToken) return null;
+
+  const listResponse = await fetch(
+    `https://www.googleapis.com/youtube/v3/captions?part=snippet&videoId=${videoId}`,
+    { headers: { Authorization: `Bearer ${accessToken}` } }
+  );
+  // 403 = el video no es de la cuenta autorizada, 404 = no existe. En ambos casos, fallback.
+  if (!listResponse.ok) return null;
+  const listData = await listResponse.json();
+  const tracks: Array<{ id: string; snippet?: { language?: string } }> = listData.items || [];
+  if (tracks.length === 0) return null;
+
+  const track = tracks.find((t) => t.snippet?.language?.startsWith('es')) || tracks[0];
+
+  const downloadResponse = await fetch(
+    `https://www.googleapis.com/youtube/v3/captions/${track.id}?tfmt=srt`,
+    { headers: { Authorization: `Bearer ${accessToken}` } }
+  );
+  if (!downloadResponse.ok) return null;
+  const raw = await downloadResponse.text();
+  return extractPlainTextFromCaptionFile(raw) || null;
+}
+
 async function getVideoTranscriptContent(videoUrl: string): Promise<string> {
   const videoId = extractYouTubeVideoId(videoUrl);
   if (!videoId) {
     throw new Error('URL de YouTube inválida');
   }
+
+  try {
+    const officialText = await getOfficialYouTubeTranscript(videoId);
+    if (officialText) return officialText;
+  } catch (err) {
+    console.error('Error leyendo transcripción por la API oficial de YouTube, se intenta lectura automática:', err);
+  }
+
+  // Fallback: lectura automática no oficial (scraping), para videos que no son de nuestro canal.
   let segments;
   try {
     segments = await YoutubeTranscript.fetchTranscript(videoId, { lang: 'es' });
   } catch {
-    segments = await YoutubeTranscript.fetchTranscript(videoId);
+    try {
+      segments = await YoutubeTranscript.fetchTranscript(videoId);
+    } catch {
+      segments = undefined;
+    }
   }
   const text = segments?.map((s) => s.text).join(' ').replace(/\s+/g, ' ').trim();
   if (!text) {
-    throw new Error('Este video no tiene subtítulos disponibles en YouTube. Prueba con la fuente "Lección" o agrega texto a la lección.');
+    throw new Error('No se pudo leer la transcripción de este video. Puede ser un bloqueo temporal de YouTube (intenta de nuevo en unos minutos) o que el video realmente no tenga subtítulos. Mientras tanto, prueba con la fuente "Lección" o "Material".');
   }
   return text;
 }

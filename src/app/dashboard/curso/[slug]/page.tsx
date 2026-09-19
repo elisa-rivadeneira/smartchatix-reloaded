@@ -14,6 +14,7 @@ import UnifiedSidebar from '@/components/unified/UnifiedSidebar';
 import { CertificateTemplate, DEFAULT_CERTIFICATE_TEMPLATE, resolveCertificateTemplate } from '@/lib/certificate-template';
 import CertificateTemplateForm from '@/components/certificate/CertificateTemplateForm';
 import CertificatePreview from '@/components/certificate/CertificatePreview';
+import { CUSTOM_LANDING_PAGES } from '@/lib/customLandingPages';
 
 function convertMarkdownToHtml(markdown: string): string {
   if (!markdown) return '';
@@ -111,6 +112,9 @@ interface Course {
   email_confirmation_template?: string | null;
   email_payment_confirmation_template?: string | null;
   certificate_template?: string | null;
+  landing_page_type?: 'automated' | 'custom';
+  custom_landing_url?: string | null;
+  whatsapp_message?: string | null;
   modules: Module[];
 }
 
@@ -3720,6 +3724,219 @@ export default function InstructorCourseEditPage() {
                   {course?.publication_status === 'published' && '✅ El curso está completamente visible con precios y enlaces de inscripción.'}
                   {course?.publication_status === 'coming_soon' && '⏳ El curso es visible pero sin precios ni enlaces de inscripción.'}
                   {(course?.publication_status === 'unpublished' || !course?.publication_status) && '🔒 El curso no es visible en la web pública. Solo admins e instructores pueden verlo.'}
+                </p>
+              </div>
+            </div>
+
+            <div style={{
+              padding: '1.5rem',
+              background: '#f9fafb',
+              borderRadius: '8px',
+              border: '1px solid #e5e7eb',
+              marginBottom: '1.5rem'
+            }}>
+              <h3 style={{
+                fontSize: '15px',
+                fontWeight: '600',
+                color: '#111827',
+                marginBottom: '1rem',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.5rem'
+              }}>
+                🎨 Landing Page del Curso
+              </h3>
+
+              <div style={{ marginBottom: '16px' }}>
+                <label style={{
+                  display: 'block',
+                  fontSize: '13px',
+                  fontWeight: '600',
+                  color: '#374151',
+                  marginBottom: '8px'
+                }}>
+                  Tipo de página
+                </label>
+                <div style={{ display: 'flex', gap: '0.5rem' }}>
+                  <select
+                    value={course?.landing_page_type || 'automated'}
+                    onChange={async (e) => {
+                      const type = e.target.value as 'automated' | 'custom';
+                      setSaving(true);
+                      try {
+                        const response = await fetch(`/api/instructor/course/${slug}/config`, {
+                          method: 'PATCH',
+                          headers: { 'Content-Type': 'application/json' },
+                          body: JSON.stringify({ landing_page_type: type })
+                        });
+                        if (response.ok) {
+                          setCourse(prev => prev ? { ...prev, landing_page_type: type } : null);
+                        } else {
+                          const data = await response.json().catch(() => ({}));
+                          showModal('error', data.error || 'Error al actualizar el tipo de página');
+                        }
+                      } catch (error) {
+                        console.error('Error:', error);
+                      } finally {
+                        setSaving(false);
+                      }
+                    }}
+                    style={{
+                      flex: 1,
+                      padding: '10px 12px',
+                      border: '2px solid #e5e7eb',
+                      borderRadius: '8px',
+                      fontSize: '14px',
+                      fontWeight: '500',
+                      cursor: 'pointer',
+                      background: 'white'
+                    }}
+                  >
+                    <option value="automated">🤖 Automatizada - Usa la plantilla genérica /cursos/{slug}</option>
+                    <option value="custom">🎨 Personalizada - Usa una landing propia ya creada en el código</option>
+                  </select>
+                  <button
+                    type="button"
+                    disabled={course?.landing_page_type === 'custom' && !course?.custom_landing_url}
+                    onClick={() => {
+                      const url = course?.landing_page_type === 'custom' && course?.custom_landing_url
+                        ? course.custom_landing_url
+                        : `/cursos/${slug}`;
+                      window.open(url, '_blank');
+                    }}
+                    style={{
+                      padding: '10px 16px',
+                      background: (course?.landing_page_type === 'custom' && !course?.custom_landing_url) ? '#f3f4f6' : 'white',
+                      border: '2px solid #e5e7eb',
+                      borderRadius: '8px',
+                      cursor: (course?.landing_page_type === 'custom' && !course?.custom_landing_url) ? 'not-allowed' : 'pointer',
+                      fontSize: '13px',
+                      color: (course?.landing_page_type === 'custom' && !course?.custom_landing_url) ? '#9ca3af' : '#7c3aed',
+                      fontWeight: '600',
+                      whiteSpace: 'nowrap'
+                    }}
+                  >
+                    👁️ Vista previa
+                  </button>
+                </div>
+                <p style={{ fontSize: '12px', color: '#6b7280', marginTop: '8px' }}>
+                  {course?.landing_page_type === 'custom'
+                    ? 'Los enlaces del catálogo apuntarán a la ruta personalizada, y /cursos/' + slug + ' redirigirá automáticamente a ella.'
+                    : 'El curso se muestra con la plantilla genérica /cursos/' + slug + '.'}
+                </p>
+              </div>
+
+              {course?.landing_page_type === 'custom' && (
+                <div>
+                  <label style={{
+                    display: 'block',
+                    fontSize: '13px',
+                    fontWeight: '600',
+                    color: '#374151',
+                    marginBottom: '8px'
+                  }}>
+                    Ruta de la landing personalizada
+                  </label>
+                  {CUSTOM_LANDING_PAGES.length === 0 ? (
+                    <p style={{ fontSize: '13px', color: '#92400e', background: '#fef3c7', border: '1px solid #fbbf24', borderRadius: '8px', padding: '0.75rem' }}>
+                      Todavía no hay ninguna landing personalizada registrada. Pide que se cree la página en el código y se agregue a <code style={{ background: 'white', padding: '2px 6px', borderRadius: '4px' }}>src/lib/customLandingPages.ts</code> para poder elegirla aquí.
+                    </p>
+                  ) : (
+                    <select
+                      value={course?.custom_landing_url || ''}
+                      onChange={async (e) => {
+                        const value = e.target.value;
+                        setSaving(true);
+                        try {
+                          const response = await fetch(`/api/instructor/course/${slug}/config`, {
+                            method: 'PATCH',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ custom_landing_url: value || null })
+                          });
+                          if (response.ok) {
+                            setCourse(prev => prev ? { ...prev, custom_landing_url: value || null } : null);
+                          } else {
+                            const data = await response.json().catch(() => ({}));
+                            showModal('error', data.error || 'Error al guardar la landing');
+                          }
+                        } catch (error) {
+                          console.error('Error:', error);
+                        } finally {
+                          setSaving(false);
+                        }
+                      }}
+                      style={{
+                        width: '100%',
+                        padding: '10px 12px',
+                        border: '2px solid #e5e7eb',
+                        borderRadius: '8px',
+                        fontSize: '14px',
+                        fontWeight: '500',
+                        cursor: 'pointer',
+                        background: 'white'
+                      }}
+                    >
+                      <option value="">Selecciona una landing personalizada…</option>
+                      {CUSTOM_LANDING_PAGES.map((page) => (
+                        <option key={page.path} value={page.path}>
+                          {page.label} — {page.path}
+                        </option>
+                      ))}
+                    </select>
+                  )}
+                  <p style={{ fontSize: '12px', color: '#6b7280', marginTop: '8px' }}>
+                    Esa página debe traer los datos del curso desde <code style={{ background: '#e5e7eb', padding: '2px 6px', borderRadius: '4px' }}>{`/api/public/courses/${slug}`}</code> y enlazar el checkout a <code style={{ background: '#e5e7eb', padding: '2px 6px', borderRadius: '4px' }}>{`/inscripcion-vivo?curso=${slug}`}</code> o <code style={{ background: '#e5e7eb', padding: '2px 6px', borderRadius: '4px' }}>{`/comprar-grabado?curso=${slug}`}</code> para que el pago y la matrícula sigan siendo reales.
+                  </p>
+                </div>
+              )}
+
+              <div style={{ marginTop: '16px' }}>
+                <label style={{
+                  display: 'block',
+                  fontSize: '13px',
+                  fontWeight: '600',
+                  color: '#374151',
+                  marginBottom: '8px'
+                }}>
+                  Mensaje del botón de WhatsApp
+                </label>
+                <textarea
+                  value={course?.whatsapp_message || ''}
+                  onChange={(e) => setCourse(prev => prev ? { ...prev, whatsapp_message: e.target.value } : null)}
+                  onBlur={async (e) => {
+                    const value = e.target.value.trim();
+                    setSaving(true);
+                    try {
+                      const response = await fetch(`/api/instructor/course/${slug}/config`, {
+                        method: 'PATCH',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ whatsapp_message: value || null })
+                      });
+                      if (!response.ok) {
+                        const data = await response.json().catch(() => ({}));
+                        showModal('error', data.error || 'Error al guardar el mensaje');
+                      }
+                    } catch (error) {
+                      console.error('Error:', error);
+                    } finally {
+                      setSaving(false);
+                    }
+                  }}
+                  placeholder={`Hola, estoy interesado en el curso "{curso}"`}
+                  rows={3}
+                  style={{
+                    width: '100%',
+                    padding: '10px 12px',
+                    border: '2px solid #e5e7eb',
+                    borderRadius: '8px',
+                    fontSize: '14px',
+                    fontFamily: 'inherit',
+                    boxSizing: 'border-box',
+                    resize: 'vertical'
+                  }}
+                />
+                <p style={{ fontSize: '12px', color: '#6b7280', marginTop: '8px' }}>
+                  Puedes usar <code style={{ background: '#e5e7eb', padding: '2px 6px', borderRadius: '4px' }}>{'{curso}'}</code> y se reemplaza por el título del curso. Si dejas vacío, se arma automáticamente: <em>&quot;Hola, estoy interesado en el curso &quot;{course?.title || 'Nombre del curso'}&quot;&quot;</em> (agregando &quot;en vivo&quot; o &quot;grabado&quot; según la modalidad, si el curso solo tiene una).
                 </p>
               </div>
             </div>

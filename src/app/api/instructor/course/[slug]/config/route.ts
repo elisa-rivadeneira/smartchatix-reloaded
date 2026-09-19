@@ -303,6 +303,27 @@ export async function PATCH(
       values.push(JSON.stringify(body.key_learnings));
     }
 
+    if (body.landing_page_type !== undefined) {
+      if (!['automated', 'custom'].includes(body.landing_page_type)) {
+        return NextResponse.json({ error: 'Tipo de landing inválido' }, { status: 400 });
+      }
+      updates.push('landing_page_type = ?');
+      values.push(body.landing_page_type);
+    }
+
+    if (body.custom_landing_url !== undefined) {
+      if (body.custom_landing_url !== null && !/^\/(?!\/)[^\s]*$/.test(body.custom_landing_url)) {
+        return NextResponse.json({ error: 'La ruta de la landing debe ser interna y empezar con "/"' }, { status: 400 });
+      }
+      updates.push('custom_landing_url = ?');
+      values.push(body.custom_landing_url || null);
+    }
+
+    if (body.whatsapp_message !== undefined) {
+      updates.push('whatsapp_message = ?');
+      values.push(body.whatsapp_message || null);
+    }
+
     if (updates.length === 0) {
       return NextResponse.json({ error: 'No hay cambios para actualizar' }, { status: 400 });
     }

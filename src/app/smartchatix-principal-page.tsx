@@ -844,7 +844,9 @@ export default function SmartChatixPrincipalPage() {
               .map((course, index) => (
               <div key={index} onClick={() => {
                 if (course.publication_status !== 'coming_soon' && course.publication_status !== 'unpublished') {
-                  window.location.href = `/cursos/${course.slug}`;
+                  window.location.href = course.landingPageType === 'custom' && course.customLandingUrl
+                    ? course.customLandingUrl
+                    : `/cursos/${course.slug}`;
                 }
               }} style={{ textDecoration: 'none', color: 'inherit' }}>
                 <div className="mobile-card-compact" style={{

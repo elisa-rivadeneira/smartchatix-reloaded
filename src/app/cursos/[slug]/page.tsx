@@ -47,6 +47,15 @@ export default function CursoPage({ params }: { params: Promise<{ slug: string }
         const response = await fetch(`/api/public/courses/${slug}`);
         if (response.ok) {
           const data = await response.json();
+
+          if (data.course?.landingPageType === 'custom' && data.course?.customLandingUrl) {
+            // Navegación completa (no router.replace de Next.js): las landings personalizadas
+            // usan animaciones de scroll (framer-motion whileInView) que quedan rotas si la
+            // página se monta por una transición SPA en vez de una carga real del navegador.
+            window.location.replace(data.course.customLandingUrl);
+            return;
+          }
+
           setCurso(data.course);
 
           if (data.course) {

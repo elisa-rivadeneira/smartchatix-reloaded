@@ -190,10 +190,15 @@ const Header: React.FC<HeaderProps> = ({
                                 overflowY: 'auto'
                               }}
                             >
-                              {courses.filter((course: any) => course.publication_status === 'published').map((course: any) => (
-                                <Link
+                              {courses.filter((course: any) => course.publication_status === 'published').map((course: any) => {
+                                const isCustomLanding = course.landingPageType === 'custom' && course.customLandingUrl;
+                                // Las landings personalizadas usan animaciones de scroll que se rompen con
+                                // la navegación SPA de <Link>, por eso usan <a> (carga completa del navegador).
+                                const LinkOrAnchor: any = isCustomLanding ? 'a' : Link;
+                                return (
+                                <LinkOrAnchor
                                   key={course.slug}
-                                  href={`/cursos/${course.slug}`}
+                                  href={isCustomLanding ? course.customLandingUrl : `/cursos/${course.slug}`}
                                   style={{
                                     display: 'block',
                                     padding: '0.5rem 1rem',
@@ -202,8 +207,8 @@ const Header: React.FC<HeaderProps> = ({
                                     textDecoration: 'none',
                                     transition: 'background 0.2s'
                                   }}
-                                  onMouseEnter={(e) => e.currentTarget.style.background = '#f3f4f6'}
-                                  onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
+                                  onMouseEnter={(e: React.MouseEvent<HTMLAnchorElement>) => e.currentTarget.style.background = '#f3f4f6'}
+                                  onMouseLeave={(e: React.MouseEvent<HTMLAnchorElement>) => e.currentTarget.style.background = 'transparent'}
                                 >
                                   <div style={{ fontWeight: '600', marginBottom: '2px' }}>
                                     {course.title}
@@ -211,8 +216,9 @@ const Header: React.FC<HeaderProps> = ({
                                   <div style={{ fontSize: '12px', color: '#6b7280' }}>
                                     {course.hours}
                                   </div>
-                                </Link>
-                              ))}
+                                </LinkOrAnchor>
+                                );
+                              })}
                             </div>
                           </div>
                         )}
@@ -588,16 +594,20 @@ const Header: React.FC<HeaderProps> = ({
                       </button>
                       {openDropdown === item.name && (
                         <div onClick={(e) => e.stopPropagation()} style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', marginTop: '0.5rem' }}>
-                          {courses.filter((course: any) => course.publication_status === 'published').map((course: any) => (
-                            <Link
-                              key={course.slug}
-                              href={`/cursos/${course.slug}`}
-                              onClick={() => setIsOpen(false)}
-                              style={{ color: 'rgba(255, 255, 255, 0.8)', fontSize: '1.1rem', fontWeight: '500', textDecoration: 'none' }}
-                            >
-                              {course.title}
-                            </Link>
-                          ))}
+                          {courses.filter((course: any) => course.publication_status === 'published').map((course: any) => {
+                            const isCustomLanding = course.landingPageType === 'custom' && course.customLandingUrl;
+                            const LinkOrAnchor: any = isCustomLanding ? 'a' : Link;
+                            return (
+                              <LinkOrAnchor
+                                key={course.slug}
+                                href={isCustomLanding ? course.customLandingUrl : `/cursos/${course.slug}`}
+                                onClick={() => setIsOpen(false)}
+                                style={{ color: 'rgba(255, 255, 255, 0.8)', fontSize: '1.1rem', fontWeight: '500', textDecoration: 'none' }}
+                              >
+                                {course.title}
+                              </LinkOrAnchor>
+                            );
+                          })}
                         </div>
                       )}
                     </div>

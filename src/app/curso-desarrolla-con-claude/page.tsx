@@ -18,6 +18,7 @@ import {
   X,
 } from 'lucide-react';
 import styles from './curso-desarrolla-con-claude.module.css';
+import WhatsAppFloatingButton from '@/components/WhatsAppFloatingButton';
 
 const CURSO_SLUG = 'desarrolla-con-claude';
 
@@ -99,14 +100,19 @@ const CURRICULUM = [
 ];
 
 interface CursoData {
+  title?: string;
   priceVivo: number | string | null;
   priceVivoOld: number | string | null;
   live_start_date: string | null;
   live_schedule: string | null;
   duration: string | null;
+  hasLiveMode?: boolean;
+  hasRecordedMode?: boolean;
+  whatsappMessage?: string | null;
 }
 
 const FALLBACK = {
+  title: 'Desarrolla con Claude',
   price: 250,
   priceOld: 400,
   fecha: '28 de septiembre',
@@ -212,6 +218,20 @@ export default function CursoDesarrollaConClaudePage() {
   const duracion = curso?.duration || FALLBACK.duracion;
 
   const checkoutHref = `/inscripcion-vivo?curso=${CURSO_SLUG}`;
+
+  const courseTitle = curso?.title || FALLBACK.title;
+  // Estrategia: la modalidad se lee del curso real (hasLiveMode/hasRecordedMode) en vez de
+  // asumirla fija, así el mensaje de WhatsApp queda correcto aunque cambie la configuración
+  // del curso sin tocar el código de esta landing. Si el curso ofrece ambas modalidades a la
+  // vez, se omite la etiqueta para no asumir cuál le interesa a la persona.
+  const modalidadTag = curso?.hasLiveMode && !curso?.hasRecordedMode
+    ? ' (en vivo)'
+    : curso?.hasRecordedMode && !curso?.hasLiveMode
+    ? ' (grabado)'
+    : '';
+  const whatsappMessage = curso?.whatsappMessage
+    ? curso.whatsappMessage.replace(/\{curso\}/g, courseTitle)
+    : `Hola, estoy interesado en el curso "${courseTitle}"${modalidadTag}`;
 
   const finalFacts = [
     { title: 'Inicio', desc: fecha },
@@ -484,6 +504,8 @@ export default function CursoDesarrollaConClaudePage() {
           <div className={styles.footerCopy}>© {new Date().getFullYear()} SmartChatix · smartchatix.com</div>
         </div>
       </footer>
+
+      <WhatsAppFloatingButton message={whatsappMessage} />
     </div>
   );
 }

@@ -16,6 +16,7 @@ import {
   PartyPopper,
 } from 'lucide-react';
 import styles from './desarrollaconclaude.module.css';
+import WhatsAppFloatingButton from '@/components/WhatsAppFloatingButton';
 
 const WHATSAPP_NUMBER = '51967717179';
 const WHATSAPP_FALLBACK_MESSAGE = encodeURIComponent('Hola, quiero anotarme a la masterclass Desarrolla con Claude');
@@ -265,6 +266,8 @@ export default function DesarrollaConClaudePage() {
       <footer className={styles.footer}>
         <p>© {new Date().getFullYear()} SmartChatix · <a href="https://smartchatix.com">smartchatix.com</a></p>
       </footer>
+
+      <WhatsAppFloatingButton message="Hola, quiero anotarme a la masterclass Desarrolla con Claude" />
     </div>
   );
 }

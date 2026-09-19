@@ -28,7 +28,9 @@ export async function GET() {
         learning_outcomes,
         module_titles,
         module_descriptions,
-        publication_status
+        publication_status,
+        landing_page_type,
+        custom_landing_url
       FROM courses
       WHERE publication_status IN ('published', 'coming_soon')
       ORDER BY id ASC
@@ -84,6 +86,8 @@ export async function GET() {
           learning_outcomes: learningOutcomes,
           module_titles: moduleTitles,
           publication_status: course.publication_status,
+          landingPageType: course.landing_page_type || 'automated',
+          customLandingUrl: course.custom_landing_url || null,
           modules: moduleTitles.map((title: string, idx: number) => ({
             num: idx + 1,
             title: title,

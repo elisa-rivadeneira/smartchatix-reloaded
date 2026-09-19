@@ -36,7 +36,10 @@ export async function GET(
         module_descriptions,
         publication_status,
         is_certification_enabled,
-        certificate_template
+        certificate_template,
+        landing_page_type,
+        custom_landing_url,
+        whatsapp_message
       FROM courses
       WHERE slug = ? AND publication_status IN ('published', 'coming_soon')
     `, [slug]);
@@ -103,6 +106,9 @@ export async function GET(
       publication_status: course.publication_status,
       isCertificationEnabled: Boolean(course.is_certification_enabled),
       certificateTemplate,
+      landingPageType: course.landing_page_type || 'automated',
+      customLandingUrl: course.custom_landing_url || null,
+      whatsappMessage: course.whatsapp_message || null,
       modules: moduleTitles.map((title: string, idx: number) => ({
         num: idx + 1,
         title: title,
