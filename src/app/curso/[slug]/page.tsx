@@ -517,6 +517,12 @@ export default function CoursePage({ params }: { params: Promise<{ slug: string 
   return (
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', background: '#f8f9fa', overflowX: 'hidden' }}>
       <style>{`
+        .curso-hamburger-btn {
+          display: none;
+        }
+        .curso-sidebar-backdrop {
+          display: none;
+        }
         @media (max-width: 640px) {
           .curso-header {
             padding: 0 12px !important;
@@ -540,6 +546,39 @@ export default function CoursePage({ params }: { params: Promise<{ slug: string 
             display: none;
           }
         }
+        @media (max-width: 900px) {
+          .curso-hamburger-btn {
+            display: flex !important;
+          }
+          .curso-sidebar {
+            position: fixed !important;
+            top: 72px !important;
+            bottom: 0 !important;
+            left: 0 !important;
+            width: 82vw !important;
+            max-width: 320px !important;
+            transform: translateX(-100%);
+            transition: transform 0.25s ease;
+            z-index: 500 !important;
+            box-shadow: 2px 0 16px rgba(0,0,0,0.2);
+          }
+          .curso-sidebar.sidebar-open {
+            transform: translateX(0);
+          }
+          .curso-sidebar-backdrop.sidebar-open {
+            display: block !important;
+            position: fixed;
+            top: 72px;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 400;
+          }
+          .curso-main {
+            width: 100%;
+          }
+        }
       `}</style>
       <header className="curso-header" style={{
         position: 'sticky',
@@ -556,6 +595,24 @@ export default function CoursePage({ params }: { params: Promise<{ slug: string 
         boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
       }}>
         <div className="curso-header-left" style={{ display: 'flex', alignItems: 'center', gap: '24px', minWidth: 0 }}>
+          <button
+            className="curso-hamburger-btn"
+            onClick={() => setSidebarOpen(!sidebarOpen)}
+            aria-label="Abrir menú de lecciones"
+            style={{
+              background: 'transparent',
+              border: 'none',
+              color: 'white',
+              fontSize: '22px',
+              cursor: 'pointer',
+              padding: '4px',
+              alignItems: 'center',
+              justifyContent: 'center',
+              flexShrink: 0
+            }}
+          >
+            {sidebarOpen ? '✕' : '☰'}
+          </button>
           <Link href="/aula-virtual" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', flexShrink: 0 }}>
             <Image
               className="curso-header-logo"
@@ -915,8 +972,12 @@ export default function CoursePage({ params }: { params: Promise<{ slug: string 
         </div>
       )}
 
-      <div style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
-        <aside style={{
+      <div style={{ display: 'flex', flex: 1, overflow: 'hidden', position: 'relative' }}>
+        <div
+          className={`curso-sidebar-backdrop${sidebarOpen ? ' sidebar-open' : ''}`}
+          onClick={() => setSidebarOpen(false)}
+        />
+        <aside className={`curso-sidebar${sidebarOpen ? ' sidebar-open' : ''}`} style={{
           width: '320px',
           background: 'white',
           borderRight: '1px solid #e5e7eb',
@@ -980,6 +1041,7 @@ export default function CoursePage({ params }: { params: Promise<{ slug: string 
                           setQuizAnswers({});
                           setQuizSubmitted(false);
                           setQuizResult(null);
+                          setSidebarOpen(false);
                         }}
                         style={{
                           width: '100%',
@@ -1083,7 +1145,7 @@ export default function CoursePage({ params }: { params: Promise<{ slug: string 
           </div>
         </aside>
 
-        <main style={{
+        <main className="curso-main" style={{
           flex: 1,
           background: '#f8f9fa',
           overflow: 'auto',
