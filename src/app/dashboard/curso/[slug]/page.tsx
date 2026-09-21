@@ -4423,7 +4423,7 @@ SmartChatix - Transformamos la forma en que las personas trabajan`}
 
       {/* Modal Preview de Lección */}
       {previewModal.open && previewModal.lesson && (
-        <div style={{
+        <div className="preview-modal-overlay" style={{
           position: 'fixed',
           top: 0,
           left: 0,
@@ -4436,7 +4436,59 @@ SmartChatix - Transformamos la forma en que las personas trabajan`}
           zIndex: 1000,
           padding: '20px'
         }}>
-          <div style={{
+          <style>{`
+            @media (max-width: 640px) {
+              .preview-modal-overlay {
+                padding: 0 !important;
+              }
+              .preview-modal-box {
+                width: 100% !important;
+                height: 100% !important;
+                max-height: 100vh !important;
+                border-radius: 0 !important;
+              }
+              .preview-modal-header {
+                padding: 14px 16px !important;
+                border-radius: 0 !important;
+              }
+              .preview-modal-title {
+                font-size: 18px !important;
+              }
+              .preview-modal-desc {
+                font-size: 13px !important;
+              }
+              .preview-content-wrapper {
+                padding: 14px !important;
+              }
+              .preview-card {
+                padding: 12px !important;
+              }
+              .preview-html-content,
+              .preview-markdown-content,
+              .preview-assignment-content {
+                font-size: 14px !important;
+              }
+              .preview-html-content h1,
+              .preview-markdown-content h1,
+              .preview-assignment-content h1 {
+                font-size: 1.3rem !important;
+                margin-top: 1.5rem !important;
+              }
+              .preview-html-content h2,
+              .preview-markdown-content h2,
+              .preview-assignment-content h2 {
+                font-size: 1.1rem !important;
+                margin-top: 1.25rem !important;
+              }
+              .preview-html-content h3,
+              .preview-markdown-content h3,
+              .preview-assignment-content h3 {
+                font-size: 1rem !important;
+                margin-top: 1rem !important;
+              }
+            }
+          `}</style>
+          <div className="preview-modal-box" style={{
             background: 'white',
             borderRadius: '16px',
             width: '95%',
@@ -4448,7 +4500,7 @@ SmartChatix - Transformamos la forma en que las personas trabajan`}
             flexDirection: 'column'
           }}>
             {/* Header */}
-            <div style={{
+            <div className="preview-modal-header" style={{
               padding: '20px 24px',
               borderBottom: '1px solid #e5e7eb',
               display: 'flex',
@@ -4460,17 +4512,18 @@ SmartChatix - Transformamos la forma en que las personas trabajan`}
               zIndex: 1,
               borderRadius: '16px 16px 0 0'
             }}>
-              <div style={{ flex: 1, paddingRight: '20px' }}>
-                <h2 style={{
+              <div style={{ flex: 1, paddingRight: '20px', minWidth: 0 }}>
+                <h2 className="preview-modal-title" style={{
                   margin: '0 0 8px 0',
                   fontSize: '24px',
                   fontWeight: '700',
-                  color: '#1a202c'
+                  color: '#1a202c',
+                  wordBreak: 'break-word'
                 }}>
                   {previewModal.lesson.title}
                 </h2>
                 {previewModal.lesson.description && (
-                  <p style={{
+                  <p className="preview-modal-desc" style={{
                     margin: 0,
                     fontSize: '14px',
                     color: '#6b7280',
@@ -4498,7 +4551,7 @@ SmartChatix - Transformamos la forma en que las personas trabajan`}
             </div>
 
             {/* Content */}
-            <div style={{ padding: '24px' }}>
+            <div className="preview-content-wrapper" style={{ padding: '24px' }}>
               {/* Video YouTube */}
               {previewModal.lesson.content_type === 'video' && previewModal.lesson.video_url && (
                 <div style={{ marginBottom: '24px' }}>
@@ -4551,7 +4604,7 @@ SmartChatix - Transformamos la forma en que las personas trabajan`}
 
               {/* Video Markdown */}
               {previewModal.lesson.main_content && (
-                <div style={{
+                <div className="preview-card" style={{
                   marginBottom: '24px',
                   padding: '20px',
                   background: '#f9fafb',
@@ -4646,7 +4699,7 @@ SmartChatix - Transformamos la forma en que las personas trabajan`}
                     </div>
                   )}
                   {previewModal.lesson.markdown_content && (
-                    <div style={{
+                    <div className="preview-card" style={{
                       padding: '20px',
                       background: '#f9fafb',
                       borderRadius: '12px',
@@ -4739,7 +4792,7 @@ SmartChatix - Transformamos la forma en que las personas trabajan`}
                     </div>
                   )}
                   {previewModal.lesson.markdown_content && (
-                    <div style={{
+                    <div className="preview-card" style={{
                       padding: '20px',
                       background: '#fef3c7',
                       borderRadius: '12px',
@@ -4803,7 +4856,7 @@ SmartChatix - Transformamos la forma en que las personas trabajan`}
                       ? JSON.parse(previewModal.lesson.documents_urls)
                       : previewModal.lesson.documents_urls;
                     return urls && urls.length > 0 && (
-                      <div style={{
+                      <div className="preview-card" style={{
                         padding: '20px',
                         background: '#f0fdf4',
                         borderRadius: '12px',
@@ -4855,7 +4908,7 @@ SmartChatix - Transformamos la forma en que las personas trabajan`}
                                 }}
                               >
                                 <span style={{ fontSize: '20px' }}>📄</span>
-                                <span style={{ flex: 1 }}>{filename}</span>
+                                <span style={{ flex: 1, minWidth: 0, wordBreak: 'break-word' }}>{filename}</span>
                                 <span style={{ fontSize: '16px' }}>⬇️</span>
                               </a>
                             );
@@ -4873,7 +4926,7 @@ SmartChatix - Transformamos la forma en que las personas trabajan`}
                   ? (typeof previewModal.lesson.documents_urls === 'string' ? JSON.parse(previewModal.lesson.documents_urls) : previewModal.lesson.documents_urls)
                   : [];
                 return (
-                  <div style={{
+                  <div className="preview-card" style={{
                     padding: '20px',
                     background: '#f0fdf4',
                     borderRadius: '12px',
@@ -4917,7 +4970,7 @@ SmartChatix - Transformamos la forma en que las personas trabajan`}
                               }}
                             >
                               <span style={{ fontSize: '20px' }}>📄</span>
-                              <span style={{ flex: 1 }}>{filename}</span>
+                              <span style={{ flex: 1, minWidth: 0, wordBreak: 'break-word' }}>{filename}</span>
                               <span style={{ fontSize: '16px' }}>⬇️</span>
                             </a>
                           );

@@ -579,6 +579,60 @@ export default function CoursePage({ params }: { params: Promise<{ slug: string 
             width: 100%;
           }
         }
+        @media (max-width: 640px) {
+          .lesson-content-wrapper {
+            padding: 16px !important;
+          }
+          .lesson-card {
+            background: transparent !important;
+            box-shadow: none !important;
+            border-radius: 0 !important;
+            padding: 0 !important;
+            margin-left: 0 !important;
+            margin-right: 0 !important;
+          }
+          .lesson-callout {
+            padding: 14px !important;
+            margin-bottom: 16px !important;
+          }
+          .lesson-callout-title {
+            font-size: 18px !important;
+          }
+          .lesson-card-light {
+            padding: 16px !important;
+          }
+          .lesson-card-light h3 {
+            font-size: 16px !important;
+          }
+          .html-content,
+          .html-content-markdown,
+          .html-content-assignment {
+            font-size: 14px !important;
+          }
+          .html-content h1,
+          .html-content-markdown h1,
+          .html-content-assignment h1 {
+            font-size: 1.3rem !important;
+            margin-top: 1.5rem !important;
+          }
+          .html-content h2,
+          .html-content-markdown h2,
+          .html-content-assignment h2 {
+            font-size: 1.1rem !important;
+            margin-top: 1.25rem !important;
+          }
+          .html-content h3,
+          .html-content-markdown h3,
+          .html-content-assignment h3 {
+            font-size: 1rem !important;
+            margin-top: 1rem !important;
+          }
+          .html-content h4,
+          .html-content-markdown h4,
+          .html-content-assignment h4 {
+            font-size: 0.95rem !important;
+          }
+        }
       `}</style>
       <header className="curso-header" style={{
         position: 'sticky',
@@ -1152,7 +1206,7 @@ export default function CoursePage({ params }: { params: Promise<{ slug: string 
           display: 'flex',
           flexDirection: 'column'
         }}>
-          <div style={{
+          <div className="lesson-content-wrapper" style={{
             flex: 1,
             padding: '32px',
             maxWidth: '1400px',
@@ -1221,7 +1275,7 @@ export default function CoursePage({ params }: { params: Promise<{ slug: string 
                     </>
                   )}
                   {selectedLesson.main_content && (
-                    <div style={{
+                    <div className="lesson-card" style={{
                       background: 'white',
                       borderRadius: '12px',
                       padding: '32px',
@@ -1378,7 +1432,7 @@ export default function CoursePage({ params }: { params: Promise<{ slug: string 
                   />
                 </div>
               ) : selectedLesson.content_type === 'markdown' ? (
-                <div style={{
+                <div className="lesson-card" style={{
                   background: 'white',
                   borderRadius: '12px',
                   padding: '40px',
@@ -1490,14 +1544,14 @@ export default function CoursePage({ params }: { params: Promise<{ slug: string 
                 </div>
               ) : selectedLesson.content_type === 'assignment' ? (
                 <>
-                  <div style={{
+                  <div className="lesson-card" style={{
                     background: 'white',
                     borderRadius: '12px',
                     padding: '40px',
                     boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
                     marginBottom: '20px'
                   }}>
-                    <div style={{
+                    <div className="lesson-callout" style={{
                       borderLeft: '4px solid #667eea',
                       paddingLeft: '20px',
                       marginBottom: '24px',
@@ -1505,7 +1559,7 @@ export default function CoursePage({ params }: { params: Promise<{ slug: string 
                       padding: '20px',
                       borderRadius: '8px'
                     }}>
-                      <h2 style={{
+                      <h2 className="lesson-callout-title" style={{
                         fontSize: '24px',
                         fontWeight: '700',
                         color: '#1a202c',
@@ -1634,7 +1688,7 @@ export default function CoursePage({ params }: { params: Promise<{ slug: string 
                       ? JSON.parse(selectedLesson.documents_urls)
                       : selectedLesson.documents_urls;
                     return urls && urls.length > 0 && (
-                      <div style={{
+                      <div className="lesson-card-light" style={{
                         background: 'white',
                         borderRadius: '12px',
                         padding: '32px',
@@ -1686,9 +1740,9 @@ export default function CoursePage({ params }: { params: Promise<{ slug: string 
                                   e.currentTarget.style.transform = 'translateX(0)';
                                 }}
                               >
-                                <span style={{ fontSize: '24px' }}>📄</span>
-                                <span style={{ flex: 1 }}>{filename}</span>
-                                <span style={{ fontSize: '20px' }}>⬇️</span>
+                                <span style={{ fontSize: '24px', flexShrink: 0 }}>📄</span>
+                                <span style={{ flex: 1, minWidth: 0, wordBreak: 'break-word' }}>{filename}</span>
+                                <span style={{ fontSize: '20px', flexShrink: 0 }}>⬇️</span>
                               </a>
                             );
                           })}
@@ -1696,7 +1750,7 @@ export default function CoursePage({ params }: { params: Promise<{ slug: string 
                       </div>
                     );
                   })()}
-                  <div style={{
+                  <div className="lesson-card-light" style={{
                     background: 'white',
                     borderRadius: '12px',
                     padding: '32px',
@@ -1880,20 +1934,20 @@ export default function CoursePage({ params }: { params: Promise<{ slug: string 
                   </div>
                 </>
               ) : selectedLesson.content_type === 'material' ? (
-                <div style={{
+                <div className="lesson-card" style={{
                   background: 'white',
                   borderRadius: '12px',
                   padding: '40px',
                   boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)'
                 }}>
-                  <div style={{
+                  <div className="lesson-callout" style={{
                     borderLeft: '4px solid #667eea',
                     marginBottom: '24px',
                     background: '#f5f7ff',
                     padding: '20px',
                     borderRadius: '8px'
                   }}>
-                    <h2 style={{
+                    <h2 className="lesson-callout-title" style={{
                       fontSize: '24px',
                       fontWeight: '700',
                       color: '#1a202c',

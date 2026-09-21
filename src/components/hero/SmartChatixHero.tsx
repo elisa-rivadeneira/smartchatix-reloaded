@@ -60,10 +60,16 @@ export default function SmartChatixHero() {
         }
         @media (max-width: 640px) {
           .hero-section {
-            padding: 1.25rem 0 1.5rem !important;
+            padding: 1.25rem 0 1.25rem !important;
+            min-height: calc(100vh - 73px) !important;
+            min-height: calc(100dvh - 73px) !important;
+            display: flex !important;
+            align-items: center !important;
+            box-sizing: border-box !important;
           }
           .hero-grid {
             gap: 1.25rem !important;
+            width: 100%;
           }
           .hero-headline {
             font-size: clamp(1.3rem, 6vw, 1.6rem) !important;
