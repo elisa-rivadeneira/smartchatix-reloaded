@@ -13,7 +13,7 @@ const BENEFITS = [
 
 export default function SmartChatixHero() {
   return (
-    <section style={sectionStyle}>
+    <section style={sectionStyle} className="hero-section">
       <style>{`
         .hero-grid {
           display: grid;
@@ -35,6 +35,9 @@ export default function SmartChatixHero() {
           margin: 0 auto;
           width: min(94vw, 560px);
         }
+        .cta-text-short {
+          display: none;
+        }
         @media (min-width: 1100px) {
           .hero-grid {
             grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
@@ -55,20 +58,70 @@ export default function SmartChatixHero() {
             margin: 0;
           }
         }
+        @media (max-width: 640px) {
+          .hero-section {
+            padding: 1.25rem 0 1.5rem !important;
+          }
+          .hero-grid {
+            gap: 1.25rem !important;
+          }
+          .hero-headline {
+            font-size: clamp(1.3rem, 6vw, 1.6rem) !important;
+            margin-bottom: 0.6rem !important;
+          }
+          .hero-subhead {
+            font-size: 0.85rem !important;
+            margin: 0 auto 1rem !important;
+          }
+          .hero-ctas {
+            flex-wrap: nowrap !important;
+            gap: 0.5rem !important;
+            margin-bottom: 0 !important;
+          }
+          .hero-cta {
+            flex: 1 1 0;
+            padding: 0.65rem 0.5rem !important;
+            font-size: 0.75rem !important;
+            gap: 0.3rem !important;
+            white-space: nowrap;
+          }
+          .cta-icon {
+            width: 14px !important;
+            height: 14px !important;
+          }
+          .cta-text-full {
+            display: none;
+          }
+          .cta-text-short {
+            display: inline;
+          }
+          .hero-benefits {
+            display: none !important;
+          }
+          .hero-laptop-col {
+            width: min(78vw, 340px) !important;
+          }
+          .hero-bg-abstract {
+            background-position: center center !important;
+          }
+          .hero-bg-overlay {
+            background: rgba(5, 11, 30, 0.72) !important;
+          }
+        }
       `}</style>
 
-      <div style={bgAbstractStyle} aria-hidden="true" />
-      <div style={bgOverlayStyle} aria-hidden="true" />
+      <div style={bgAbstractStyle} className="hero-bg-abstract" aria-hidden="true" />
+      <div style={bgOverlayStyle} className="hero-bg-overlay" aria-hidden="true" />
 
       <div style={containerStyle}>
         <div className="hero-grid">
           <div className="hero-copy">
-            <h1 style={headlineStyle}>
+            <h1 className="hero-headline" style={headlineStyle}>
               Transformamos problemas en{' '}
               <span style={gradientTextStyle}>soluciones con IA.</span>
             </h1>
 
-            <p style={subheadStyle}>
+            <p className="hero-subhead" style={subheadStyle}>
               Desarrollamos agentes de IA, chatbots, automatizaciones, ERP personalizados y software a medida para que tu negocio avance más rápido.
             </p>
 
@@ -79,13 +132,15 @@ export default function SmartChatixHero() {
                 rel="noopener noreferrer"
                 style={{ textDecoration: 'none' }}
               >
-                <button style={primaryCtaStyle}>
-                  Quiero una solución <ArrowRight size={18} />
+                <button className="hero-cta" style={primaryCtaStyle}>
+                  <span className="cta-text-full">Quiero una solución</span>
+                  <span className="cta-text-short">Conversemos</span>
+                  <ArrowRight size={18} className="cta-icon" />
                 </button>
               </a>
               <Link href="#otros-programas" style={{ textDecoration: 'none' }}>
-                <button style={secondaryCtaStyle}>
-                  Ver cursos <ArrowRight size={18} />
+                <button className="hero-cta" style={secondaryCtaStyle}>
+                  Ver cursos <ArrowRight size={18} className="cta-icon" />
                 </button>
               </Link>
             </div>

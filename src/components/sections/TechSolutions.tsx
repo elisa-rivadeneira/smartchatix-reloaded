@@ -146,8 +146,7 @@ export default function TechSolutions() {
             Soluciones
           </div>
           <h2 style={{ fontSize: '2.25rem', fontWeight: 700, color: colors.primary, lineHeight: 1.25, margin: 0 }}>
-            Tecnología que resuelve<br />
-            <span style={gradientText}>problemas reales</span>
+            Lo que construimos para <span style={gradientText}>tu negocio</span>
           </h2>
           <p style={{
             fontSize: '1.1rem',
@@ -156,7 +155,7 @@ export default function TechSolutions() {
             margin: '1rem auto 0',
             lineHeight: 1.6,
           }}>
-            Desarrollamos, automatizamos e integramos soluciones con IA para que tu negocio sea más eficiente, productivo y escalable.
+            Desarrollamos, automatizamos e integramos tecnología para que tu equipo trabaje mejor: más eficiente, más productivo, más libre para lo importante.
           </p>
         </div>
 
@@ -212,7 +211,7 @@ export default function TechSolutions() {
             Nuestro proceso
           </div>
           <h2 style={{ fontSize: '2.25rem', fontWeight: 700, color: colors.primary, margin: 0 }}>
-            De tu idea a una <span style={gradientText}>solución</span>
+            Contigo en <span style={gradientText}>cada paso</span> del camino
           </h2>
           <p style={{
             fontSize: '1.1rem',
@@ -221,7 +220,7 @@ export default function TechSolutions() {
             margin: '1rem auto 0',
             lineHeight: 1.6,
           }}>
-            Te acompañamos en cada etapa para convertir tus ideas en tecnología que genera valor.
+            Un equipo contigo en cada etapa, desde la primera conversación hasta que la tecnología ya forma parte de tu día a día.
           </p>
         </div>
 

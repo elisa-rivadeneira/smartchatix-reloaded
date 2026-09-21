@@ -515,8 +515,33 @@ export default function CoursePage({ params }: { params: Promise<{ slug: string 
   if (!courseData) return null;
 
   return (
-    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', background: '#f8f9fa' }}>
-      <header style={{
+    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', background: '#f8f9fa', overflowX: 'hidden' }}>
+      <style>{`
+        @media (max-width: 640px) {
+          .curso-header {
+            padding: 0 12px !important;
+          }
+          .curso-header-left {
+            gap: 10px !important;
+            min-width: 0;
+          }
+          .curso-header-logo {
+            width: 100px !important;
+            height: 29px !important;
+          }
+          .curso-header-divider {
+            display: none !important;
+          }
+          .curso-header-title {
+            font-size: 13px !important;
+            max-width: 120px !important;
+          }
+          .curso-header-grade-btn span {
+            display: none;
+          }
+        }
+      `}</style>
+      <header className="curso-header" style={{
         position: 'sticky',
         top: 0,
         left: 0,
@@ -530,9 +555,10 @@ export default function CoursePage({ params }: { params: Promise<{ slug: string 
         zIndex: 100,
         boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
       }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '24px' }}>
-          <Link href="/aula-virtual" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center' }}>
+        <div className="curso-header-left" style={{ display: 'flex', alignItems: 'center', gap: '24px', minWidth: 0 }}>
+          <Link href="/aula-virtual" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', flexShrink: 0 }}>
             <Image
+              className="curso-header-logo"
               src="/images/logo_smartchatix_horiz.png"
               alt="SmartChatix"
               width={180}
@@ -540,12 +566,13 @@ export default function CoursePage({ params }: { params: Promise<{ slug: string 
               style={{ objectFit: 'contain' }}
             />
           </Link>
-          <div style={{
+          <div className="curso-header-divider" style={{
             height: '40px',
             width: '1px',
-            background: 'rgba(255,255,255,0.2)'
+            background: 'rgba(255,255,255,0.2)',
+            flexShrink: 0
           }} />
-          <h1 style={{
+          <h1 className="curso-header-title" style={{
             fontSize: '16px',
             fontWeight: '700',
             color: 'white',
@@ -559,8 +586,9 @@ export default function CoursePage({ params }: { params: Promise<{ slug: string 
           </h1>
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '16px', flexShrink: 0 }}>
           <button
+            className="curso-header-grade-btn"
             style={{
               padding: '8px 16px',
               background: 'transparent',
@@ -578,10 +606,10 @@ export default function CoursePage({ params }: { params: Promise<{ slug: string 
             onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.1)'}
             onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
           >
-            ⭐ Calificar
+            ⭐ <span>Calificar</span>
           </button>
 
-          <div style={{ position: 'relative' }}>
+          <div style={{ position: 'relative', flexShrink: 0 }}>
             <button
               onClick={() => setUserMenuOpen(!userMenuOpen)}
               style={{
@@ -1901,8 +1929,86 @@ export default function CoursePage({ params }: { params: Promise<{ slug: string 
         </main>
       </div>
 
+      <style>{`
+        .markdown-content { max-width: 100%; overflow-wrap: anywhere; word-break: break-word; }
+        .markdown-content pre { max-width: 100%; overflow-x: auto; white-space: pre-wrap; }
+        .markdown-content img { max-width: 100%; height: auto; }
+        .markdown-content table { display: block; max-width: 100%; overflow-x: auto; }
+        .quiz-modal-box { box-sizing: border-box; }
+        @media (max-width: 640px) {
+          .quiz-modal-overlay {
+            padding: 10px !important;
+            align-items: flex-start !important;
+          }
+          .quiz-modal-box {
+            padding: 20px 16px !important;
+            border-radius: 12px !important;
+            max-height: 94vh !important;
+          }
+          .quiz-modal-header {
+            gap: 10px !important;
+            margin-bottom: 16px !important;
+          }
+          .quiz-modal-header h3 {
+            font-size: 17px !important;
+            gap: 6px !important;
+          }
+          .quiz-modal-header p {
+            font-size: 13px !important;
+          }
+          .quiz-modal-close {
+            font-size: 22px !important;
+            flex-shrink: 0 !important;
+          }
+          .quiz-result-emoji {
+            font-size: 40px !important;
+            margin-bottom: 8px !important;
+          }
+          .result-header-emoji {
+            font-size: 32px !important;
+          }
+          .quiz-result-title {
+            font-size: 18px !important;
+            margin-bottom: 12px !important;
+          }
+          .quiz-result-score-box {
+            padding: 12px 16px !important;
+          }
+          .quiz-result-score-box p:first-child {
+            font-size: 14px !important;
+          }
+          .quiz-result-score-box p:last-child {
+            font-size: 16px !important;
+          }
+          .quiz-result-wrap {
+            margin-bottom: 20px !important;
+          }
+          .quiz-question-card {
+            padding: 12px !important;
+            border-radius: 10px !important;
+          }
+          .quiz-question-text {
+            font-size: 14px !important;
+          }
+          .quiz-option {
+            padding: 10px !important;
+            gap: 8px !important;
+          }
+          .quiz-answer-box {
+            padding: 10px !important;
+          }
+          .quiz-explanation-box {
+            padding: 10px !important;
+          }
+          .quiz-action-btn {
+            padding: 12px 16px !important;
+            font-size: 14px !important;
+          }
+        }
+      `}</style>
+
       {quizModalOpen && selectedQuizLesson && (
-        <div style={{
+        <div className="quiz-modal-overlay" style={{
           position: 'fixed',
           top: 0,
           left: 0,
@@ -1916,18 +2022,20 @@ export default function CoursePage({ params }: { params: Promise<{ slug: string 
           zIndex: 2000,
           padding: '20px'
         }}>
-          <div style={{
+          <div className="quiz-modal-box" style={{
             background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.9) 100%)',
             borderRadius: '16px',
             padding: '32px',
             maxWidth: '800px',
             width: '100%',
+            boxSizing: 'border-box',
             maxHeight: '90vh',
             overflowY: 'auto',
+            overflowX: 'hidden',
             boxShadow: '0 20px 60px rgba(6, 182, 212, 0.4)',
             border: '1px solid rgba(6, 182, 212, 0.3)'
           }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+            <div className="quiz-modal-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px', gap: '16px' }}>
               <h3 style={{
                 fontSize: '24px',
                 fontWeight: '700',
@@ -1936,12 +2044,15 @@ export default function CoursePage({ params }: { params: Promise<{ slug: string 
                 display: 'flex',
                 alignItems: 'center',
                 gap: '8px',
-                textShadow: '0 2px 10px rgba(6, 182, 212, 0.3)'
+                textShadow: '0 2px 10px rgba(6, 182, 212, 0.3)',
+                minWidth: 0,
+                wordBreak: 'break-word'
               }}>
                 ⚡ Preguntas Rápidas: {selectedQuizLesson.title}
               </h3>
               <button
                 onClick={() => setQuizModalOpen(false)}
+                className="quiz-modal-close"
                 style={{
                   background: 'none',
                   border: 'none',
@@ -1949,7 +2060,8 @@ export default function CoursePage({ params }: { params: Promise<{ slug: string 
                   cursor: 'pointer',
                   color: '#6b7280',
                   padding: '0',
-                  lineHeight: '1'
+                  lineHeight: '1',
+                  flexShrink: 0
                 }}
               >
                 ×
@@ -1988,39 +2100,43 @@ export default function CoursePage({ params }: { params: Promise<{ slug: string 
 
                 return (
                   <div>
-                    <div style={{
+                    <div className="quiz-result-wrap" style={{
                       textAlign: 'center',
                       marginBottom: '32px'
                     }}>
-                      <div style={{
+                      <div className="quiz-result-emoji" style={{
                         fontSize: '72px',
                         marginBottom: '16px'
                       }}>
                         {emoji}
                       </div>
 
-                      <h3 style={{
+                      <h3 className="quiz-result-title" style={{
                         fontSize: '24px',
                         fontWeight: '700',
                         color: '#1a202c',
-                        marginBottom: '16px'
+                        marginBottom: '16px',
+                        maxWidth: '100%',
+                        wordBreak: 'break-word'
                       }}>
                         {message}
                       </h3>
 
-                      <div style={{
+                      <div className="quiz-result-score-box" style={{
                         padding: '20px',
                         background: bgColor,
                         border: '2px solid',
                         borderColor: borderColor,
                         borderRadius: '12px',
-                        display: 'inline-block'
+                        display: 'inline-block',
+                        maxWidth: '100%'
                       }}>
                         <p style={{
                           fontSize: '18px',
                           fontWeight: '600',
                           color: '#1a202c',
-                          marginBottom: '4px'
+                          marginBottom: '4px',
+                          wordBreak: 'break-word'
                         }}>
                           {quizResult.score} de {quizResult.total} respuestas correctas
                         </p>
@@ -2036,6 +2152,7 @@ export default function CoursePage({ params }: { params: Promise<{ slug: string 
 
                     <button
                       onClick={handleRetryQuiz}
+                      className="quiz-action-btn"
                       style={{
                         width: '100%',
                         padding: '14px 32px',
@@ -2066,17 +2183,18 @@ export default function CoursePage({ params }: { params: Promise<{ slug: string 
 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
               {selectedQuizLesson.quiz_data.map((question: any, qIdx: number) => (
-                <div key={qIdx} style={{
+                <div key={qIdx} className="quiz-question-card" style={{
                   background: 'rgba(6, 182, 212, 0.05)',
                   padding: '20px',
                   borderRadius: '8px',
                   border: '1px solid rgba(6, 182, 212, 0.2)'
                 }}>
-                  <p style={{
+                  <p className="quiz-question-text" style={{
                     fontSize: '16px',
                     fontWeight: '600',
                     color: '#1a202c',
-                    marginBottom: '16px'
+                    marginBottom: '16px',
+                    wordBreak: 'break-word'
                   }}>
                     {qIdx + 1}. {question.question}
                   </p>
@@ -2085,6 +2203,7 @@ export default function CoursePage({ params }: { params: Promise<{ slug: string 
                     {Object.entries(question.options).map(([key, value]: [string, any]) => (
                       <label
                         key={key}
+                        className="quiz-option"
                         style={{
                           display: 'flex',
                           alignItems: 'center',
@@ -2128,7 +2247,8 @@ export default function CoursePage({ params }: { params: Promise<{ slug: string 
                         <span style={{
                           fontSize: '14px',
                           color: '#374151',
-                          flex: 1
+                          flex: 1,
+                          wordBreak: 'break-word'
                         }}>
                           {value}
                         </span>
@@ -2143,6 +2263,7 @@ export default function CoursePage({ params }: { params: Promise<{ slug: string 
               <button
                 onClick={handleSubmitQuiz}
                 disabled={Object.keys(quizAnswers).length !== selectedQuizLesson.quiz_data.length}
+                className="quiz-action-btn"
                 style={{
                   width: '100%',
                   padding: '14px 32px',
@@ -2197,7 +2318,7 @@ export default function CoursePage({ params }: { params: Promise<{ slug: string 
         }
 
         return (
-          <div style={{
+          <div className="quiz-modal-overlay" style={{
             position: 'fixed',
             top: 0,
             left: 0,
@@ -2210,17 +2331,19 @@ export default function CoursePage({ params }: { params: Promise<{ slug: string 
             zIndex: 3000,
             padding: '20px'
           }}>
-            <div style={{
+            <div className="quiz-modal-box" style={{
               background: 'white',
               borderRadius: '16px',
               padding: '32px',
               maxWidth: '800px',
               width: '100%',
+              boxSizing: 'border-box',
               maxHeight: '90vh',
               overflowY: 'auto',
+              overflowX: 'hidden',
               boxShadow: '0 20px 60px rgba(0, 0, 0, 0.3)'
             }}>
-              <div style={{
+              <div className="quiz-modal-header" style={{
                 display: 'flex',
                 justifyContent: 'space-between',
                 alignItems: 'center',
@@ -2230,16 +2353,18 @@ export default function CoursePage({ params }: { params: Promise<{ slug: string 
                 background: 'white',
                 paddingBottom: '16px',
                 borderBottom: '2px solid #e5e7eb',
-                zIndex: 1
+                zIndex: 1,
+                gap: '12px'
               }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                  <span style={{ fontSize: '48px' }}>{emoji}</span>
-                  <div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', minWidth: 0 }}>
+                  <span className="result-header-emoji" style={{ fontSize: '48px', flexShrink: 0 }}>{emoji}</span>
+                  <div style={{ minWidth: 0 }}>
                     <h3 style={{
                       fontSize: '24px',
                       fontWeight: '700',
                       color: '#1a202c',
-                      marginBottom: '4px'
+                      marginBottom: '4px',
+                      wordBreak: 'break-word'
                     }}>
                       {message}
                     </h3>
@@ -2254,6 +2379,7 @@ export default function CoursePage({ params }: { params: Promise<{ slug: string 
                 </div>
                 <button
                   onClick={() => setResultModalOpen(false)}
+                  className="quiz-modal-close"
                   style={{
                     background: 'none',
                     border: 'none',
@@ -2261,7 +2387,8 @@ export default function CoursePage({ params }: { params: Promise<{ slug: string 
                     cursor: 'pointer',
                     color: '#6b7280',
                     padding: '0',
-                    lineHeight: '1'
+                    lineHeight: '1',
+                    flexShrink: 0
                   }}
                 >
                   ×
@@ -2274,7 +2401,7 @@ export default function CoursePage({ params }: { params: Promise<{ slug: string 
                   const isCorrect = userAnswer === question.correct;
 
                   return (
-                    <div key={qIdx} style={{
+                    <div key={qIdx} className="quiz-question-card" style={{
                       background: isCorrect ? '#f0fdf4' : '#fef2f2',
                       border: '2px solid',
                       borderColor: isCorrect ? '#86efac' : '#fca5a5',
@@ -2291,16 +2418,17 @@ export default function CoursePage({ params }: { params: Promise<{ slug: string 
                           {isCorrect ? '✅' : '❌'}
                         </span>
                         <div style={{ flex: 1 }}>
-                          <p style={{
+                          <p className="quiz-question-text" style={{
                             fontSize: '15px',
                             fontWeight: '600',
                             color: '#1a202c',
-                            marginBottom: '12px'
+                            marginBottom: '12px',
+                            wordBreak: 'break-word'
                           }}>
                             {qIdx + 1}. {question.question}
                           </p>
 
-                          <div style={{
+                          <div className="quiz-answer-box" style={{
                             background: 'white',
                             padding: '12px',
                             borderRadius: '8px',
@@ -2325,7 +2453,7 @@ export default function CoursePage({ params }: { params: Promise<{ slug: string 
                           </div>
 
                           {question.explanations && (
-                            <div style={{
+                            <div className="quiz-explanation-box" style={{
                               background: isCorrect ? '#dcfce7' : '#fff7ed',
                               padding: '12px',
                               borderRadius: '8px',
@@ -2402,6 +2530,7 @@ export default function CoursePage({ params }: { params: Promise<{ slug: string 
 
               <button
                 onClick={() => setResultModalOpen(false)}
+                className="quiz-action-btn"
                 style={{
                   width: '100%',
                   padding: '14px 32px',
