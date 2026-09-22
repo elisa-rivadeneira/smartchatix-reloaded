@@ -16,6 +16,9 @@ import CertificateTemplateForm from '@/components/certificate/CertificateTemplat
 import CertificatePreview from '@/components/certificate/CertificatePreview';
 import { CUSTOM_LANDING_PAGES } from '@/lib/customLandingPages';
 
+const DEFAULT_WEBINAR_TITLE = 'Mira cómo se aprende en la práctica';
+const DEFAULT_WEBINAR_DESCRIPTION = 'Disfruta el webinar completo y conoce nuestro enfoque de enseñanza.';
+
 function convertMarkdownToHtml(markdown: string): string {
   if (!markdown) return '';
   try {
@@ -115,6 +118,9 @@ interface Course {
   landing_page_type?: 'automated' | 'custom';
   custom_landing_url?: string | null;
   whatsapp_message?: string | null;
+  webinar_title?: string | null;
+  webinar_description?: string | null;
+  webinar_video_url?: string | null;
   modules: Module[];
 }
 
@@ -3938,6 +3944,169 @@ export default function InstructorCourseEditPage() {
                 <p style={{ fontSize: '12px', color: '#6b7280', marginTop: '8px' }}>
                   Puedes usar <code style={{ background: '#e5e7eb', padding: '2px 6px', borderRadius: '4px' }}>{'{curso}'}</code> y se reemplaza por el título del curso. Si dejas vacío, se arma automáticamente: <em>&quot;Hola, estoy interesado en el curso &quot;{course?.title || 'Nombre del curso'}&quot;&quot;</em> (agregando &quot;en vivo&quot; o &quot;grabado&quot; según la modalidad, si el curso solo tiene una).
                 </p>
+              </div>
+            </div>
+
+            {/* Webinar en la landing pública */}
+            <div style={{
+              padding: '1.5rem',
+              background: '#f9fafb',
+              borderRadius: '8px',
+              border: '1px solid #e5e7eb',
+              marginBottom: '1.5rem'
+            }}>
+              <h3 style={{
+                fontSize: '15px',
+                fontWeight: '600',
+                color: '#111827',
+                marginBottom: '0.5rem',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.5rem'
+              }}>
+                🎥 Video de Webinar en la Landing
+              </h3>
+              <p style={{ fontSize: '12px', color: '#6b7280', marginBottom: '1rem' }}>
+                Se muestra en la página pública del curso, justo antes de la sección de certificado. Si dejas la URL vacía, esta sección no aparece.
+              </p>
+
+              <div style={{ marginBottom: '1rem' }}>
+                <label style={{
+                  display: 'block',
+                  fontSize: '13px',
+                  fontWeight: '600',
+                  color: '#374151',
+                  marginBottom: '8px'
+                }}>
+                  Título
+                </label>
+                <input
+                  type="text"
+                  value={course?.webinar_title || DEFAULT_WEBINAR_TITLE}
+                  onChange={(e) => setCourse(prev => prev ? { ...prev, webinar_title: e.target.value } : null)}
+                  onBlur={async (e) => {
+                    const value = e.target.value.trim();
+                    setSaving(true);
+                    try {
+                      const response = await fetch(`/api/instructor/course/${slug}/config`, {
+                        method: 'PATCH',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ webinar_title: value || null })
+                      });
+                      if (!response.ok) {
+                        const data = await response.json().catch(() => ({}));
+                        showModal('error', data.error || 'Error al guardar el título');
+                      }
+                    } catch (error) {
+                      console.error('Error:', error);
+                    } finally {
+                      setSaving(false);
+                    }
+                  }}
+                  placeholder="Mira cómo se aprende en la práctica"
+                  style={{
+                    width: '100%',
+                    padding: '10px 12px',
+                    border: '2px solid #e5e7eb',
+                    borderRadius: '8px',
+                    fontSize: '14px',
+                    fontFamily: 'inherit',
+                    boxSizing: 'border-box'
+                  }}
+                />
+              </div>
+
+              <div style={{ marginBottom: '1rem' }}>
+                <label style={{
+                  display: 'block',
+                  fontSize: '13px',
+                  fontWeight: '600',
+                  color: '#374151',
+                  marginBottom: '8px'
+                }}>
+                  Descripción
+                </label>
+                <textarea
+                  value={course?.webinar_description || DEFAULT_WEBINAR_DESCRIPTION}
+                  onChange={(e) => setCourse(prev => prev ? { ...prev, webinar_description: e.target.value } : null)}
+                  onBlur={async (e) => {
+                    const value = e.target.value.trim();
+                    setSaving(true);
+                    try {
+                      const response = await fetch(`/api/instructor/course/${slug}/config`, {
+                        method: 'PATCH',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ webinar_description: value || null })
+                      });
+                      if (!response.ok) {
+                        const data = await response.json().catch(() => ({}));
+                        showModal('error', data.error || 'Error al guardar la descripción');
+                      }
+                    } catch (error) {
+                      console.error('Error:', error);
+                    } finally {
+                      setSaving(false);
+                    }
+                  }}
+                  placeholder="Disfruta el webinar completo y conoce nuestro enfoque de enseñanza."
+                  rows={3}
+                  style={{
+                    width: '100%',
+                    padding: '10px 12px',
+                    border: '2px solid #e5e7eb',
+                    borderRadius: '8px',
+                    fontSize: '14px',
+                    fontFamily: 'inherit',
+                    boxSizing: 'border-box',
+                    resize: 'vertical'
+                  }}
+                />
+              </div>
+
+              <div>
+                <label style={{
+                  display: 'block',
+                  fontSize: '13px',
+                  fontWeight: '600',
+                  color: '#374151',
+                  marginBottom: '8px'
+                }}>
+                  URL del video (YouTube)
+                </label>
+                <input
+                  type="text"
+                  value={course?.webinar_video_url || ''}
+                  onChange={(e) => setCourse(prev => prev ? { ...prev, webinar_video_url: e.target.value } : null)}
+                  onBlur={async (e) => {
+                    const value = e.target.value.trim();
+                    setSaving(true);
+                    try {
+                      const response = await fetch(`/api/instructor/course/${slug}/config`, {
+                        method: 'PATCH',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ webinar_video_url: value || null })
+                      });
+                      if (!response.ok) {
+                        const data = await response.json().catch(() => ({}));
+                        showModal('error', data.error || 'Error al guardar el video');
+                      }
+                    } catch (error) {
+                      console.error('Error:', error);
+                    } finally {
+                      setSaving(false);
+                    }
+                  }}
+                  placeholder="https://www.youtube.com/watch?v=..."
+                  style={{
+                    width: '100%',
+                    padding: '10px 12px',
+                    border: '2px solid #e5e7eb',
+                    borderRadius: '8px',
+                    fontSize: '14px',
+                    fontFamily: 'inherit',
+                    boxSizing: 'border-box'
+                  }}
+                />
               </div>
             </div>
 

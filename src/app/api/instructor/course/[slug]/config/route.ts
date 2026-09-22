@@ -324,6 +324,21 @@ export async function PATCH(
       values.push(body.whatsapp_message || null);
     }
 
+    if (body.webinar_title !== undefined) {
+      updates.push('webinar_title = ?');
+      values.push(body.webinar_title || null);
+    }
+
+    if (body.webinar_description !== undefined) {
+      updates.push('webinar_description = ?');
+      values.push(body.webinar_description || null);
+    }
+
+    if (body.webinar_video_url !== undefined) {
+      updates.push('webinar_video_url = ?');
+      values.push(body.webinar_video_url || null);
+    }
+
     if (updates.length === 0) {
       return NextResponse.json({ error: 'No hay cambios para actualizar' }, { status: 400 });
     }

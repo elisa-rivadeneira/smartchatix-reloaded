@@ -10,6 +10,32 @@ import CertificatePreview from '@/components/certificate/CertificatePreview';
 import { useCurrency } from '@/hooks/useCurrency';
 import * as fbPixel from '@/lib/fbPixel';
 
+function getYouTubeEmbedUrl(url: string): string {
+  if (!url) return '';
+
+  let videoId = '';
+
+  if (url.includes('youtube.com/watch')) {
+    const urlParams = new URLSearchParams(new URL(url).search);
+    videoId = urlParams.get('v') || '';
+  } else if (url.includes('youtu.be/')) {
+    videoId = url.split('youtu.be/')[1]?.split('?')[0] || '';
+  } else if (url.includes('youtube.com/embed/')) {
+    return url;
+  } else {
+    videoId = url;
+  }
+
+  if (videoId) {
+    return `https://www.youtube-nocookie.com/embed/${videoId}?modestbranding=1&rel=0&showinfo=0&iv_load_policy=3&cc_load_policy=0&playsinline=1`;
+  }
+
+  return url;
+}
+
+const DEFAULT_WEBINAR_TITLE = 'Mira cómo se aprende en la práctica';
+const DEFAULT_WEBINAR_DESCRIPTION = 'Disfruta el webinar completo y conoce nuestro enfoque de enseñanza.';
+
 export default function CursoPage({ params }: { params: Promise<{ slug: string }> }) {
   const { currency, symbol, exchangeRate } = useCurrency();
   const [showModal, setShowModal] = React.useState(false);
@@ -762,6 +788,87 @@ export default function CursoPage({ params }: { params: Promise<{ slug: string }
           </div>
         </div>
       </section>
+
+      {/* Sección Webinar */}
+      {curso.webinarVideoUrl && (
+        <section style={{
+          backgroundColor: colors.gray[50],
+          padding: `${spacing.xxl} ${spacing.lg}`,
+          display: 'flex',
+          justifyContent: 'center'
+        }}>
+          <div style={{
+            maxWidth: '1000px',
+            width: '100%',
+            padding: `0 ${spacing.lg}`
+          }}>
+            <div style={{
+              textAlign: 'center',
+              marginBottom: spacing.xl,
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              gap: spacing.sm
+            }}>
+              <div style={{
+                fontSize: '2.5rem',
+                color: colors.primary
+              }}>
+                🎥
+              </div>
+              <div style={{ minWidth: 0, maxWidth: '640px' }}>
+                <h2 style={{
+                  fontSize: '1.6rem',
+                  fontWeight: '700',
+                  color: colors.primary,
+                  margin: 0,
+                  marginBottom: spacing.xs
+                }}>
+                  {curso.webinarTitle || DEFAULT_WEBINAR_TITLE}
+                </h2>
+                <p style={{
+                  fontSize: '0.95rem',
+                  color: colors.gray[600],
+                  margin: 0,
+                  lineHeight: '1.6'
+                }}>
+                  {curso.webinarDescription || DEFAULT_WEBINAR_DESCRIPTION}
+                </p>
+              </div>
+            </div>
+
+            <div style={{
+              backgroundColor: colors.white,
+              padding: spacing.sm,
+              borderRadius: '12px',
+              boxShadow: '0 4px 20px rgba(0,0,0,0.1)'
+            }}>
+              <div style={{
+                position: 'relative',
+                paddingBottom: '56.25%',
+                height: 0,
+                overflow: 'hidden',
+                borderRadius: '8px'
+              }}>
+                <iframe
+                  src={getYouTubeEmbedUrl(curso.webinarVideoUrl)}
+                  style={{
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    width: '100%',
+                    height: '100%',
+                    border: 'none'
+                  }}
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                  title={curso.webinarTitle || DEFAULT_WEBINAR_TITLE}
+                />
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* Sección Certificado */}
       <section style={{
