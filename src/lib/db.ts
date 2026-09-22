@@ -8,7 +8,13 @@ const dbConfig = {
   charset: 'utf8mb4',
   waitForConnections: true,
   connectionLimit: 10,
-  queueLimit: 0
+  queueLimit: 0,
+  // Las columnas DATE (ej. courses.live_start_date) vienen como string plano
+  // "YYYY-MM-DD" en vez de un objeto Date. Sin esto, mysql2 arma el Date
+  // interpretando el valor con la zona horaria del SERVIDOR (no la del
+  // usuario), y según qué timezone tenga el contenedor en producción, la
+  // fecha puede aparecer un día antes o después al formatearla en el navegador.
+  dateStrings: ['DATE'] as ('DATE' | 'TIMESTAMP' | 'DATETIME')[]
 };
 
 // Pool de conexiones

@@ -212,7 +212,7 @@ export default function CursoDesarrollaConClaudePage() {
   const price = curso?.priceVivo ? Math.round(parseFloat(String(curso.priceVivo))) : FALLBACK.price;
   const priceOld = curso?.priceVivoOld ? Math.round(parseFloat(String(curso.priceVivoOld))) : FALLBACK.priceOld;
   const fecha = curso?.live_start_date
-    ? new Date(curso.live_start_date).toLocaleDateString('es-PE', { day: 'numeric', month: 'long' })
+    ? new Date(curso.live_start_date).toLocaleDateString('es-PE', { day: 'numeric', month: 'long', timeZone: 'UTC' })
     : FALLBACK.fecha;
   const horario = curso?.live_schedule || FALLBACK.horario;
   const duracion = curso?.duration || FALLBACK.duracion;
