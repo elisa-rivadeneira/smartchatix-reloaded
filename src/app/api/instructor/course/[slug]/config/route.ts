@@ -339,6 +339,16 @@ export async function PATCH(
       values.push(body.webinar_video_url || null);
     }
 
+    if (body.yape_phone !== undefined) {
+      updates.push('yape_phone = ?');
+      values.push(body.yape_phone || null);
+    }
+
+    if (body.yape_qr_url !== undefined) {
+      updates.push('yape_qr_url = ?');
+      values.push(body.yape_qr_url || null);
+    }
+
     if (updates.length === 0) {
       return NextResponse.json({ error: 'No hay cambios para actualizar' }, { status: 400 });
     }

@@ -121,6 +121,8 @@ interface Course {
   webinar_title?: string | null;
   webinar_description?: string | null;
   webinar_video_url?: string | null;
+  yape_phone?: string | null;
+  yape_qr_url?: string | null;
   modules: Module[];
 }
 
@@ -2391,6 +2393,7 @@ export default function InstructorCourseEditPage() {
   const [certCustomEnabled, setCertCustomEnabled] = useState(false);
   const [certTemplateDraft, setCertTemplateDraft] = useState<CertificateTemplate>(DEFAULT_CERTIFICATE_TEMPLATE);
   const [savingCertTemplate, setSavingCertTemplate] = useState(false);
+  const [uploadingYapeQr, setUploadingYapeQr] = useState(false);
 
   const showModal = (type: 'success' | 'error' | 'warning' | 'info', message: string) => {
     setModal({ show: true, type, message });
@@ -2398,6 +2401,42 @@ export default function InstructorCourseEditPage() {
 
   const closeModal = () => {
     setModal({ show: false, type: 'info', message: '' });
+  };
+
+  const handleYapeQrUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploadingYapeQr(true);
+    const formDataUpload = new FormData();
+    formDataUpload.append('file', file);
+
+    try {
+      const uploadRes = await fetch('/api/upload', { method: 'POST', body: formDataUpload });
+      const uploadData = await uploadRes.json();
+      if (!uploadData.url) {
+        showModal('error', 'Error al subir el QR');
+        return;
+      }
+
+      const configRes = await fetch(`/api/instructor/course/${slug}/config`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ yape_qr_url: uploadData.url }),
+      });
+      if (!configRes.ok) {
+        const data = await configRes.json().catch(() => ({}));
+        showModal('error', data.error || 'Error al guardar el QR');
+        return;
+      }
+
+      setCourse(prev => prev ? { ...prev, yape_qr_url: uploadData.url } : null);
+    } catch (error) {
+      console.error('Error:', error);
+      showModal('error', 'Error al subir el QR');
+    } finally {
+      setUploadingYapeQr(false);
+    }
   };
 
   useEffect(() => {
@@ -4107,6 +4146,103 @@ export default function InstructorCourseEditPage() {
                     boxSizing: 'border-box'
                   }}
                 />
+              </div>
+            </div>
+
+            {/* Yape del checkout */}
+            <div style={{
+              padding: '1.5rem',
+              background: '#f9fafb',
+              borderRadius: '8px',
+              border: '1px solid #e5e7eb',
+              marginBottom: '1.5rem'
+            }}>
+              <h3 style={{
+                fontSize: '15px',
+                fontWeight: '600',
+                color: '#111827',
+                marginBottom: '0.5rem',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.5rem'
+              }}>
+                💜 Yape del checkout
+              </h3>
+              <p style={{ fontSize: '12px', color: '#6b7280', marginBottom: '1rem' }}>
+                Número y QR que se muestran al alumno como opción de pago en la inscripción en vivo de este curso. Si dejas ambos vacíos, se usa el Yape por defecto de la cuenta principal.
+              </p>
+
+              <div style={{ marginBottom: '1rem' }}>
+                <label style={{
+                  display: 'block',
+                  fontSize: '13px',
+                  fontWeight: '600',
+                  color: '#374151',
+                  marginBottom: '8px'
+                }}>
+                  Número de Yape
+                </label>
+                <input
+                  type="text"
+                  value={course?.yape_phone || ''}
+                  onChange={(e) => setCourse(prev => prev ? { ...prev, yape_phone: e.target.value } : null)}
+                  onBlur={async (e) => {
+                    const value = e.target.value.trim();
+                    setSaving(true);
+                    try {
+                      const response = await fetch(`/api/instructor/course/${slug}/config`, {
+                        method: 'PATCH',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ yape_phone: value || null })
+                      });
+                      if (!response.ok) {
+                        const data = await response.json().catch(() => ({}));
+                        showModal('error', data.error || 'Error al guardar el número');
+                      }
+                    } catch (error) {
+                      console.error('Error:', error);
+                    } finally {
+                      setSaving(false);
+                    }
+                  }}
+                  placeholder="+51 983 269 818 (por defecto)"
+                  style={{
+                    width: '100%',
+                    padding: '10px 12px',
+                    border: '2px solid #e5e7eb',
+                    borderRadius: '8px',
+                    fontSize: '14px',
+                    fontFamily: 'inherit',
+                    boxSizing: 'border-box'
+                  }}
+                />
+              </div>
+
+              <div>
+                <label style={{
+                  display: 'block',
+                  fontSize: '13px',
+                  fontWeight: '600',
+                  color: '#374151',
+                  marginBottom: '8px'
+                }}>
+                  QR de Yape
+                </label>
+                {course?.yape_qr_url && (
+                  <img
+                    src={course.yape_qr_url}
+                    alt="QR Yape del curso"
+                    style={{ width: '140px', height: 'auto', borderRadius: '8px', border: '2px solid #e5e7eb', marginBottom: '10px', display: 'block' }}
+                  />
+                )}
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleYapeQrUpload}
+                  disabled={uploadingYapeQr}
+                  style={{ fontSize: '13px' }}
+                />
+                {uploadingYapeQr && <p style={{ fontSize: '12px', color: '#6b7280', marginTop: '4px' }}>Subiendo QR...</p>}
               </div>
             </div>
 

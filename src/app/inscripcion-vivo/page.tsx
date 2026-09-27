@@ -894,7 +894,7 @@ function InscripcionVivoContent() {
                         Escanea el QR o yapea al número:
                       </p>
                       <img
-                        src="/images/yape.jpeg"
+                        src={curso.yapeQrUrl || '/images/yape.jpeg'}
                         alt="QR Yape"
                         style={{
                           maxWidth: '200px',
@@ -914,7 +914,7 @@ function InscripcionVivoContent() {
                       }}>
                         <div style={{ fontSize: '0.85rem', marginBottom: '4px' }}>📱 Número:</div>
                         <div style={{ fontSize: '1.3rem', fontWeight: '700', letterSpacing: '0.05em' }}>
-                          +51 983 269 818
+                          {curso.yapePhone || '+51 983 269 818'}
                         </div>
                       </div>
                       <div style={{

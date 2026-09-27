@@ -42,7 +42,9 @@ export async function GET(
         whatsapp_message,
         webinar_title,
         webinar_description,
-        webinar_video_url
+        webinar_video_url,
+        yape_phone,
+        yape_qr_url
       FROM courses
       WHERE slug = ? AND publication_status IN ('published', 'coming_soon')
     `, [slug]);
@@ -115,6 +117,8 @@ export async function GET(
       webinarTitle: course.webinar_title || null,
       webinarDescription: course.webinar_description || null,
       webinarVideoUrl: course.webinar_video_url || null,
+      yapePhone: course.yape_phone || null,
+      yapeQrUrl: course.yape_qr_url || null,
       modules: moduleTitles.map((title: string, idx: number) => ({
         num: idx + 1,
         title: title,
